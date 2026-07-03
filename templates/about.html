@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}À propos{% endblock %}
+
+{% block content %}
+<section class="section about-section">
+    <div class="container">
+        <h2 class="section-title">À propos de <span>Kartners</span></h2>
+        
+        <div class="about-grid">
+            <div class="about-content">
+                <div class="about-block">
+                    <h3 class="about-title">
+                        <i class="fas fa-building"></i> Qui sommes-nous ?
+                    </h3>
+                    <p class="about-text-content"><strong>Kartners Travel Agency</strong> est votre partenaire de confiance pour tous vos projets de voyage et démarches administratives. <strong>"Voyagez, comme vous l'imaginez"</strong> - telle est notre devise.</p>
+                </div>
+                
+                <div class="about-block">
+                    <h3 class="about-title">
+                        <i class="fas fa-concierge-bell"></i> Nos services
+                    </h3>
+                    <ul class="services-list">
+                        <li><i class="fas fa-passport service-icon"></i><strong>Pré-enrôlement administratif</strong> - Passeport, Carte Nationale d'Identité (CNI)</li>
+                        <li><i class="fas fa-plane service-icon"></i><strong>Billeterie aérienne</strong> - Vols nationaux & internationaux, tarifs compétitifs</li>
+                        <li><i class="fas fa-hotel service-icon"></i><strong>Réservation d'hôtels</strong> - Séjours nationaux & internationaux</li>
+                        <li><i class="fas fa-file-visa service-icon"></i><strong>Assistance Visa</strong> - Études, tourisme, affaires, suivi complet du dossier</li>
+                        <li><i class="fas fa-map-marked-alt service-icon"></i><strong>Planification de voyage</strong> - Voyages organisés, circuits touristiques personnalisés</li>
+                    </ul>
+                </div>
+                
+                <div class="about-block">
+                    <h3 class="about-title">
+                        <i class="fas fa-star"></i> Pourquoi nous choisir ?
+                    </h3>
+                    <ul class="why-list">
+                        <li><i class="fas fa-check-circle why-icon"></i>Rapidité & professionnalisme</li>
+                        <li><i class="fas fa-check-circle why-icon"></i>Accompagnement personnalisé</li>
+                        <li><i class="fas fa-check-circle why-icon"></i>Transparence & fiabilité</li>
+                        <li><i class="fas fa-check-circle why-icon"></i>Satisfaction client garantie</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="about-carousel">
+                <div id="aboutCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="0" class="active"></button>
+                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="2"></button>
+                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="3"></button>
+                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="4"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="carousel-card card-service-1">
+                                <i class="fas fa-passport card-icon"></i>
+                                <h4>Pré-enrôlement administratif</h4>
+                                <p>Passeport & CNI</p>
+                                <span>Démarches simplifiées</span>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="carousel-card card-service-2">
+                                <i class="fas fa-plane card-icon"></i>
+                                <h4>Billeterie aérienne</h4>
+                                <p>Vols nationaux & internationaux</p>
+                                <span>Tarifs compétitifs</span>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="carousel-card card-service-3">
+                                <i class="fas fa-hotel card-icon"></i>
+                                <h4>Réservation d'hôtels</h4>
+                                <p>Séjours nationaux & internationaux</p>
+                                <span>Standards, confort & luxe</span>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="carousel-card card-service-4">
+                                <i class="fas fa-file-visa card-icon"></i>
+                                <h4>Assistance Visa</h4>
+                                <p>Études, tourisme, affaires</p>
+                                <span>Suivi complet du dossier</span>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="carousel-card card-service-5">
+                                <i class="fas fa-map-marked-alt card-icon"></i>
+                                <h4>Planification de voyage</h4>
+                                <p>Voyages organisés</p>
+                                <span>Circuits personnalisés</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#aboutCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#aboutCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-stats-grid">
+            <div class="contact-card">
+                <h4><i class="fas fa-phone-alt"></i> Contactez-nous</h4>
+                <p><strong>Téléphone :</strong> +237 676 268 350</p>
+                <p><strong>Email :</strong> kta2k23@gmail.com</p>
+                <p class="tagline">"Votre voyage commence ici."</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number"><span id="servicesCounter">0</span></div>
+                    <div class="stat-label">Services proposés</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number"><span id="clientsCounter">0</span>+</div>
+                    <div class="stat-label">Clients accompagnés</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number"><span id="yearsCounter">0</span></div>
+                    <div class="stat-label">Ans d'expertise</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* ===== SECTION À PROPOS - SANS BORDURES ===== */
+    .about-section {
+        padding: 60px 0;
+        background: #F8FAFC;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 50px;
+    }
+
+    .section-title span {
+        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    /* Grille principale */
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        margin-bottom: 60px;
+    }
+
+    /* Contenu texte */
+    .about-content {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .about-block {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .about-block:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(139,92,246,0.1);
+    }
+
+    .about-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0F172A;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .about-title i {
+        color: #8B5CF6;
+        font-size: 1.4rem;
+    }
+
+    .about-text-content {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: #475569;
+        margin: 0;
+    }
+
+    .about-text-content strong {
+        color: #0F172A;
+    }
+
+    /* Listes de services */
+    .services-list, .why-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .services-list li, .why-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 0;
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.6;
+        border-bottom: none; /* SUPPRESSION BORDURE */
+    }
+
+    .services-list li:last-child, .why-list li:last-child {
+        border-bottom: none;
+    }
+
+    .service-icon, .why-icon {
+        color: #8B5CF6;
+        font-size: 1.1rem;
+        margin-top: 3px;
+        flex-shrink: 0;
+        width: 20px;
+        text-align: center;
+    }
+
+    .services-list strong {
+        color: #0F172A;
+    }
+
+    /* Carrousel */
+    .about-carousel {
+        display: flex;
+        align-items: center;
+    }
+
+    .carousel {
+        width: 100%;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .carousel-card {
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px 30px;
+        color: white;
+        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .carousel-card .card-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .carousel-card h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .carousel-card p {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 8px;
+    }
+
+    .carousel-card span {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        font-weight: 500;
+        background: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 30px;
+    }
+
+    .card-service-1 { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+    .card-service-2 { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+    .card-service-3 { background: linear-gradient(135deg, #10B981, #047857); }
+    .card-service-4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
+    .card-service-5 { background: linear-gradient(135deg, #EF4444, #B91C1C); }
+
+    .carousel-control-prev, .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .carousel-control-prev:hover, .carousel-control-next:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    /* Contact & Stats */
+    .contact-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .contact-card {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .contact-card h4 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0F172A;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .contact-card h4 i {
+        color: #8B5CF6;
+    }
+
+    .contact-card p {
+        font-size: 0.95rem;
+        color: #475569;
+        margin-bottom: 10px;
+    }
+
+    .contact-card strong {
+        color: #0F172A;
+    }
+
+    .tagline {
+        font-style: italic;
+        color: #8B5CF6 !important;
+        font-weight: 500;
+        margin-top: 15px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .stat-item {
+        background: white;
+        padding: 30px 20px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: none; /* SUPPRESSION BORDURE */
+    }
+
+    .stat-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(139,92,246,0.1);
+    }
+
+    .stat-number {
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #64748B;
+        font-weight: 500;
+        margin-top: 5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .about-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .contact-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .carousel-card {
+            height: 300px;
+            padding: 30px 20px;
+        }
+
+        .carousel-card h4 {
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .about-block {
+            padding: 20px;
+        }
+
+        .services-list li, .why-list li {
+            font-size: 0.85rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+function animateCounter(elementId, start, end, duration) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const current = Math.floor(progress * (end - start) + start);
+        element.textContent = current;
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+const observerOptions = {
+    threshold: 0.3,
+    rootMargin: '0px'
+};
+
+let countersStarted = false;
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !countersStarted) {
+            countersStarted = true;
+            animateCounter('servicesCounter', 0, 5, 1500);
+            animateCounter('clientsCounter', 0, 5000, 2500);
+            animateCounter('yearsCounter', 0, 15, 1500);
+        }
+    });
+}, observerOptions);
+
+const statsSection = document.querySelector('.stats-grid');
+if (statsSection) {
+    observer.observe(statsSection);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var carousel = document.getElementById('aboutCarousel');
+    if (carousel) {
+        new bootstrap.Carousel(carousel, {
+            interval: 3500,
+            wrap: true,
+            ride: 'carousel'
+        });
+    }
+});
+</script>
+{% endblock %}

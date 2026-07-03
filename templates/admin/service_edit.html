@@ -1,0 +1,312 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Modifier le service</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nom du service</label>
+                        <input type="text" name="name" class="form-control" value="{{ service.name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Icone (Font Awesome)</label>
+                        <input type="text" name="icon" class="form-control" value="{{ service.icon }}" required>
+                        <small class="text-muted">Ex: fas fa-plane-departure</small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" required>{{ service.description }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Caracteristiques (separees par |)</label>
+                        <input type="text" name="features" class="form-control" value="{{ service.features }}">
+                        <small class="text-muted">Ex: Vols internationaux|Tarifs competitis|Reservation rapide</small>
+                    </div>
+                    
+                    <!-- SECTION IMAGE - MODIFICATION DIRECTE -->
+                    <div class="col-md-12 mt-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <i class="fas fa-image text-primary"></i> Gestion de l'image
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 text-center">
+                                        <label class="form-label fw-bold">Image actuelle</label><br>
+                                        {% if service.image and service.image != 'services/default.jpg' %}
+                                            <div class="current-image-wrapper">
+                                                <img src="/static/images/{{ service.image }}" 
+                                                     alt="{{ service.name }}" 
+                                                     class="preview-service"
+                                                     id="currentImage">
+                                                <br>
+                                                <span class="badge bg-success mt-2">
+                                                    <i class="fas fa-check-circle"></i> Image personnalisée
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <div class="no-image-placeholder">
+                                                <i class="fas fa-image"></i>
+                                                <p>Aucune image</p>
+                                                <small class="text-muted">L'icône sera affichée</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-upload"></i> Nouvelle image
+                                        </label>
+                                        <input type="file" name="image" class="form-control" accept="image/*"
+                                               onchange="previewImage(this, 'newImagePreview')">
+                                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (Max 5MB)</small>
+                                        
+                                        <!-- Prévisualisation de la nouvelle image -->
+                                        <div class="mt-2 text-center" id="newImagePreviewContainer" style="display:none;">
+                                            <label class="form-label fw-bold">Aperçu</label>
+                                            <img id="newImagePreview" class="preview-service" style="width:200px; height:150px; object-fit:cover; border-radius:10px; border:2px solid #E2E8F0;">
+                                        </div>
+                                        
+                                        <!-- Option de suppression -->
+                                        {% if service.image and service.image != 'services/default.jpg' %}
+                                        <div class="mt-3">
+                                            <div class="form-check">
+                                                <input type="checkbox" name="remove_image" id="remove_image" class="form-check-input" value="on">
+                                                <label class="form-check-label text-danger" for="remove_image">
+                                                    <i class="fas fa-trash-alt"></i> Supprimer l'image actuelle
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                    <a href="/admin/services" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ===== STYLES POUR L'ADMIN SERVICE ===== */
+
+/* Image preview */
+.preview-service {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #E2E8F0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.current-image-wrapper {
+    padding: 20px;
+    background: #F8FAFC;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.no-image-placeholder {
+    padding: 30px 20px;
+    background: #F8FAFC;
+    border-radius: 12px;
+    border: 2px dashed #CBD5E1;
+    color: #64748B;
+    display: inline-block;
+    min-width: 200px;
+}
+
+.no-image-placeholder i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.5;
+    color: #94A3B8;
+}
+
+.no-image-placeholder p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.no-image-placeholder small {
+    font-size: 0.75rem;
+}
+
+/* Card */
+.card-header {
+    background: #F8FAFC !important;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 12px 20px;
+    font-weight: 600;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.card-header i {
+    color: #8B5CF6;
+    margin-right: 8px;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* Form */
+.form-label {
+    font-weight: 600;
+    color: #1E293B;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+}
+
+.text-muted {
+    color: #64748B !important;
+    font-size: 0.85rem;
+}
+
+/* Boutons */
+.btn-primary {
+    background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+    border: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+}
+
+.btn-secondary {
+    background: #E2E8F0;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    color: #1E293B;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #CBD5E1;
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-check-input:checked {
+    background-color: #EF4444;
+    border-color: #EF4444;
+}
+
+/* Badge */
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .preview-service {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .card-body {
+        padding: 16px;
+    }
+    
+    .no-image-placeholder {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+}
+</style>
+
+<script>
+// ===== PRÉVISUALISATION DE L'IMAGE =====
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    const container = document.getElementById('newImagePreviewContainer');
+    
+    if (!preview || !container) return;
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            container.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+// ===== GESTION DE LA CHECKBOX SUPPRESSION =====
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('input[type="file"][name="image"]');
+    const checkbox = document.getElementById('remove_image');
+    
+    if (fileInput && checkbox) {
+        // Désactiver la checkbox si un fichier est sélectionné
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                checkbox.checked = false;
+                checkbox.disabled = true;
+            } else {
+                checkbox.disabled = false;
+            }
+        });
+        
+        // Réactiver le champ file si on décoche la checkbox
+        checkbox.addEventListener('change', function() {
+            if (!this.checked) {
+                fileInput.value = '';
+                fileInput.disabled = false;
+                document.getElementById('newImagePreviewContainer').style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

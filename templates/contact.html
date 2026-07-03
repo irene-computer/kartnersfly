@@ -1,0 +1,1057 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | Kartners Travel Agency{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Contactez Kartners Travel Agency pour tous vos projets de voyage. Assistance visa, billetterie, réservation hôtelière et pré-enrôlement administratif.">
+<meta name="keywords" content="contact agence de voyage, assistance visa cameroun, billetterie aérienne douala">
+{% endblock %}
+
+{% block content %}
+<section class="contact-hero">
+    <div class="container">
+        <div class="contact-hero-content">
+            <h1>Contactez-<span>nous</span></h1>
+            <p>Notre équipe est à votre écoute du lundi au samedi</p>
+        </div>
+    </div>
+</section>
+
+<section class="contact-main">
+    <div class="container">
+        <div class="contact-grid">
+            <!-- Carte Informations -->
+            <div class="contact-card info-card">
+                <div class="card-badge">
+                    <i class="fas fa-map-pin"></i>
+                    <span>Nous trouver</span>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Adresse</h3>
+                        <p>Logpom, Douala - Cameroun</p>
+                        <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="map-link">
+                            <i class="fas fa-directions"></i> Voir l'itinéraire
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="info-divider"></div>
+                
+                <div class="info-section">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Téléphone</h3>
+                        <a href="tel:+237676268350" class="contact-link">+237 676 268 350</a>
+                        <span class="contact-note">Disponible 24h/24</span>
+                    </div>
+                </div>
+                
+                <div class="info-divider"></div>
+                
+                <div class="info-section">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Email</h3>
+                        <a href="mailto:kta2k23@gmail.com" class="contact-link">kta2k23@gmail.com</a>
+                        <span class="contact-note">Réponse sous 24h</span>
+                    </div>
+                </div>
+                
+                <div class="info-divider"></div>
+                
+                <div class="hours-section">
+                    <div class="hours-header">
+                        <i class="far fa-clock"></i>
+                        <h4>Horaires d'ouverture</h4>
+                    </div>
+                    <ul class="hours-list">
+                        <li>
+                            <span class="day">Lundi - Samedi</span>
+                            <span class="time">08:00 - 18:00</span>
+                        </li>
+                        <li>
+                            <span class="day">Dimanche & Jours fériés</span>
+                            <span class="time closed">Fermé</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="social-section">
+                    <div class="social-header">
+                        <i class="fas fa-share-alt"></i>
+                        <h4>Suivez-nous</h4>
+                    </div>
+                    <div class="social-grid">
+                        <a href="https://wa.me/237676268350" target="_blank" rel="noopener noreferrer" class="social-link whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp</span>
+                        </a>
+                        <a href="https://www.facebook.com/profile.php?id=61555991666119" class="social-link facebook">
+                            <i class="fab fa-facebook-f"></i>
+                            <span>Facebook</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/kartners-agency-4746a2305?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="social-link linkedin">
+                            <i class="fab fa-linkedin-in"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="https://www.instagram.com/kartnerstravelagency?utm_source=qr&igsh=MWRxdXhubnhlZXgyaA==" class="social-link instagram">
+                            <i class="fab fa-instagram"></i>
+                            <span>Instagram</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carte Formulaire -->
+            <div class="contact-card form-card">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h2>Envoyez-nous un message</h2>
+                    <p>Remplissez le formulaire et nous vous répondrons dans les plus brefs délais</p>
+                </div>
+                
+                <form id="contactForm" class="contact-form" novalidate>
+                    <div class="form-group">
+                        <label for="name">
+                            <i class="fas fa-user"></i>
+                            <span>Nom complet</span>
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="name" name="name" class="form-input" placeholder="Jean Dupont" required>
+                        <div class="error-message" data-for="name"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                                <span class="required">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="jean@exemple.com" required>
+                            <div class="error-message" data-for="email"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">
+                                <i class="fas fa-phone"></i>
+                                <span>Téléphone</span>
+                            </label>
+                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="+237 676 268 350">
+                            <div class="error-message" data-for="phone"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service">
+                            <i class="fas fa-concierge-bell"></i>
+                            <span>Service concerné</span>
+                        </label>
+                        <select id="service" name="service" class="form-select">
+                            <option value="">Sélectionnez un service</option>
+                            <option value="passeport">Pré-enrôlement - Passeport/CNI</option>
+                            <option value="billetterie">Billeterie aérienne</option>
+                            <option value="hotel">Réservation hôtelière</option>
+                            <option value="visa">Assistance visa</option>
+                            <option value="voyage">Planification de voyage</option>
+                            <option value="autre">Autre demande</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">
+                            <i class="fas fa-comment"></i>
+                            <span>Message</span>
+                            <span class="required">*</span>
+                        </label>
+                        <textarea id="message" name="message" class="form-textarea" rows="5" placeholder="Décrivez votre demande..." required></textarea>
+                        <div class="char-count" id="charCount">0/500 caractères</div>
+                        <div class="error-message" data-for="message"></div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-paper-plane"></i>
+                            Envoyer le message
+                        </span>
+                        <div class="btn-spinner"></div>
+                    </button>
+                    
+                    <p class="form-note">
+                        <i class="fas fa-lock"></i>
+                        Vos informations sont confidentielles
+                    </p>
+                    
+                    <div id="formMessage" class="form-message" style="display: none;"></div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Carte Google Maps -->
+        <div class="map-card">
+            <div class="map-header">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Notre emplacement</h3>
+                <p>Logpom, Douala - Cameroun</p>
+            </div>
+            <div class="map-wrapper">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15915.528703831552!2d9.703471!3d4.051197!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1061123b8f7b6f8d%3A0x8b5c6d3e2f1a0b7!2sLogpom%2C%20Douala%2C%20Cameroun!5e0!3m2!1sfr!2scm!4v1700000000000!5m2!1sfr!2scm" 
+                    width="100%" 
+                    height="400" 
+                    style="border:0; border-radius: 16px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Kartners Travel Agency - Logpom Douala">
+                </iframe>
+            </div>
+            <div class="map-footer">
+                <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="map-button">
+                    <i class="fas fa-external-link-alt"></i>
+                    Ouvrir dans Google Maps
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* ===== CONTACT PAGE STYLES ===== */
+.contact-hero {
+    background: linear-gradient(135deg, var(--violet-primary) 0%, var(--blue-primary) 100%);
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-hero::before {
+    content: "✈️";
+    font-size: 200px;
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+.contact-hero::after {
+    content: "🌍";
+    font-size: 150px;
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+.contact-hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease;
+}
+
+.contact-hero-content h1 span {
+    background: linear-gradient(135deg, #FFE4B5, white);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.contact-hero-content p {
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.9);
+    animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.contact-main {
+    background: var(--gray-light);
+    padding: 60px 0 80px;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.contact-card {
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+.info-card {
+    padding: 32px;
+}
+
+.card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
+    padding: 6px 16px;
+    border-radius: 50px;
+    margin-bottom: 28px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--violet-dark);
+}
+
+.card-badge i {
+    font-size: 0.9rem;
+}
+
+.info-section {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.info-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.info-icon-wrapper i {
+    font-size: 1.4rem;
+    color: white;
+}
+
+.info-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-content p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.contact-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--violet-dark);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+    color: var(--violet-primary);
+}
+
+.contact-note {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-gray);
+    margin-top: 4px;
+}
+
+.map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--blue-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: gap 0.3s ease;
+}
+
+.map-link:hover {
+    gap: 10px;
+}
+
+.info-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gray-medium), transparent);
+    margin: 24px 0;
+}
+
+.hours-section {
+    margin-bottom: 28px;
+}
+
+.hours-header, .social-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.hours-header i, .social-header i {
+    font-size: 1.2rem;
+    color: var(--violet-primary);
+}
+
+.hours-header h4, .social-header h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.hours-list {
+    list-style: none;
+    padding: 0;
+}
+
+.hours-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-medium);
+}
+
+.hours-list li:last-child {
+    border-bottom: none;
+}
+
+.hours-list .day {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.hours-list .time {
+    color: var(--text-gray);
+}
+
+.hours-list .time.closed {
+    color: #EF4444;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.social-link.whatsapp { background: #25D366; }
+.social-link.facebook { background: #1877F2; }
+.social-link.linkedin { background: #0077B5; }
+.social-link.instagram { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCAF45); }
+
+.social-link:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.05);
+}
+
+/* Form Card */
+.form-card {
+    padding: 40px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.form-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.form-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.form-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.form-header p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.form-group label i {
+    color: var(--violet-primary);
+}
+
+.required {
+    color: #EF4444;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--gray-medium);
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--violet-primary);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+}
+
+.form-input.error, .form-textarea.error {
+    border-color: #EF4444;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--text-gray);
+    margin-top: 6px;
+}
+
+.error-message {
+    color: #EF4444;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    display: none;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139,92,246,0.3);
+}
+
+.submit-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-spinner {
+    display: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.submit-btn.loading .btn-text {
+    opacity: 0;
+}
+
+.submit-btn.loading .btn-spinner {
+    display: block;
+}
+
+.form-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-gray);
+    margin-top: 18px;
+}
+
+.form-message {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.form-message.success {
+    background: #10B981;
+    color: white;
+}
+
+.form-message.error {
+    background: #EF4444;
+    color: white;
+}
+
+.form-message.info {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    color: white;
+}
+
+/* Map Card */
+.map-card {
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+.map-header {
+    padding: 24px 28px 0;
+}
+
+.map-header i {
+    font-size: 1.4rem;
+    color: var(--violet-primary);
+    margin-right: 10px;
+}
+
+.map-header h3 {
+    display: inline-block;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.map-header p {
+    color: var(--text-gray);
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+}
+
+.map-wrapper {
+    padding: 20px;
+}
+
+.map-footer {
+    padding: 0 28px 28px;
+    text-align: center;
+}
+
+.map-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.map-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139,92,246,0.3);
+    color: white;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-hero-content h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-hero {
+        padding: 60px 0 40px;
+    }
+    
+    .contact-hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .contact-hero-content p {
+        font-size: 1rem;
+    }
+    
+    .contact-main {
+        padding: 40px 0 60px;
+    }
+    
+    .info-card, .form-card {
+        padding: 24px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .social-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-header {
+        padding: 20px 20px 0;
+    }
+    
+    .map-wrapper {
+        padding: 15px;
+    }
+    
+    .map-footer {
+        padding: 0 20px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-icon-wrapper {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .info-icon-wrapper i {
+        font-size: 1.2rem;
+    }
+    
+    .contact-link {
+        font-size: 1rem;
+    }
+    
+    .map-header h3 {
+        font-size: 1.1rem;
+    }
+}
+</style>
+
+<script>
+// Configuration du formulaire
+const CONFIG = {
+    API_ENDPOINT: '/api/contact',
+    MAX_MESSAGE_LENGTH: 500,
+    DEBOUNCE_DELAY: 300,
+    RETRY_ATTEMPTS: 2
+};
+
+// Éléments DOM
+const elements = {
+    form: document.getElementById('contactForm'),
+    name: document.getElementById('name'),
+    email: document.getElementById('email'),
+    phone: document.getElementById('phone'),
+    service: document.getElementById('service'),
+    message: document.getElementById('message'),
+    submitBtn: document.getElementById('submitBtn'),
+    formMessage: document.getElementById('formMessage'),
+    charCount: document.getElementById('charCount')
+};
+
+let isSubmitting = false;
+let validationErrors = {};
+
+// Validators
+const validators = {
+    name: (value) => {
+        if (!value || value.trim().length < 2) {
+            return { valid: false, message: 'Veuillez entrer un nom valide (minimum 2 caractères)' };
+        }
+        if (value.trim().length > 100) {
+            return { valid: false, message: 'Le nom ne peut pas dépasser 100 caractères' };
+        }
+        return { valid: true, message: '' };
+    },
+    email: (value) => {
+        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        if (!value || !emailRegex.test(value)) {
+            return { valid: false, message: 'Veuillez entrer une adresse email valide' };
+        }
+        if (value.length > 255) {
+            return { valid: false, message: "L'email ne peut pas dépasser 255 caractères" };
+        }
+        return { valid: true, message: '' };
+    },
+    phone: (value) => {
+        if (!value) return { valid: true, message: '' };
+        const phoneRegex = /^[\+\d\s\-\(\)]{8,20}$/;
+        if (!phoneRegex.test(value)) {
+            return { valid: false, message: 'Veuillez entrer un numéro de téléphone valide' };
+        }
+        return { valid: true, message: '' };
+    },
+    message: (value) => {
+        if (!value || value.trim().length < 10) {
+            return { valid: false, message: 'Veuillez entrer un message d\'au moins 10 caractères' };
+        }
+        if (value.length > CONFIG.MAX_MESSAGE_LENGTH) {
+            return { valid: false, message: `Le message ne peut pas dépasser ${CONFIG.MAX_MESSAGE_LENGTH} caractères` };
+        }
+        return { valid: true, message: '' };
+    }
+};
+
+function showError(fieldName, message) {
+    const errorDiv = document.querySelector(`.error-message[data-for="${fieldName}"]`);
+    const input = document.getElementById(fieldName);
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = message ? 'block' : 'none';
+    }
+    if (input) {
+        input.classList.toggle('error', !!message);
+    }
+}
+
+function validateField(fieldName) {
+    const value = elements[fieldName]?.value || '';
+    const validator = validators[fieldName];
+    if (validator) {
+        const result = validator(value);
+        showError(fieldName, result.valid ? '' : result.message);
+        if (!result.valid) validationErrors[fieldName] = result.message;
+        else delete validationErrors[fieldName];
+        return result.valid;
+    }
+    return true;
+}
+
+function validateForm() {
+    validationErrors = {};
+    let isValid = true;
+    for (const field of ['name', 'email', 'message']) {
+        if (!validateField(field)) isValid = false;
+    }
+    if (elements.phone.value && !validateField('phone')) isValid = false;
+    return isValid && Object.keys(validationErrors).length === 0;
+}
+
+function updateCharCount() {
+    if (elements.charCount && elements.message) {
+        const length = elements.message.value.length;
+        elements.charCount.textContent = `${length}/${CONFIG.MAX_MESSAGE_LENGTH} caractères`;
+        if (length >= CONFIG.MAX_MESSAGE_LENGTH) {
+            elements.message.value = elements.message.value.slice(0, CONFIG.MAX_MESSAGE_LENGTH);
+        }
+    }
+}
+
+function setStatusMessage(message, isError = false, isSuccess = false) {
+    if (elements.formMessage) {
+        elements.formMessage.textContent = message;
+        elements.formMessage.className = 'form-message';
+        elements.formMessage.classList.add(isError ? 'error' : (isSuccess ? 'success' : 'info'));
+        elements.formMessage.style.display = 'block';
+        if (!isError) {
+            setTimeout(() => {
+                if (elements.formMessage) elements.formMessage.style.display = 'none';
+            }, 5000);
+        }
+    }
+}
+
+function setLoading(isLoading) {
+    isSubmitting = isLoading;
+    if (elements.submitBtn) {
+        elements.submitBtn.classList.toggle('loading', isLoading);
+        elements.submitBtn.disabled = isLoading;
+    }
+    if (elements.form) {
+        const inputs = elements.form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => input.disabled = isLoading);
+    }
+}
+
+async function submitWithRetry(data, attempt = 1) {
+    try {
+        const response = await fetch(CONFIG.API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        if (attempt < CONFIG.RETRY_ATTEMPTS) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            return submitWithRetry(data, attempt + 1);
+        }
+        throw error;
+    }
+}
+
+async function handleSubmit(e) {
+    e.preventDefault();
+    if (isSubmitting) return;
+    if (!validateForm()) {
+        setStatusMessage('Veuillez corriger les erreurs dans le formulaire', true);
+        const firstError = document.querySelector('.error-message:not(:empty)');
+        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    setLoading(true);
+    setStatusMessage('Envoi en cours...', false);
+    const formData = {
+        name: elements.name.value.trim(),
+        email: elements.email.value.trim(),
+        phone: elements.phone.value.trim() || null,
+        service: elements.service.value || null,
+        message: elements.message.value.trim(),
+        source: 'website_contact',
+        timestamp: new Date().toISOString()
+    };
+    try {
+        const result = await submitWithRetry(formData);
+        if (result.success) {
+            setStatusMessage('Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.', false, true);
+            elements.form.reset();
+            updateCharCount();
+            Object.keys(validators).forEach(field => showError(field, ''));
+        } else {
+            throw new Error(result.message || 'Erreur lors de l\'envoi');
+        }
+    } catch (error) {
+        console.error('Form submission error:', error);
+        setStatusMessage('Une erreur est survenue. Veuillez réessayer ou nous contacter directement par téléphone au +237 676 268 350', true);
+    } finally {
+        setLoading(false);
+    }
+}
+
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+const debouncedValidation = debounce((fieldName) => validateField(fieldName), CONFIG.DEBOUNCE_DELAY);
+
+function initEventListeners() {
+    if (elements.form) elements.form.addEventListener('submit', handleSubmit);
+    ['name', 'email', 'phone', 'message'].forEach(fieldName => {
+        if (elements[fieldName]) {
+            elements[fieldName].addEventListener('input', () => debouncedValidation(fieldName));
+            elements[fieldName].addEventListener('blur', () => validateField(fieldName));
+        }
+    });
+    if (elements.message) {
+        elements.message.addEventListener('input', updateCharCount);
+        updateCharCount();
+    }
+}
+
+function addCSRFToken() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (csrfToken && elements.form) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_csrf';
+        input.value = csrfToken;
+        elements.form.appendChild(input);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initEventListeners();
+    addCSRFToken();
+});
+</script>
+{% endblock %}

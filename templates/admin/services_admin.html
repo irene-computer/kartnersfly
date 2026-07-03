@@ -1,0 +1,132 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Gestion des services</h2>
+    
+    <!-- Formulaire d'ajout -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Ajouter un service</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/admin/service/add" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Nom du service</label>
+                        <input type="text" name="name" class="form-control" placeholder="Ex: Billeterie aerienne" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Courte description" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Icone (Font Awesome)</label>
+                        <input type="text" name="icon" class="form-control" placeholder="fas fa-plane-departure" value="fas fa-plane-departure">
+                        <small class="text-muted">Classe Font Awesome</small>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Image</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label class="form-label">Caracteristiques (separees par |)</label>
+                        <input type="text" name="features" class="form-control" placeholder="Vols internationaux|Tarifs competitis|Reservation rapide">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des services -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Liste des services</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Icone</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in services %}
+                        <tr>
+                            <td>{{ service.id }}</td>
+                            <td class="text-center">
+                                {% if service.icon %}
+                                    <i class="{{ service.icon }}" style="font-size: 1.5rem; color: #8B5CF6;"></i>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ service.name }}</strong>
+                                {% if service.features %}
+                                <br>
+                                <small class="text-muted">
+                                    {% for feature in service.features.split('|') %}
+                                    <span class="badge bg-light text-dark me-1">{{ feature }}</span>
+                                    {% endfor %}
+                                </small>
+                                {% endif %}
+                            </td>
+                            <td>{{ service.description }}</td>
+                            <td class="text-center">
+                                {% if service.image and service.image != 'services/default.jpg' %}
+                                    <img src="/static/images/{{ service.image }}" width="50" height="50" style="object-fit: cover; border-radius: 8px;" alt="{{ service.name }}">
+                                {% else %}
+                                    <span class="text-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/service/edit/{{ service.id }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="/admin/service/delete/{{ service.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce service ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <i class="fas fa-concierge-bell fa-2x text-muted mb-2 d-block"></i>
+                                <p class="text-muted mb-0">Aucun service trouve</p>
+                                <small class="text-muted">Ajoutez votre premier service via le formulaire ci-dessus</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge.bg-light {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+    font-weight: normal;
+}
+.btn-sm {
+    margin-right: 5px;
+}
+</style>
+{% endblock %}

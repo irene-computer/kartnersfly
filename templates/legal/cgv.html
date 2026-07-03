@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Conditions Générales de Vente | Kartners Travel Agency{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Conditions Générales de Vente de Kartners Travel Agency - Réservation, paiement, annulation et remboursement.">
+{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container">
+        <div class="legal-header">
+            <h1>Conditions Générales de <span>Vente</span></h1>
+            <p>Dernière mise à jour : 01 janvier 2026</p>
+        </div>
+        
+        <div class="legal-content">
+            <div class="legal-block">
+                <h2><i class="fas fa-file-contract"></i> Article 1 - Champ d'application</h2>
+                <p>Les présentes Conditions Générales de Vente (CGV) s'appliquent à toutes les prestations de services proposées par Kartners Travel Agency, agence de voyages spécialisée dans la billetterie aérienne, la réservation hôtelière, l'assistance visa, le pré-enrôlement administratif et la planification de voyages.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-hand-holding-usd"></i> Article 2 - Tarifs</h2>
+                <p>Les prix de nos prestations sont indiqués en euros (€) toutes taxes comprises. Ils sont susceptibles d'être modifiés sans préavis. Les tarifs définitifs sont ceux confirmés lors de la réservation.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-credit-card"></i> Article 3 - Réservation et paiement</h2>
+                <p>Pour toute réservation, un acompte de 30% du montant total est demandé. Le solde doit être réglé au plus tard 15 jours avant la date de départ. Les paiements peuvent être effectués par virement bancaire, carte bancaire ou espèces.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-calendar-times"></i> Article 4 - Annulation et remboursement</h2>
+                <p><strong>Annulation par le client :</strong></p>
+                <ul>
+                    <li>Plus de 30 jours avant le départ : remboursement intégral</li>
+                    <li>Entre 15 et 30 jours avant le départ : remboursement de 50%</li>
+                    <li>Moins de 15 jours avant le départ : aucun remboursement</li>
+                </ul>
+                <p><strong>Annulation par l'agence :</strong> En cas d'impossibilité de fournir la prestation, le client sera intégralement remboursé.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-passport"></i> Article 5 - Formalités administratives</h2>
+                <p>Le client est responsable de la validité de ses documents de voyage (passeport, visa, etc.). Kartners Travel Agency ne pourra être tenue responsable en cas de refus d'entrée sur le territoire.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-shield-alt"></i> Article 6 - Assurance</h2>
+                <p>Nous recommandons vivement à nos clients de souscrire une assurance voyage couvrant l'annulation, le rapatriement et les frais médicaux à l'étranger.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-gavel"></i> Article 7 - Litiges</h2>
+                <p>En cas de litige, une solution amiable sera recherchée avant toute procédure judiciaire. À défaut, les tribunaux de Douala (Cameroun) seront seuls compétents.</p>
+            </div>
+        </div>
+        
+        <div class="legal-footer">
+            <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.legal-section {
+    background: var(--gray-light);
+    padding: 80px 0;
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.legal-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.legal-header h1 span {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.legal-header p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.legal-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.legal-block {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.legal-block:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.legal-block h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--violet-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legal-block h2 i {
+    color: var(--violet-primary);
+}
+
+.legal-block p {
+    color: var(--text-gray);
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.legal-block ul {
+    margin: 15px 0 0 20px;
+    color: var(--text-gray);
+    line-height: 1.7;
+}
+
+.legal-block li {
+    margin-bottom: 8px;
+}
+
+.legal-footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139,92,246,0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .legal-section {
+        padding: 50px 0;
+    }
+    
+    .legal-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .legal-block {
+        padding: 20px;
+    }
+    
+    .legal-block h2 {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}

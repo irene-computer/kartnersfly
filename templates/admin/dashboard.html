@@ -1,0 +1,53 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Tableau de bord</h2>
+    
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                    <h3>{{ messages_count }}</h3>
+                    <p class="text-muted">Messages non lus</p>
+                    <a href="/admin/messages" class="btn btn-sm btn-outline-primary">Voir</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                    <h3>{{ bookings_count }}</h3>
+                    <p class="text-muted">Reservations en attente</p>
+                    <a href="/admin/bookings" class="btn btn-sm btn-outline-success">Voir</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-plane fa-3x text-info mb-3"></i>
+                    <h3>{{ destinations_count }}</h3>
+                    <p class="text-muted">Destinations</p>
+                    <a href="/admin/destinations" class="btn btn-sm btn-outline-info">Gerer</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-concierge-bell fa-3x text-warning mb-3"></i>
+                    <h3>{{ services_count }}</h3>
+                    <p class="text-muted">Services</p>
+                    <a href="/admin/services" class="btn btn-sm btn-outline-warning">Gerer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

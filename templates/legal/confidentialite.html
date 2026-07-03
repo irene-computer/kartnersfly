@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Politique de confidentialité | Kartners Travel Agency{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Politique de confidentialité de Kartners Travel Agency - Protection de vos données personnelles.">
+{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container">
+        <div class="legal-header">
+            <h1>Politique de <span>confidentialité</span></h1>
+            <p>Dernière mise à jour : 01 janvier 2026</p>
+        </div>
+        
+        <div class="legal-content">
+            <div class="legal-block">
+                <h2><i class="fas fa-lock"></i> Article 1 - Collecte des données</h2>
+                <p>Nous collectons les informations que vous nous fournissez directement lorsque vous :</p>
+                <ul>
+                    <li>Remplissez notre formulaire de contact</li>
+                    <li>Effectuez une réservation de voyage</li>
+                    <li>Vous inscrivez à notre newsletter</li>
+                    <li>Nous contactez par téléphone ou email</li>
+                </ul>
+                <p>Les données collectées peuvent inclure : nom, prénom, adresse email, numéro de téléphone, informations de paiement, etc.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-database"></i> Article 2 - Utilisation des données</h2>
+                <p>Vos données personnelles sont utilisées pour :</p>
+                <ul>
+                    <li>Traiter vos demandes de réservation</li>
+                    <li>Vous envoyer des confirmations et informations sur vos voyages</li>
+                    <li>Répondre à vos questions et demandes</li>
+                    <li>Vous envoyer notre newsletter (avec votre consentement)</li>
+                    <li>Améliorer nos services</li>
+                </ul>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-share-alt"></i> Article 3 - Partage des données</h2>
+                <p>Nous ne vendons ni ne louons vos données personnelles à des tiers. Vos informations peuvent être partagées uniquement avec :</p>
+                <ul>
+                    <li>Nos partenaires de voyage (compagnies aériennes, hôtels, etc.) pour l'exécution de vos réservations</li>
+                    <li>Les autorités légales si la loi l'exige</li>
+                </ul>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-clock"></i> Article 4 - Durée de conservation</h2>
+                <p>Nous conservons vos données personnelles pendant la durée nécessaire à la fourniture de nos services, et conformément aux obligations légales. Les données de newsletter sont conservées jusqu'à votre désinscription.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-user-shield"></i> Article 5 - Vos droits</h2>
+                <p>Conformément à la réglementation applicable, vous disposez des droits suivants :</p>
+                <ul>
+                    <li>Droit d'accès à vos données</li>
+                    <li>Droit de rectification</li>
+                    <li>Droit à l'effacement ("droit à l'oubli")</li>
+                    <li>Droit d'opposition au traitement</li>
+                    <li>Droit à la portabilité des données</li>
+                </ul>
+                <p>Pour exercer ces droits, contactez-nous à : <a href="mailto:kta2k23@gmail.com">kta2k23@gmail.com</a></p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-cookie"></i> Article 6 - Cookies</h2>
+                <p>Notre site utilise des cookies pour améliorer votre expérience de navigation. Vous pouvez configurer votre navigateur pour refuser tous les cookies ou pour être averti lorsque des cookies sont envoyés.</p>
+            </div>
+            
+            <div class="legal-block">
+                <h2><i class="fas fa-envelope"></i> Article 7 - Contact</h2>
+                <p>Pour toute question concernant cette politique de confidentialité, vous pouvez nous contacter :</p>
+                <p>📞 Téléphone : <a href="tel:+237676268350">+237 676 268 350</a></p>
+                <p>📧 Email : <a href="mailto:kta2k23@gmail.com">kta2k23@gmail.com</a></p>
+                <p>📍 Adresse : Logpom, Douala - Cameroun</p>
+            </div>
+        </div>
+        
+        <div class="legal-footer">
+            <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.legal-section {
+    background: var(--gray-light);
+    padding: 80px 0;
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.legal-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.legal-header h1 span {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.legal-header p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.legal-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.legal-block {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.legal-block:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.legal-block h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--violet-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legal-block h2 i {
+    color: var(--violet-primary);
+}
+
+.legal-block p {
+    color: var(--text-gray);
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.legal-block ul {
+    margin: 15px 0 0 20px;
+    color: var(--text-gray);
+    line-height: 1.7;
+}
+
+.legal-block li {
+    margin-bottom: 8px;
+}
+
+.legal-block a {
+    color: var(--violet-primary);
+    text-decoration: none;
+}
+
+.legal-block a:hover {
+    text-decoration: underline;
+}
+
+.legal-footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139,92,246,0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .legal-section {
+        padding: 50px 0;
+    }
+    
+    .legal-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .legal-block {
+        padding: 20px;
+    }
+    
+    .legal-block h2 {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}

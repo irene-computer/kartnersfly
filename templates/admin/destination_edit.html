@@ -1,0 +1,314 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">
+        <i class="fas fa-edit"></i> Modifier la destination
+    </h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nom</label>
+                        <input type="text" name="name" class="form-control" value="{{ destination.name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Pays</label>
+                        <input type="text" name="country" class="form-control" value="{{ destination.country }}" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" required>{{ destination.description }}</textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Prix (€)</label>
+                        <input type="number" name="price" class="form-control" value="{{ destination.price }}" step="0.01" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Continent</label>
+                        <select name="continent" class="form-control" required>
+                            <option value="europe" {% if destination.continent == 'europe' %}selected{% endif %}>Europe</option>
+                            <option value="afrique" {% if destination.continent == 'afrique' %}selected{% endif %}>Afrique</option>
+                            <option value="asie" {% if destination.continent == 'asie' %}selected{% endif %}>Asie</option>
+                            <option value="amerique" {% if destination.continent == 'amerique' %}selected{% endif %}>Amérique</option>
+                            <option value="oceanie" {% if destination.continent == 'oceanie' %}selected{% endif %}>Océanie</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- SECTION IMAGES - MODIFICATION DIRECTE -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-flag"></i> Drapeau
+                            </div>
+                            <div class="card-body text-center">
+                                {% if destination.flag_image %}
+                                <div class="current-image-wrapper">
+                                    <img src="{{ url_for('static', filename=destination.flag_image) }}" 
+                                         alt="Drapeau" 
+                                         class="preview-flag"
+                                         id="flagPreview">
+                                    <br>
+                                    <small class="text-muted">Image actuelle</small>
+                                </div>
+                                {% else %}
+                                <div class="no-image-placeholder">
+                                    <i class="fas fa-flag"></i>
+                                    <p>Aucun drapeau</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mt-3">
+                                    <label class="form-label fw-bold">Nouveau drapeau</label>
+                                    <input type="file" name="flag_image" class="form-control" accept="image/*" 
+                                           onchange="previewImage(this, 'flagPreview')">
+                                    <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (Max 5MB)</small>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="remove_flag" id="remove_flag" class="form-check-input" value="on">
+                                        <label class="form-check-label text-danger" for="remove_flag">
+                                            <i class="fas fa-trash"></i> Supprimer le drapeau actuel
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-image"></i> Image de la destination
+                            </div>
+                            <div class="card-body text-center">
+                                {% if destination.image and destination.image != 'destinations/default.jpg' %}
+                                <div class="current-image-wrapper">
+                                    <img src="{{ url_for('static', filename=destination.image) }}" 
+                                         alt="Destination" 
+                                         class="preview-destination"
+                                         id="destPreview">
+                                    <br>
+                                    <small class="text-muted">Image actuelle</small>
+                                </div>
+                                {% else %}
+                                <div class="no-image-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>Image par défaut</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mt-3">
+                                    <label class="form-label fw-bold">Nouvelle image</label>
+                                    <input type="file" name="destination_image" class="form-control" accept="image/*"
+                                           onchange="previewImage(this, 'destPreview')">
+                                    <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (Max 5MB)</small>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="remove_dest_image" id="remove_dest_image" class="form-check-input" value="on">
+                                        <label class="form-check-label text-danger" for="remove_dest_image">
+                                            <i class="fas fa-trash"></i> Supprimer l'image actuelle
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer les modifications
+                    </button>
+                    <a href="{{ url_for('admin_destinations') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ===== STYLES POUR L'ADMIN DESTINATION ===== */
+.preview-flag {
+    width: 80px;
+    height: 53px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--gray-medium);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.preview-destination {
+    width: 200px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--gray-medium);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.current-image-wrapper {
+    padding: 15px;
+    background: var(--gray-light);
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.no-image-placeholder {
+    padding: 30px;
+    background: var(--gray-light);
+    border-radius: 12px;
+    border: 2px dashed var(--gray-medium);
+    color: var(--text-gray);
+}
+
+.no-image-placeholder i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.no-image-placeholder p {
+    margin: 0;
+}
+
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-header {
+    background: var(--gray-light);
+    border-bottom: 1px solid var(--gray-medium);
+    padding: 12px 20px;
+    font-weight: 600;
+}
+
+.card-header i {
+    color: var(--violet-primary);
+    margin-right: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.form-control:focus {
+    border-color: var(--violet-primary);
+    box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    border: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+}
+
+.btn-secondary {
+    background: var(--gray-medium);
+    border: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+    background: #d0d5dd;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #EF4444;
+    border-color: #EF4444;
+}
+
+@media (max-width: 768px) {
+    .preview-destination {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .preview-flag {
+        width: 100%;
+        height: 80px;
+    }
+    
+    .card {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<script>
+// Prévisualisation des images avant upload
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (!preview) return;
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            // Masquer le placeholder si présent
+            const wrapper = preview.closest('.current-image-wrapper');
+            if (wrapper) {
+                wrapper.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Désactiver les checkbox si un fichier est sélectionné
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const checkbox = this.closest('.card-body').querySelector('input[type="checkbox"]');
+        if (checkbox && this.files.length > 0) {
+            checkbox.checked = false;
+            checkbox.disabled = true;
+        } else if (checkbox) {
+            checkbox.disabled = false;
+        }
+    });
+});
+
+// Réactiver les checkbox quand on les décoche
+document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (!this.checked) {
+            const fileInput = this.closest('.card-body').querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.disabled = false;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

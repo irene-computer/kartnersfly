@@ -1,0 +1,869 @@
+{% extends "base.html" %}
+
+{% block title %}Services | Kartners Travel Agency{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Kartners Travel Agency - Services de voyage sur mesure : billeterie aérienne, réservation hôtelière, assistance visa, pré-enrôlement administratif et planification de voyage.">
+<meta name="keywords" content="agence voyage cameroun, billetterie douala, assistance visa, réservation hôtel, passeport, cni">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section Services -->
+<section class="services-hero">
+    <div class="container">
+        <div class="services-hero-content">
+            <h1>Nos <span>Services</span></h1>
+            <p>Des solutions sur mesure pour tous vos projets de voyage</p>
+            <div class="hero-badge">
+                <i class="fas fa-check-circle"></i>
+                <span>Service de confiance - Plus de 5000 clients accompagnés</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="services-grid-section">
+    <div class="container">
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card">
+                <!-- IMAGE DU SERVICE - VERSION SIMPLIFIEE -->
+                <div class="service-image-wrapper">
+                    {% if service.image and service.image != 'services/default.jpg' %}
+                        {% set img_path = service.image %}
+                        {% if not img_path.startswith('images/') %}
+                            {% set img_path = 'images/' + img_path %}
+                        {% endif %}
+                        <img src="{{ url_for('static', filename=img_path) }}" 
+                             alt="{{ service.name }}" 
+                             class="service-image" 
+                             loading="lazy">
+                    {% else %}
+                        <div class="service-icon-wrapper">
+                            <i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="service-tag">
+                    {% if service.features %}
+                        {% set features_list = service.features.split('|') %}
+                        {{ features_list[0] if features_list|length > 0 else 'Service premium' }}
+                    {% else %}
+                        Service premium
+                    {% endif %}
+                </div>
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.description }}</p>
+                <ul class="service-features">
+                    {% if service.features %}
+                        {% for feature in service.features.split('|') %}
+                        <li><i class="fas fa-check"></i> {{ feature }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li><i class="fas fa-check"></i> Service de qualité</li>
+                        <li><i class="fas fa-check"></i> Accompagnement personnalisé</li>
+                        <li><i class="fas fa-check"></i> Tarifs compétitifs</li>
+                    {% endif %}
+                </ul>
+                <a href="{{ url_for('contact') }}" class="service-link">
+                    Demander un devis <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i>
+                    Aucun service disponible pour le moment.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Section Pays desservis -->
+<section class="countries-section">
+    <div class="container">
+        <div class="countries-header">
+            <i class="fas fa-globe-americas"></i>
+            <h2>Pays desservis</h2>
+            <p>Assistance visa et voyages vers plus de 50 destinations</p>
+        </div>
+        
+        <div class="countries-grid">
+            <div class="country-category">
+                <h3><i class="fas fa-map-marker-alt"></i> Europe</h3>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> France</li>
+                    <li><i class="fas fa-check-circle"></i> Allemagne</li>
+                    <li><i class="fas fa-check-circle"></i> Belgique</li>
+                    <li><i class="fas fa-check-circle"></i> Italie</li>
+                    <li><i class="fas fa-check-circle"></i> Espagne</li>
+                    <li><i class="fas fa-check-circle"></i> Pays-Bas</li>
+                    <li><i class="fas fa-check-circle"></i> Suisse</li>
+                    <li><i class="fas fa-check-circle"></i> Royaume-Uni</li>
+                </ul>
+            </div>
+            
+            <div class="country-category">
+                <h3><i class="fas fa-map-marker-alt"></i> Amériques & Asie</h3>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> États-Unis</li>
+                    <li><i class="fas fa-check-circle"></i> Canada</li>
+                    <li><i class="fas fa-check-circle"></i> Chine</li>
+                    <li><i class="fas fa-check-circle"></i> Émirats Arabes Unis</li>
+                    <li><i class="fas fa-check-circle"></i> Turquie</li>
+                </ul>
+            </div>
+            
+            <div class="country-category">
+                <h3><i class="fas fa-map-marker-alt"></i> Afrique & autres</h3>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> Maroc</li>
+                    <li><i class="fas fa-check-circle"></i> Afrique du Sud</li>
+                    <li><i class="fas fa-check-circle"></i> Sénégal</li>
+                    <li><i class="fas fa-check-circle"></i> Côte d'Ivoire</li>
+                    <li><i class="fas fa-check-circle"></i> Gabon</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="countries-footer">
+            <div class="motif-badge">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Motifs de voyage :</span>
+                <div class="motif-list">
+                    <span class="motif">Études</span>
+                    <span class="motif">Tourisme</span>
+                    <span class="motif">Affaires</span>
+                </div>
+            </div>
+            <div class="cta-message">
+                <i class="fas fa-headset"></i>
+                <p>Besoin d'un visa pour un pays non listé ? <a href="{{ url_for('contact') }}">Contactez-nous</a> pour une assistance personnalisée.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Pourquoi nous choisir -->
+<section class="why-choose-section">
+    <div class="container">
+        <div class="why-header">
+            <i class="fas fa-star"></i>
+            <h2>Pourquoi nous <span>choisir ?</span></h2>
+            <p>Des services de qualité avec un accompagnement personnalisé</p>
+        </div>
+        
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Rapidité & professionnalisme</h3>
+                <p>Traitement rapide de vos demandes avec des experts dédiés à chaque service.</p>
+            </div>
+            
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3>Accompagnement personnalisé</h3>
+                <p>Un conseiller dédié pour vous guider à chaque étape de votre projet.</p>
+            </div>
+            
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>Transparence & fiabilité</h3>
+                <p>Des tarifs clairs, sans surprise. Des partenaires de confiance.</p>
+            </div>
+            
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3>Satisfaction client garantie</h3>
+                <p>Plus de 5000 clients satisfaits et de nombreuses recommandations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-text">
+                <h3>Prêt à voyager avec nous ?</h3>
+                <p>Contactez notre équipe dès maintenant pour bénéficier de nos services sur mesure</p>
+            </div>
+            <a href="{{ url_for('contact') }}" class="cta-button">
+                <i class="fas fa-paper-plane"></i>
+                Demander un devis gratuit
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+/* ========================================
+   SERVICES PAGE - STYLES OPTIMISES
+   ======================================== */
+
+/* Variables */
+:root {
+    --violet-primary: #8B5CF6;
+    --violet-dark: #6B3FA0;
+    --blue-primary: #3B82F6;
+    --blue-dark: #1E3A8A;
+    --white: #FFFFFF;
+    --gray-light: #F8FAFC;
+    --gray-medium: #E2E8F0;
+    --text-dark: #1E293B;
+    --text-gray: #4B5563;
+}
+
+/* ===== HERO SECTION ===== */
+.services-hero {
+    background: linear-gradient(135deg, var(--violet-primary) 0%, var(--blue-primary) 100%);
+    padding: 60px 0 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.services-hero-content h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease;
+}
+
+.services-hero-content h1 span {
+    background: linear-gradient(135deg, #FFE4B5, white);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.services-hero-content p {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 24px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+}
+
+.hero-badge i {
+    color: #FFE4B5;
+}
+
+/* ===== SERVICES GRID ===== */
+.services-grid-section {
+    background: var(--gray-light);
+    padding: 60px 0;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+/* ===== SERVICE CARD ===== */
+.service-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.service-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Image wrapper */
+.service-image-wrapper {
+    width: 100%;
+    height: 180px;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(59,130,246,0.06));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.service-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-image {
+    transform: scale(1.05);
+}
+
+/* Icon fallback */
+.service-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-icon-wrapper i {
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Card content */
+.service-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.12));
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--violet-dark);
+    margin-bottom: 12px;
+    align-self: flex-start;
+}
+
+.service-card h3 {
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.service-card p {
+    color: var(--text-gray);
+    line-height: 1.6;
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.service-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.service-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: clamp(0.8rem, 1vw, 0.85rem);
+    color: var(--text-gray);
+}
+
+.service-features li i {
+    color: #10B981;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--violet-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: gap 0.3s ease;
+    margin-top: auto;
+}
+
+.service-link:hover {
+    gap: 14px;
+    color: var(--violet-dark);
+}
+
+/* ===== COUNTRIES SECTION ===== */
+.countries-section {
+    background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
+    color: white;
+    padding: 60px 0;
+}
+
+.countries-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.countries-header i {
+    font-size: 2.5rem;
+    color: var(--violet-primary);
+    margin-bottom: 12px;
+}
+
+.countries-header h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.countries-header p {
+    opacity: 0.8;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+}
+
+.countries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.country-category h3 {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(139,92,246,0.4);
+}
+
+.country-category h3 i {
+    color: var(--violet-primary);
+}
+
+.country-category ul {
+    list-style: none;
+    padding: 0;
+}
+
+.country-category ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+    opacity: 0.9;
+}
+
+.country-category ul li i {
+    color: #10B981;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.countries-footer {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.motif-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50px;
+    margin-bottom: 20px;
+}
+
+.motif-badge i {
+    font-size: 1.1rem;
+    color: var(--violet-primary);
+}
+
+.motif-badge > span {
+    font-weight: 600;
+}
+
+.motif-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.motif {
+    background: rgba(139,92,246,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
+}
+
+.cta-message {
+    background: rgba(139,92,246,0.12);
+    border-radius: 14px;
+    padding: 14px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cta-message i {
+    font-size: 1.2rem;
+    color: var(--violet-primary);
+}
+
+.cta-message a {
+    color: var(--violet-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.cta-message a:hover {
+    text-decoration: underline;
+}
+
+/* ===== WHY CHOOSE ===== */
+.why-choose-section {
+    background: var(--gray-light);
+    padding: 60px 0;
+}
+
+.why-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.why-header i {
+    font-size: 2rem;
+    color: var(--violet-primary);
+    margin-bottom: 12px;
+}
+
+.why-header h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.why-header h2 span {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.why-header p {
+    color: var(--text-gray);
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+}
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.why-card {
+    text-align: center;
+    padding: 24px 16px;
+    background: white;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+    border: none !important;
+}
+
+.why-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.why-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.why-icon i {
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.why-card h3 {
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.why-card p {
+    color: var(--text-gray);
+    font-size: clamp(0.8rem, 1vw, 0.9rem);
+    line-height: 1.5;
+}
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    padding: 40px 0;
+}
+
+.cta-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cta-text h3 {
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.cta-text p {
+    color: rgba(255,255,255,0.9);
+    margin: 0;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    color: var(--violet-dark);
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    color: var(--violet-dark);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE - TOUS LES ÉCRANS
+   ======================================== */
+
+/* Grands écrans > 1400px */
+@media (min-width: 1400px) {
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Écrans moyens 992-1399px */
+@media (max-width: 1399px) and (min-width: 992px) {
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Tablettes 768-991px */
+@media (max-width: 991px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .why-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .countries-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .cta-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Mobiles 576-767px */
+@media (max-width: 767px) {
+    .services-hero {
+        padding: 50px 0 35px;
+    }
+    
+    .services-grid-section {
+        padding: 40px 0;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .service-card {
+        padding: 20px;
+    }
+    
+    .service-image-wrapper {
+        height: 160px;
+    }
+    
+    .why-choose-section {
+        padding: 40px 0;
+    }
+    
+    .why-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .why-card {
+        padding: 20px;
+    }
+    
+    .countries-section {
+        padding: 40px 0;
+    }
+    
+    .countries-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .country-category h3 {
+        justify-content: center;
+    }
+    
+    .country-category ul li {
+        justify-content: center;
+    }
+    
+    .motif-badge {
+        flex-direction: column;
+        border-radius: 20px;
+    }
+    
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 6px 14px;
+    }
+}
+
+/* Très petits mobiles < 576px */
+@media (max-width: 576px) {
+    .service-image-wrapper {
+        height: 140px;
+    }
+    
+    .service-icon-wrapper {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .service-icon-wrapper i {
+        font-size: 1.8rem;
+    }
+    
+    .cta-button {
+        white-space: normal;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .motif-list {
+        justify-content: center;
+    }
+    
+    .cta-message {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Petit écran < 400px */
+@media (max-width: 400px) {
+    .service-image-wrapper {
+        height: 120px;
+    }
+    
+    .service-card {
+        padding: 16px;
+    }
+    
+    .hero-badge {
+        font-size: 0.65rem;
+        padding: 4px 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

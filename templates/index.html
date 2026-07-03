@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Voyagez, <span class="highlight">comme vous l'imaginez.</span></h1>
+        <p class="lead mb-4">Kartners Travel Agency - Votre partenaire de confiance pour tous vos voyages</p>
+        <a href="/destinations" class="btn btn-primary-custom me-3">Découvrir nos voyages</a>
+        <a href="/contact" class="btn btn-outline-custom">Nous contacter</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Pourquoi <span>Kartners</span> ?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-globe-africa"></i>
+                    </div>
+                    <h3>Expertise locale</h3>
+                    <p>Plus de 15 ans d'expérience au Cameroun et à l'international</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Assistance 24/7</h3>
+                    <p>Une équipe dédiée pour tous vos déplacements</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Services complets</h3>
+                    <p>Billeterie, visas, hôtels, assurances, pré-enrôlement</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

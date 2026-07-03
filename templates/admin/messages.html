@@ -1,0 +1,227 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Messages recus</h2>
+    
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total messages</h5>
+                    <h2 class="mb-0">{{ messages|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Non lus</h5>
+                    <h2 class="mb-0">{{ messages|selectattr('status', 'equalto', 'non lu')|list|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Lus</h5>
+                    <h2 class="mb-0">{{ messages|selectattr('status', 'equalto', 'lu')|list|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Telephone</th>
+                            <th>Service concerne</th>
+                            <th>Message</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in messages %}
+                        <tr class="{% if msg.status == 'non lu' %}table-warning{% endif %}">
+                            <td style="min-width: 150px;">{{ msg.created_at[:16] if msg.created_at else '-' }}</td>
+                            <td><strong>{{ msg.name }}</strong></td>
+                            <td>{{ msg.email }}</td>
+                            <td>{{ msg.phone or '-' }}</td>
+                            <td>
+                                {% if msg.service %}
+                                    <span class="badge bg-info text-white">
+                                        {% if msg.service == 'passeport' %}
+                                            <i class="fas fa-id-card"></i> Passeport/CNI
+                                        {% elif msg.service == 'billetterie' %}
+                                            <i class="fas fa-plane"></i> Billeterie
+                                        {% elif msg.service == 'hotel' %}
+                                            <i class="fas fa-hotel"></i> Hotel
+                                        {% elif msg.service == 'visa' %}
+                                            <i class="fas fa-passport"></i> Visa
+                                        {% elif msg.service == 'voyage' %}
+                                            <i class="fas fa-map-marked-alt"></i> Voyage
+                                        {% elif msg.service == 'autre' %}
+                                            <i class="fas fa-question-circle"></i> Autre
+                                        {% else %}
+                                            {{ msg.service }}
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Non specifie</span>
+                                {% endif %}
+                            </td>
+                            <td style="max-width: 250px;">
+                                <div class="message-preview" data-full-message="{{ msg.message }}" 
+                                     onclick="viewMessage({{ msg.id }}, '{{ msg.name }}', '{{ msg.email }}', '{{ msg.phone or '' }}', '{{ msg.service or '' }}', '{{ msg.message|replace("'", "\\'") }}')">
+                                    {{ msg.message[:80] }}{% if msg.message|length > 80 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if msg.status == 'non lu' %}
+                                    <span class="badge bg-danger">Non lu</span>
+                                {% else %}
+                                    <span class="badge bg-success">Lu</span>
+                                {% endif %}
+                            </td>
+                            <td style="min-width: 100px;">
+                                <a href="/admin/message/read/{{ msg.id }}" class="btn btn-sm btn-primary" title="Marquer comme lu">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="/admin/message/delete/{{ msg.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce message ?')" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour voir le message complet -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-envelope-open-text me-2"></i>Detail du message
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Nom complet</small>
+                            <p id="modalName" class="fw-bold mb-0"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Telephone</small>
+                            <p id="modalPhone" class="fw-bold mb-0"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Service concerne</small>
+                            <p id="modalService" class="fw-bold mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="border rounded p-3">
+                        <small class="text-muted">Email</small>
+                        <p id="modalEmail" class="fw-bold mb-0"></p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Message complet</small>
+                        <p id="modalMessage" class="mb-0 mt-2" style="white-space: pre-wrap;"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
+                <a href="#" id="markAsReadBtn" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Marquer comme lu
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.message-preview {
+    cursor: pointer;
+    color: #4B5563;
+    transition: color 0.3s ease;
+}
+.message-preview:hover {
+    color: #8B5CF6;
+    text-decoration: underline;
+}
+.table-warning {
+    background-color: #FEF3C7 !important;
+}
+.btn-sm {
+    margin: 0 2px;
+}
+.badge-info {
+    background-color: #3B82F6;
+}
+</style>
+
+<script>
+function viewMessage(id, name, email, phone, service, message) {
+    document.getElementById('modalName').textContent = name;
+    document.getElementById('modalEmail').innerHTML = '<a href="mailto:' + email + '">' + email + '</a>';
+    document.getElementById('modalPhone').textContent = phone || 'Non renseigne';
+    
+    // Afficher le service avec libelle lisible
+    let serviceText = '';
+    switch(service) {
+        case 'passeport':
+            serviceText = 'Pre-enrolement - Passeport/CNI';
+            break;
+        case 'billetterie':
+            serviceText = 'Billeterie aerienne';
+            break;
+        case 'hotel':
+            serviceText = 'Reservation hoteliere';
+            break;
+        case 'visa':
+            serviceText = 'Assistance visa';
+            break;
+        case 'voyage':
+            serviceText = 'Planification de voyage';
+            break;
+        case 'autre':
+            serviceText = 'Autre demande';
+            break;
+        default:
+            serviceText = service || 'Non specifie';
+    }
+    document.getElementById('modalService').innerHTML = '<span class="badge bg-info text-white">' + serviceText + '</span>';
+    document.getElementById('modalMessage').textContent = message;
+    
+    const markAsReadBtn = document.getElementById('markAsReadBtn');
+    markAsReadBtn.href = '/admin/message/read/' + id;
+    
+    new bootstrap.Modal(document.getElementById('messageModal')).show();
+}
+</script>
+{% endblock %}

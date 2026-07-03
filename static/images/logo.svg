@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="violetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B3FA0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E3A8A;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Cercle extérieur -->
+  <circle cx="100" cy="100" r="95" fill="url(#violetGrad)" stroke="url(#blueGrad)" stroke-width="3"/>
+  
+  <!-- Éléments intérieurs -->
+  <circle cx="100" cy="100" r="70" fill="none" stroke="white" stroke-width="2" stroke-dasharray="10 5"/>
+  
+  <!-- Avion stylisé -->
+  <path d="M70 100 L130 100 M100 70 L100 130" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="100" cy="100" r="12" fill="white"/>
+  
+  <!-- Étoiles -->
+  <circle cx="60" cy="60" r="3" fill="white"/>
+  <circle cx="140" cy="60" r="3" fill="white"/>
+  <circle cx="60" cy="140" r="3" fill="white"/>
+  <circle cx="140" cy="140" r="3" fill="white"/>
+  
+  <!-- Texte KARTNERS -->
+  <text x="100" y="175" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif" letter-spacing="3">KARTNERS</text>
+</svg>

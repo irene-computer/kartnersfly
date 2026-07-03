@@ -1,0 +1,90 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Reservations</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Destination</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Date depart</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.created_at[:16] if booking.created_at else '-' }}</td>
+                            <td>{{ booking.destination_name or booking.dest_name or '-' }}</td>
+                            <td>{{ booking.fullname }}</td>
+                            <td>{{ booking.email }}</td>
+                            <td>{{ booking.departure_date or '-' }}</td>
+                            <td>
+                                {% if booking.status == 'en attente' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elif booking.status == 'confirmee' %}
+                                    <span class="badge bg-success">Confirmee</span>
+                                {% elif booking.status == 'annulee' %}
+                                    <span class="badge bg-danger">Annulee</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ booking.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if booking.status == 'en attente' %}
+                                <div class="btn-group" role="group">
+                                    <a href="/admin/booking/confirm/{{ booking.id }}" class="btn btn-sm btn-success" onclick="return confirm('Confirmer cette reservation et envoyer un email au client ?')">
+                                        <i class="fas fa-check"></i> Confirmer
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="updateStatus({{ booking.id }}, 'annulee')">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </button>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStatus(id, status) {
+    if (confirm(`Confirmer le passage au statut "${status}" ?`)) {
+        fetch(`/admin/booking/update/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `status=${status}`
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Erreur lors de la mise a jour');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la mise a jour');
+        });
+    }
+}
+</script>
+{% endblock %}
