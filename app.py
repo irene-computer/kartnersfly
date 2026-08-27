@@ -24,31 +24,25 @@ from functools import wraps
 # ============================================================
 import tempfile
 
-# S'assurer que le chemin de la base est absolu et résolu
 db_path_original = Config.DATABASE
 db_dir = os.path.dirname(db_path_original)
 
-# Si le dossier parent n'existe pas ou n'est pas accessible, on utilise un fallback
 try:
     if db_dir:
         os.makedirs(db_dir, exist_ok=True, mode=0o777)
-        # Tester l'écriture
         test_file = os.path.join(db_dir, '.write_test')
         with open(test_file, 'w') as f:
             f.write('ok')
         os.remove(test_file)
         print(f"[OK] Dossier de la base accessible : {db_dir}")
     else:
-        # Pas de dossier parent, on est dans le répertoire courant
         print("[INFO] Base de données dans le répertoire courant.")
 except Exception as e:
     print(f"[ERREUR] Impossible d'utiliser {db_dir} : {e}")
-    # Fallback vers /tmp (toujours accessible en écriture)
     fallback_dir = tempfile.gettempdir()
     fallback_path = os.path.join(fallback_dir, 'database.db')
     Config.DATABASE = fallback_path
     print(f"[INFO] Utilisation du fallback : {Config.DATABASE}")
-    # Créer le dossier /tmp si besoin (existe toujours)
     os.makedirs(fallback_dir, exist_ok=True)
 
 # ============================================================
@@ -73,13 +67,28 @@ from models import (
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ===== LOGS DE DÉMARRAGE (affichage des variables d'environnement) =====
+# ============================================================
+# FALLBACK ADMIN – FORCER LES IDENTIFIANTS SI NON DÉFINIS
+# ============================================================
+# Nettoyage des variables d'environnement
+admin_username = os.getenv('ADMIN_USERNAME', 'admin').strip()
+admin_password = os.getenv('ADMIN_PASSWORD', 'admin123').strip()
+
+# Si les identifiants sont vides ou 'None', on utilise les valeurs par défaut
+if not admin_username or admin_username.lower() == 'none':
+    admin_username = 'admin'
+if not admin_password or admin_password.lower() == 'none':
+    admin_password = 'admin123'
+
+# On force les valeurs dans la configuration
+Config.ADMIN_USERNAME = admin_username
+Config.ADMIN_PASSWORD = admin_password
+
 print("=" * 70)
-print("[INFO] === CONFIGURATION CHARGÉE ===")
+print("[INFO] === CONFIGURATION ADMIN ===")
 print(f"[INFO] ADMIN_USERNAME = '{Config.ADMIN_USERNAME}'")
-print(f"[INFO] ADMIN_PASSWORD = {'*' * len(Config.ADMIN_PASSWORD) if Config.ADMIN_PASSWORD else 'VIDE'}")
+print(f"[INFO] ADMIN_PASSWORD = {'*' * len(Config.ADMIN_PASSWORD)}")
 print(f"[INFO] DATABASE = {Config.DATABASE}")
-print(f"[INFO] SECRET_KEY = {Config.SECRET_KEY[:8]}... (tronqué)")
 print("=" * 70)
 
 # ==================== SECURITE ====================
@@ -101,7 +110,6 @@ limiter = Limiter(
 )
 
 def sanitize_input(data):
-    """Nettoie les entrées utilisateur"""
     if isinstance(data, dict):
         return {k: sanitize_input(v) for k, v in data.items()}
     elif isinstance(data, list):
@@ -141,7 +149,6 @@ def login_required(f):
 UPLOAD_FOLDER = 'static/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 
-# Création des sous-dossiers
 for sub in ['flags', 'destinations', 'services', 'scholarships']:
     os.makedirs(os.path.join(UPLOAD_FOLDER, sub), exist_ok=True)
 
@@ -149,19 +156,14 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def save_uploaded_image(file, subfolder='scholarships'):
-    """
-    Sauvegarde une image uploadée et retourne le chemin relatif (ex: images/sous-dossier/nom.jpg)
-    Utilisation : save_uploaded_image(request.files['image'], 'destinations')
-    """
     if not file or not allowed_file(file.filename):
         return None
     filename = secure_filename(file.filename)
     unique_name = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}_{filename}"
-    folder = os.path.join(UPLOAD_FOLDER, subfolder)  # static/images/sous-dossier
+    folder = os.path.join(UPLOAD_FOLDER, subfolder)
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, unique_name)
     file.save(filepath)
-    # Retourne le chemin relatif à utiliser avec url_for('static', filename=...)
     return f"images/{subfolder}/{unique_name}"
 
 # Initialiser la base de données
@@ -268,7 +270,6 @@ def send_bulk_email(recipients, subject, html_content, text_content=None):
 
 def send_scholarship_notification(recipients, scholarship_data):
     subject = f"Nouvelle opportunité de bourse - Kartners Travel Agency"
-
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -298,7 +299,6 @@ def send_scholarship_notification(recipients, scholarship_data):
                 <h2>Nouvelle opportunité de bourse d'études</h2>
                 <p>Bonjour,</p>
                 <p>Nous avons le plaisir de vous informer qu'une nouvelle opportunité de bourse est disponible.</p>
-
                 <div class="info-block">
                     <h3>Détails de l'opportunité</h3>
                     <p><strong>Pays :</strong> {scholarship_data.get('country', 'À déterminer')}</p>
@@ -306,7 +306,6 @@ def send_scholarship_notification(recipients, scholarship_data):
                     <p><strong>Domaine :</strong> {scholarship_data.get('field_of_study', 'À déterminer')}</p>
                     <p><strong>Date limite :</strong> {scholarship_data.get('deadline', 'Consultez notre site')}</p>
                 </div>
-
                 <p style="text-align: center; margin: 30px 0;">
                     <a href="https://www.kartnersagency.com/bourse-etudes" class="btn">En savoir plus</a>
                 </p>
@@ -319,7 +318,6 @@ def send_scholarship_notification(recipients, scholarship_data):
     </body>
     </html>
     """
-
     text_content = f"""
 KARTNERS TRAVEL AGENCY - NOUVELLE OPPORTUNITÉ DE BOURSE
 
@@ -334,7 +332,6 @@ Détails:
 
 Pour en savoir plus: https://www.kartnersagency.com/bourse-etudes
     """
-
     return send_bulk_email(recipients, subject, html_content, text_content)
 
 # ==================== ROUTES CLIENT ====================
@@ -519,11 +516,10 @@ def admin_login():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
 
-        # Sanitisation
         username = sanitize_input(username)
         password = sanitize_input(password)
 
-        # Logs détaillés (affichage en clair pour déboguer)
+        # Logs détaillés
         print("=" * 60)
         print("[LOGIN] Tentative de connexion")
         print(f"[LOGIN] Username saisi : '{username}'")
@@ -537,16 +533,19 @@ def admin_login():
             session['admin_username'] = username
             session['admin_ip'] = request.remote_addr
             session.permanent = True
+            flash('Connexion réussie', 'success')
             print("[LOGIN] SUCCÈS ! Redirection vers le dashboard.")
             return redirect(url_for('admin_dashboard'))
         else:
             print("[LOGIN] ÉCHEC !")
+            flash('Identifiants incorrects', 'danger')
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
 
 @app.route('/admin/logout')
 def admin_logout():
     session.clear()
+    flash('Déconnexion réussie', 'info')
     return redirect(url_for('admin_login'))
 
 @app.route('/admin/dashboard')
@@ -625,13 +624,11 @@ def admin_destination_add():
         price = float(request.form.get('price'))
         continent = sanitize_input(request.form.get('continent', 'europe'))
 
-        # Flag image
         flag_file = request.files.get('flag_image')
         flag_path = save_uploaded_image(flag_file, 'flags') if flag_file else None
         if not flag_path:
-            flag_path = 'images/flags/default.png'  # fallback
+            flag_path = 'images/flags/default.png'
 
-        # Destination image
         dest_file = request.files.get('destination_image')
         dest_path = save_uploaded_image(dest_file, 'destinations') if dest_file else None
         if not dest_path:
@@ -666,7 +663,6 @@ def admin_destination_edit(id):
             flag_path = old['flag_image']
             dest_path = old['image']
 
-            # Nouveau drapeau
             flag_file = request.files.get('flag_image')
             if flag_file and allowed_file(flag_file.filename):
                 if flag_path and not flag_path.endswith('default.png'):
@@ -676,7 +672,6 @@ def admin_destination_edit(id):
                         except: pass
                 flag_path = save_uploaded_image(flag_file, 'flags')
 
-            # Nouvelle image destination
             dest_file = request.files.get('destination_image')
             if dest_file and allowed_file(dest_file.filename):
                 if dest_path and not dest_path.endswith('default.jpg'):
@@ -1077,7 +1072,6 @@ def admin_scholarship_add():
                 description, benefits, requirements
             )
 
-            # Notification
             scholarship_data = {
                 'country': country,
                 'study_level': study_level,
