@@ -1,5 +1,5 @@
 # ============================================
-# KARTNERSFLY - Dockerfile (Root)
+# KARTNERSFLY - Dockerfile pour Railway
 # ============================================
 
 FROM python:3.10-slim
@@ -21,13 +21,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Créer le dossier instance et les dossiers d'upload
-RUN mkdir -p instance static/images/flags static/images/destinations static/images/services static/images/scholarships
+# Créer les dossiers nécessaires avec les bons droits
+RUN mkdir -p static/images/flags static/images/destinations static/images/services static/images/scholarships \
+    && chmod -R 755 /app
 
-# Suppression de l'utilisateur non-root
-# RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
-# USER appuser
-
+# Exécution en root (pas d'utilisateur non-root)
 EXPOSE 5000
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "3", "--threads", "2", "app:app"]

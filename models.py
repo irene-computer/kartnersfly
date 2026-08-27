@@ -5,15 +5,60 @@ import os
 import re
 from werkzeug.utils import secure_filename
 
+# ============================================================
+# CONFIGURATION DE LA BASE DE DONNEES
+# ============================================================
+
 # Chemin vers votre base de donnees
 DB_PATH = Config.DATABASE if hasattr(Config, 'DATABASE') else 'database.db'
 
 def get_db():
-    """Retourne une connexion a la base de donnees"""
-    os.makedirs(os.path.dirname(DB_PATH) if os.path.dirname(DB_PATH) else '.', exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """
+    Retourne une connexion à la base de données.
+    Crée le dossier parent s'il n'existe pas et gère les droits.
+    """
+    global DB_PATH
+    
+    # 1. Vérifier et créer le dossier parent
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir:
+        try:
+            os.makedirs(db_dir, exist_ok=True)
+        except Exception:
+            # Si le dossier ne peut pas être créé, utiliser le répertoire courant
+            print(f"[WARNING] Impossible de créer {db_dir}, utilisation du répertoire courant")
+            DB_PATH = 'database.db'
+            db_dir = '.'
+
+    # 2. Tester l'écriture (création d'un fichier temporaire)
+    try:
+        test_file = os.path.join(db_dir, '.write_test')
+        with open(test_file, 'w') as f:
+            f.write('ok')
+        os.remove(test_file)
+    except Exception as e:
+        # Fallback vers /tmp si le répertoire n'est pas accessible en écriture
+        print(f"[WARNING] Pas de droits d'écriture dans {db_dir}, fallback vers /tmp")
+        DB_PATH = '/tmp/database.db'
+        # S'assurer que /tmp est accessible
+        try:
+            with open('/tmp/.write_test', 'w') as f:
+                f.write('ok')
+            os.remove('/tmp/.write_test')
+        except Exception:
+            raise RuntimeError("Impossible d'écrire dans le répertoire courant ni dans /tmp")
+
+    # 3. Connexion à la base
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        return conn
+    except sqlite3.OperationalError as e:
+        raise RuntimeError(f"Impossible d'ouvrir {DB_PATH}: {e}")
+
+# ============================================================
+# INITIALISATION DE LA BASE DE DONNEES
+# ============================================================
 
 def init_db():
     """Initialise toutes les tables de la base de donnees"""
@@ -171,7 +216,9 @@ def init_db():
     print("Base de donnees initialisee avec succes")
 
 
-# ==================== FONCTIONS POUR LES MESSAGES ====================
+# ============================================================
+# FONCTIONS POUR LES MESSAGES
+# ============================================================
 
 def add_message(name, email, phone, service, message):
     """Ajoute un nouveau message de contact avec le service concerne"""
@@ -219,7 +266,9 @@ def delete_message(message_id):
     conn.close()
 
 
-# ==================== FONCTIONS POUR LES DESTINATIONS ====================
+# ============================================================
+# FONCTIONS POUR LES DESTINATIONS
+# ============================================================
 
 def get_all_destinations():
     """Recupere toutes les destinations"""
@@ -276,7 +325,9 @@ def get_destinations_count():
     return count
 
 
-# ==================== FONCTIONS POUR LES SERVICES ====================
+# ============================================================
+# FONCTIONS POUR LES SERVICES
+# ============================================================
 
 def get_all_services():
     """Recupere tous les services"""
@@ -333,7 +384,9 @@ def get_services_count():
     return count
 
 
-# ==================== FONCTIONS POUR LES RESERVATIONS ====================
+# ============================================================
+# FONCTIONS POUR LES RESERVATIONS
+# ============================================================
 
 def add_booking(destination_id, destination_name, fullname, email, phone, departure_date, travelers, message):
     """Ajoute une nouvelle reservation"""
@@ -385,7 +438,9 @@ def get_pending_bookings_count():
     return count
 
 
-# ==================== FONCTIONS POUR LA NEWSLETTER ====================
+# ============================================================
+# FONCTIONS POUR LA NEWSLETTER
+# ============================================================
 
 def subscribe_newsletter(email):
     """Ajoute un email a la newsletter"""
@@ -435,7 +490,9 @@ def get_all_user_emails():
     return list(emails)
 
 
-# ==================== FONCTIONS POUR LES BOURSES (DEMANDES) ====================
+# ============================================================
+# FONCTIONS POUR LES BOURSES (DEMANDES)
+# ============================================================
 
 def add_scholarship(full_name, email, phone, country, study_level, field_of_study, message):
     """Ajoute une nouvelle demande de bourse"""
@@ -508,7 +565,9 @@ def get_scholarships_ending_soon(days=5):
     return scholarships
 
 
-# ==================== FONCTIONS POUR LES OPPORTUNITES DE BOURSE ====================
+# ============================================================
+# FONCTIONS POUR LES OPPORTUNITES DE BOURSE
+# ============================================================
 
 def add_scholarship_opportunity(title, country, study_level, field_of_study,
                                 start_date, end_date,
@@ -586,7 +645,9 @@ def delete_scholarship_opportunity(opportunity_id):
     conn.close()
 
 
-# ==================== FONCTIONS DE MIGRATION / CORRECTION DES CHEMINS ====================
+# ============================================================
+# FONCTIONS DE MIGRATION / CORRECTION DES CHEMINS
+# ============================================================
 
 def migrate_image_paths():
     """
@@ -620,7 +681,9 @@ def migrate_image_paths():
     return updated
 
 
-# ==================== INITIALISATION DES DOSSIERS ====================
+# ============================================================
+# INITIALISATION DES DOSSIERS
+# ============================================================
 
 def create_upload_folders():
     """Creer les dossiers d'images s'ils n'existent pas"""

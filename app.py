@@ -1135,6 +1135,11 @@ if __name__ == '__main__':
     print("=" * 50)
     print("Kartners Travel Agency - Démarrage")
     print("=" * 50)
+    print(f"[INFO] Base de données initialisée : {Config.DATABASE}")
+    print(f"[INFO] Admin : {Config.ADMIN_USERNAME} / {Config.ADMIN_PASSWORD}")
+   
+    print("Répertoire de travail :", os.getcwd())
+    print("Base de données configurée :", Config.DATABASE)
     print(f"Site client: http://0.0.0.0:{port}")
     print(f"Admin: http://0.0.0.0:{port}/admin/login")
     print(f"Bourse d'études: http://0.0.0.0:{port}/bourse-etudes")
