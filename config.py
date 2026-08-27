@@ -10,10 +10,12 @@ class Config:
     DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
     # ===== ADMIN =====
-    ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
-    ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
+    # ⚠️ Les identifiants DOIVENT être définis dans les variables d'environnement ou .env
+    # Ils ne sont pas codés en dur ici pour des raisons de sécurité.
+    ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', '').strip()
+    ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', '').strip()
 
-    # ===== DATABASE - Utilise la variable d'environnement ou un chemin par défaut =====
+    # ===== DATABASE =====
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     DATABASE = os.getenv('DATABASE', os.path.join(BASE_DIR, 'database.db'))
 
