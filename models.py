@@ -1,7 +1,9 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import Config
 import os
+import re
+from werkzeug.utils import secure_filename
 
 # Chemin vers votre base de donnees
 DB_PATH = Config.DATABASE if hasattr(Config, 'DATABASE') else 'database.db'
@@ -18,7 +20,7 @@ def init_db():
     conn = get_db()
     cursor = conn.cursor()
     
-    # Table des messages de contact - AJOUT de la colonne service
+    # Table des messages de contact
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,6 +85,41 @@ def init_db():
         CREATE TABLE IF NOT EXISTS newsletter (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Table des demandes de bourse (scholarships)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS scholarships (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT,
+            country TEXT NOT NULL,
+            study_level TEXT NOT NULL,
+            field_of_study TEXT NOT NULL,
+            message TEXT,
+            status TEXT DEFAULT 'en attente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Table des opportunités de bourse (avec champs images)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS scholarship_opportunities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            country TEXT NOT NULL,
+            study_level TEXT NOT NULL,
+            field_of_study TEXT NOT NULL,
+            start_date DATE,
+            end_date DATE,
+            flag_url TEXT,
+            image_url TEXT,
+            description TEXT,
+            benefits TEXT,
+            requirements TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -312,10 +349,10 @@ def add_booking(destination_id, destination_name, fullname, email, phone, depart
 
 
 def get_all_bookings():
-    """Recupere toutes les reservations"""
+    """Recupere toutes les reservations avec details complets"""
     conn = get_db()
     bookings = conn.execute('''
-        SELECT b.*, d.name as dest_name 
+        SELECT b.*, d.name as dest_name, d.country as dest_country, d.image as dest_image
         FROM bookings b 
         LEFT JOIN destinations d ON b.destination_id = d.id 
         ORDER BY b.created_at DESC
@@ -366,14 +403,232 @@ def get_newsletter_count():
     return count
 
 
-# ==================== INITIALISATION ====================
+def get_all_newsletter_emails():
+    """Recupere tous les emails de la newsletter"""
+    conn = get_db()
+    emails = conn.execute('SELECT email FROM newsletter').fetchall()
+    conn.close()
+    return [email['email'] for email in emails]
 
-# Creer les dossiers d'images s'ils n'existent pas
+
+def get_all_user_emails():
+    """Recupere tous les emails des utilisateurs (messages, bookings, newsletter)"""
+    conn = get_db()
+    emails = set()
+    
+    messages = conn.execute('SELECT DISTINCT email FROM messages').fetchall()
+    for msg in messages:
+        if msg['email']:
+            emails.add(msg['email'])
+    
+    bookings = conn.execute('SELECT DISTINCT email FROM bookings').fetchall()
+    for book in bookings:
+        if book['email']:
+            emails.add(book['email'])
+    
+    newsletter = conn.execute('SELECT DISTINCT email FROM newsletter').fetchall()
+    for nl in newsletter:
+        if nl['email']:
+            emails.add(nl['email'])
+    
+    conn.close()
+    return list(emails)
+
+
+# ==================== FONCTIONS POUR LES BOURSES (DEMANDES) ====================
+
+def add_scholarship(full_name, email, phone, country, study_level, field_of_study, message):
+    """Ajoute une nouvelle demande de bourse"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO scholarships (full_name, email, phone, country, study_level, field_of_study, message, created_at, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'en attente')
+    ''', (full_name, email, phone, country, study_level, field_of_study, message, datetime.now().isoformat()))
+    conn.commit()
+    last_id = cursor.lastrowid
+    conn.close()
+    return last_id
+
+
+def get_all_scholarships():
+    """Recupere toutes les demandes de bourse"""
+    conn = get_db()
+    scholarships = conn.execute('SELECT * FROM scholarships ORDER BY created_at DESC').fetchall()
+    conn.close()
+    return scholarships
+
+
+def get_pending_scholarships_count():
+    """Recupere le nombre de demandes de bourse en attente"""
+    conn = get_db()
+    count = conn.execute('SELECT COUNT(*) FROM scholarships WHERE status = "en attente"').fetchone()[0]
+    conn.close()
+    return count
+
+
+def update_scholarship_status(scholarship_id, status):
+    """Met a jour le statut d'une demande de bourse"""
+    conn = get_db()
+    conn.execute('UPDATE scholarships SET status = ? WHERE id = ?', (status, scholarship_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_scholarship(scholarship_id):
+    """Supprime une demande de bourse"""
+    conn = get_db()
+    conn.execute('DELETE FROM scholarships WHERE id = ?', (scholarship_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_scholarship_by_id(scholarship_id):
+    """Recupere une demande de bourse par son ID"""
+    conn = get_db()
+    scholarship = conn.execute('SELECT * FROM scholarships WHERE id = ?', (scholarship_id,)).fetchone()
+    conn.close()
+    return scholarship
+
+
+def get_scholarships_ending_soon(days=5):
+    """Recupere les bourses dont la date limite est dans moins de X jours"""
+    conn = get_db()
+    today = datetime.now().date()
+    start_date = (today - timedelta(days=days+5)).isoformat()
+    end_date = (today - timedelta(days=days)).isoformat()
+    
+    scholarships = conn.execute('''
+        SELECT * FROM scholarships 
+        WHERE created_at BETWEEN ? AND ?
+        AND status = "en attente"
+    ''', (start_date, end_date)).fetchall()
+    
+    conn.close()
+    return scholarships
+
+
+# ==================== FONCTIONS POUR LES OPPORTUNITES DE BOURSE ====================
+
+def add_scholarship_opportunity(title, country, study_level, field_of_study,
+                                start_date, end_date,
+                                flag_url, image_url,
+                                description, benefits, requirements):
+    """
+    Ajoute une opportunité de bourse.
+    - flag_url : chemin relatif (ex: images/scholarships/fichier.jpg) ou URL absolue (déjà traité par app.py)
+    - image_url : chemin relatif ou URL absolue
+    Tous les paramètres sont requis, mais start_date, end_date, flag_url, image_url peuvent être None.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO scholarship_opportunities 
+        (title, country, study_level, field_of_study, start_date, end_date,
+         flag_url, image_url, description, benefits, requirements, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (title, country, study_level, field_of_study,
+          start_date, end_date,
+          flag_url, image_url,
+          description, benefits, requirements,
+          datetime.now().isoformat()))
+    conn.commit()
+    last_id = cursor.lastrowid
+    conn.close()
+    return last_id
+
+
+def update_scholarship_opportunity(opportunity_id, title, country, study_level,
+                                   field_of_study, start_date, end_date,
+                                   flag_url, image_url,
+                                   description, benefits, requirements):
+    """
+    Met à jour une opportunité de bourse.
+    Tous les champs sont obligatoires (les URLs d'images sont déjà traitées par app.py).
+    """
+    conn = get_db()
+    conn.execute('''
+        UPDATE scholarship_opportunities 
+        SET title = ?, country = ?, study_level = ?, field_of_study = ?,
+            start_date = ?, end_date = ?, flag_url = ?, image_url = ?,
+            description = ?, benefits = ?, requirements = ?
+        WHERE id = ?
+    ''', (title, country, study_level, field_of_study,
+          start_date, end_date,
+          flag_url, image_url,
+          description, benefits, requirements,
+          opportunity_id))
+    conn.commit()
+    conn.close()
+
+
+def get_all_scholarship_opportunities():
+    """Recupere toutes les opportunités de bourse"""
+    conn = get_db()
+    opportunities = conn.execute('SELECT * FROM scholarship_opportunities ORDER BY created_at DESC').fetchall()
+    conn.close()
+    return opportunities
+
+
+def get_scholarship_opportunity_by_id(opportunity_id):
+    """Recupere une opportunité de bourse par son ID"""
+    conn = get_db()
+    opportunity = conn.execute('SELECT * FROM scholarship_opportunities WHERE id = ?', (opportunity_id,)).fetchone()
+    conn.close()
+    return opportunity
+
+
+def delete_scholarship_opportunity(opportunity_id):
+    """Supprime une opportunité de bourse"""
+    conn = get_db()
+    conn.execute('DELETE FROM scholarship_opportunities WHERE id = ?', (opportunity_id,))
+    conn.commit()
+    conn.close()
+
+
+# ==================== FONCTIONS DE MIGRATION / CORRECTION DES CHEMINS ====================
+
+def migrate_image_paths():
+    """
+    Corrige les chemins d'images existants pour les bourses.
+    Ajoute le préfixe 'images/' si le chemin ne commence ni par 'http' ni par 'images/'.
+    À exécuter une fois après la correction du code.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Récupérer toutes les opportunités
+    opportunities = cursor.execute('SELECT id, flag_url, image_url FROM scholarship_opportunities').fetchall()
+    
+    updated = 0
+    for opp in opportunities:
+        updates = {}
+        for field in ['flag_url', 'image_url']:
+            val = opp[field]
+            if val and not val.startswith('http') and not val.startswith('images/'):
+                updates[field] = f"images/{val}"
+        if updates:
+            sql = "UPDATE scholarship_opportunities SET "
+            set_clause = ", ".join([f"{k} = ?" for k in updates.keys()])
+            values = list(updates.values()) + [opp['id']]
+            cursor.execute(f"UPDATE scholarship_opportunities SET {set_clause} WHERE id = ?", values)
+            updated += 1
+    
+    conn.commit()
+    conn.close()
+    print(f"Migration terminée : {updated} enregistrements mis à jour.")
+    return updated
+
+
+# ==================== INITIALISATION DES DOSSIERS ====================
+
 def create_upload_folders():
+    """Creer les dossiers d'images s'ils n'existent pas"""
     folders = [
         'static/images/flags',
         'static/images/destinations',
-        'static/images/services'
+        'static/images/services',
+        'static/images/scholarships'
     ]
     for folder in folders:
         os.makedirs(folder, exist_ok=True)

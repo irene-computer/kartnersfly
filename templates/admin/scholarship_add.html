@@ -1,0 +1,342 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Ajouter une bourse{% endblock %}
+{% block page_title %}Ajouter une opportunité de bourse{% endblock %}
+{% block page_subtitle %}Créez une nouvelle bourse avec sa période de validité{% endblock %}
+
+{% block admin_content %}
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Nouvelle bourse d'études</h5>
+            </div>
+            <div class="card-body">
+                <!-- Formulaire avec support des fichiers -->
+                <form method="POST" action="{{ url_for('admin_scholarship_add') }}" enctype="multipart/form-data">
+                    
+                    <!-- ===== Informations principales ===== -->
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Titre de la bourse <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" placeholder="Ex: Bourse d'excellence - France" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Pays <span class="text-danger">*</span></label>
+                            <div class="position-relative">
+                                <input type="text" name="country" class="form-control" 
+                                       placeholder="Entrez un pays (ex: France, Canada...)" 
+                                       list="countryList" required>
+                                <datalist id="countryList">
+                                    <option value="France">France</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Belgique">Belgique</option>
+                                    <option value="Maroc">Maroc</option>
+                                    <option value="Turquie">Turquie</option>
+                                    <option value="Allemagne">Allemagne</option>
+                                    <option value="Suisse">Suisse</option>
+                                    <option value="Royaume-Uni">Royaume-Uni</option>
+                                    <option value="Etats-Unis">Etats-Unis</option>
+                                    <option value="Sénégal">Sénégal</option>
+                                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                                    <option value="Cameroun">Cameroun</option>
+                                    <option value="Gabon">Gabon</option>
+                                    <option value="Togo">Togo</option>
+                                    <option value="Bénin">Bénin</option>
+                                    <option value="Burkina Faso">Burkina Faso</option>
+                                    <option value="Mali">Mali</option>
+                                    <option value="Niger">Niger</option>
+                                    <option value="RDC">RDC</option>
+                                    <option value="Congo">Congo</option>
+                                    <option value="Angola">Angola</option>
+                                    <option value="Afrique du Sud">Afrique du Sud</option>
+                                    <option value="Égypte">Égypte</option>
+                                    <option value="Tunisie">Tunisie</option>
+                                    <option value="Algérie">Algérie</option>
+                                    <option value="Mauritanie">Mauritanie</option>
+                                    <option value="Espagne">Espagne</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Italie">Italie</option>
+                                    <option value="Pays-Bas">Pays-Bas</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Suède">Suède</option>
+                                    <option value="Norvège">Norvège</option>
+                                    <option value="Danemark">Danemark</option>
+                                    <option value="Finlande">Finlande</option>
+                                    <option value="Pologne">Pologne</option>
+                                    <option value="République Tchèque">République Tchèque</option>
+                                    <option value="Hongrie">Hongrie</option>
+                                    <option value="Grèce">Grèce</option>
+                                    <option value="Chine">Chine</option>
+                                    <option value="Japon">Japon</option>
+                                    <option value="Corée du Sud">Corée du Sud</option>
+                                    <option value="Inde">Inde</option>
+                                    <option value="Australie">Australie</option>
+                                    <option value="Nouvelle-Zélande">Nouvelle-Zélande</option>
+                                    <option value="Brésil">Brésil</option>
+                                    <option value="Argentine">Argentine</option>
+                                    <option value="Mexique">Mexique</option>
+                                    <option value="Russie">Russie</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                </datalist>
+                            </div>
+                            <small class="text-muted">Vous pouvez saisir n'importe quel pays</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Niveau d'étude <span class="text-danger">*</span></label>
+                            <select name="study_level" class="form-select" required>
+                                <option value="">Sélectionnez un niveau</option>
+                                <option value="Bac">Bac / Baccalauréat</option>
+                                <option value="Licence">Licence (Bachelor)</option>
+                                <option value="Master">Master</option>
+                                <option value="Doctorat">Doctorat / PhD</option>
+                                <option value="Formation">Formation professionnelle</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Domaine d'étude <span class="text-danger">*</span></label>
+                            <select name="field_of_study" class="form-select" required>
+                                <option value="">Sélectionnez un domaine</option>
+                                <option value="Medecine">Médecine / Santé</option>
+                                <option value="Ingenieur">Ingénierie / Technologie</option>
+                                <option value="Commerce">Commerce / Gestion</option>
+                                <option value="Droit">Droit</option>
+                                <option value="Lettres">Lettres / Arts</option>
+                                <option value="Sciences">Sciences fondamentales</option>
+                                <option value="Informatique">Informatique / Data</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ===== Période de validité ===== -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" name="start_date" class="form-control" id="start_date">
+                            <small class="text-muted">Début de la période de candidature</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" name="end_date" class="form-control" id="end_date">
+                            <small class="text-muted">Fin de la période de candidature</small>
+                        </div>
+                    </div>
+
+                    <!-- ===== Images : drapeau et illustration ===== -->
+                    <hr class="my-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <i class="fas fa-flag text-primary"></i> Drapeau du pays
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Télécharger un drapeau</label>
+                                        <input type="file" name="flag_image" class="form-control" accept="image/*" onchange="previewImage(this, 'flagPreview')">
+                                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">OU URL du drapeau</label>
+                                        <input type="url" name="flag_url" class="form-control" placeholder="https://exemple.com/drapeau.png">
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <img id="flagPreview" src="" alt="Aperçu du drapeau" style="max-width:120px; max-height:80px; display:none; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <i class="fas fa-image text-primary"></i> Image de la bourse
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Télécharger une image</label>
+                                        <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImage(this, 'imagePreview')">
+                                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">OU URL de l'image</label>
+                                        <input type="url" name="image_url" class="form-control" placeholder="https://exemple.com/image.jpg">
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <img id="imagePreview" src="" alt="Aperçu de l'image" style="max-width:200px; max-height:150px; display:none; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Description & Avantages ===== -->
+                    <hr class="my-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Description de la bourse <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="Décrivez la bourse, l'université, le programme..." required></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Avantages (montant, couverture, etc.)</label>
+                            <textarea name="benefits" class="form-control" rows="3" placeholder="Ex: 500 €/mois, frais de scolarité couverts, logement inclus..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Conditions d'éligibilité</label>
+                            <textarea name="requirements" class="form-control" rows="3" placeholder="Ex: Diplôme requis, niveau de langue, moyenne minimale..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ===== Notification ===== -->
+                    <hr class="my-4">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-bell"></i> Notification automatique</h6>
+                        <p class="mb-0">Lors de l'ajout de cette bourse, une notification par email sera envoyée à <strong>tous les utilisateurs</strong> présents dans la base de données.</p>
+                    </div>
+
+                    <!-- ===== Boutons d'action ===== -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Ajouter et notifier
+                        </button>
+                        <a href="{{ url_for('admin_scholarship_opportunities') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== Validation des dates =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+
+        if (startDate && endDate) {
+            function validateDates() {
+                if (startDate.value && endDate.value && endDate.value < startDate.value) {
+                    alert('La date de fin doit être postérieure à la date de début');
+                    endDate.value = '';
+                }
+            }
+            endDate.addEventListener('change', validateDates);
+            startDate.addEventListener('change', function() {
+                if (endDate.value && this.value && endDate.value < this.value) {
+                    alert('La date de fin doit être postérieure à la date de début');
+                    endDate.value = '';
+                }
+            });
+        }
+    });
+
+    // ===== Prévisualisation des images =====
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (!preview) return;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    }
+
+    // ===== Nettoyer les champs URL quand un fichier est sélectionné =====
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const parent = this.closest('.card-body');
+            if (parent) {
+                const urlInput = parent.querySelector('input[type="url"]');
+                if (urlInput && this.files.length > 0) {
+                    urlInput.value = '';
+                }
+            }
+        });
+    });
+
+    // ===== Inversement : vider le file input si une URL est saisie =====
+    document.querySelectorAll('input[type="url"]').forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                const parent = this.closest('.card-body');
+                if (parent) {
+                    const fileInput = parent.querySelector('input[type="file"]');
+                    if (fileInput) {
+                        fileInput.value = '';
+                        // Réinitialiser l'aperçu
+                        const preview = parent.querySelector('img[id$="Preview"]');
+                        if (preview) {
+                            preview.src = '';
+                            preview.style.display = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #1E293B;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+    }
+
+    .card-header {
+        border-radius: 16px 16px 0 0 !important;
+        font-weight: 600;
+    }
+
+    .text-danger {
+        color: #EF4444 !important;
+        font-weight: 700;
+    }
+
+    .alert-info {
+        background-color: #EFF6FF;
+        border-color: #93C5FD;
+        color: #1E40AF;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+    }
+</style>
+
+{% endblock %}

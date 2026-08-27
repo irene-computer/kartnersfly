@@ -1,508 +1,843 @@
 {% extends "base.html" %}
 
-{% block title %}À propos{% endblock %}
+{% block title %}À propos de Kartners Travel Agency{% endblock %}
 
 {% block content %}
-<section class="section about-section">
-    <div class="container">
-        <h2 class="section-title">À propos de <span>Kartners</span></h2>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<section class="k-about-section">
+    <div class="k-container">
         
-        <div class="about-grid">
-            <div class="about-content">
-                <div class="about-block">
-                    <h3 class="about-title">
-                        <i class="fas fa-building"></i> Qui sommes-nous ?
-                    </h3>
-                    <p class="about-text-content"><strong>Kartners Travel Agency</strong> est votre partenaire de confiance pour tous vos projets de voyage et démarches administratives. <strong>"Voyagez, comme vous l'imaginez"</strong> - telle est notre devise.</p>
-                </div>
-                
-                <div class="about-block">
-                    <h3 class="about-title">
-                        <i class="fas fa-concierge-bell"></i> Nos services
-                    </h3>
-                    <ul class="services-list">
-                        <li><i class="fas fa-passport service-icon"></i><strong>Pré-enrôlement administratif</strong> - Passeport, Carte Nationale d'Identité (CNI)</li>
-                        <li><i class="fas fa-plane service-icon"></i><strong>Billeterie aérienne</strong> - Vols nationaux & internationaux, tarifs compétitifs</li>
-                        <li><i class="fas fa-hotel service-icon"></i><strong>Réservation d'hôtels</strong> - Séjours nationaux & internationaux</li>
-                        <li><i class="fas fa-file-visa service-icon"></i><strong>Assistance Visa</strong> - Études, tourisme, affaires, suivi complet du dossier</li>
-                        <li><i class="fas fa-map-marked-alt service-icon"></i><strong>Planification de voyage</strong> - Voyages organisés, circuits touristiques personnalisés</li>
-                    </ul>
-                </div>
-                
-                <div class="about-block">
-                    <h3 class="about-title">
-                        <i class="fas fa-star"></i> Pourquoi nous choisir ?
-                    </h3>
-                    <ul class="why-list">
-                        <li><i class="fas fa-check-circle why-icon"></i>Rapidité & professionnalisme</li>
-                        <li><i class="fas fa-check-circle why-icon"></i>Accompagnement personnalisé</li>
-                        <li><i class="fas fa-check-circle why-icon"></i>Transparence & fiabilité</li>
-                        <li><i class="fas fa-check-circle why-icon"></i>Satisfaction client garantie</li>
-                    </ul>
-                </div>
-            </div>
+        <!-- Header Section -->
+        <div class="k-header text-center">
+            <span class="k-badge">Découvrez notre univers</span>
+            <h1 class="k-title">À propos de <span class="k-gradient-text">Kartners</span></h1>
+            <p class="k-subtitle">Votre partenaire de confiance pour transformer chaque voyage en une expérience inoubliable.</p>
+        </div>
+
+        <!-- Grille Principale -->
+        <div class="k-grid">
             
-            <div class="about-carousel">
-                <div id="aboutCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="0" class="active"></button>
-                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="1"></button>
-                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="2"></button>
-                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="3"></button>
-                        <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="4"></button>
+            <!-- Colonne Gauche : Présentation et Services -->
+            <div class="k-content-col">
+                
+                <!-- Carte Qui sommes-nous -->
+                <div class="k-card k-card-fade">
+                    <div class="k-card-icon-wrapper">
+                        <i class="fas fa-building"></i>
                     </div>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <div class="carousel-card card-service-1">
-                                <i class="fas fa-passport card-icon"></i>
-                                <h4>Pré-enrôlement administratif</h4>
-                                <p>Passeport & CNI</p>
-                                <span>Démarches simplifiées</span>
+                    <div class="k-card-content">
+                        <h3>Qui sommes-nous ?</h3>
+                        <p><strong>Kartners Travel Agency</strong> est bien plus qu'une simple agence. Nous sommes les architectes de vos rêves de voyage. <br><br> 
+                        <em>"Voyagez, comme vous l'imaginez"</em> n'est pas juste une devise, c'est notre promesse. Nous allions expertise locale et vision internationale pour vous offrir des services sur mesure, de la préparation administrative à l'embarquement.</p>
+                    </div>
+                </div>
+
+                <!-- Carte Nos Services Exclusifs -->
+                <div class="k-card k-card-fade" style="transition-delay: 0.1s;">
+                    <div class="k-card-icon-wrapper">
+                        <i class="fas fa-concierge-bell"></i>
+                    </div>
+                    <div class="k-card-content">
+                        <h3>Nos Services Exclusifs</h3>
+                        <ul class="k-service-list">
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-passport"></i></div>
+                                <div><strong>Pré-enrôlement</strong> <span>Passeport & CNI, démarches simplifiées.</span></div>
+                            </li>
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-plane-departure"></i></div>
+                                <div><strong>Billetterie Aérienne</strong> <span>Vols nationaux & internationaux aux meilleurs tarifs.</span></div>
+                            </li>
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-hotel"></i></div>
+                                <div><strong>Réservation Hôtelière</strong> <span>Séjours sur mesure, du standard au luxe.</span></div>
+                            </li>
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <div><strong>Bourse d'études & Visa étudiant</strong> <span>Accompagnement complet pour vos études à l'étranger.</span></div>
+                            </li>
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-file-signature"></i></div>
+                                <div><strong>Assistance Visa</strong> <span>Tourisme, Affaires, suivi complet du dossier.</span></div>
+                            </li>
+                            <li>
+                                <div class="k-list-icon"><i class="fas fa-map-marked-alt"></i></div>
+                                <div><strong>Planification de Voyage</strong> <span>Circuits personnalisés et voyages organisés.</span></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Carte Pourquoi nous choisir -->
+                <div class="k-card k-card-fade" style="transition-delay: 0.2s;">
+                    <div class="k-card-icon-wrapper">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="k-card-content">
+                        <h3>Pourquoi nous choisir ?</h3>
+                        <div class="k-why-grid">
+                            <div class="k-why-item">
+                                <i class="fas fa-bolt"></i>
+                                <span>Rapidité</span>
                             </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="carousel-card card-service-2">
-                                <i class="fas fa-plane card-icon"></i>
-                                <h4>Billeterie aérienne</h4>
-                                <p>Vols nationaux & internationaux</p>
-                                <span>Tarifs compétitifs</span>
+                            <div class="k-why-item">
+                                <i class="fas fa-handshake"></i>
+                                <span>Fiabilité</span>
                             </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="carousel-card card-service-3">
-                                <i class="fas fa-hotel card-icon"></i>
-                                <h4>Réservation d'hôtels</h4>
-                                <p>Séjours nationaux & internationaux</p>
-                                <span>Standards, confort & luxe</span>
+                            <div class="k-why-item">
+                                <i class="fas fa-gem"></i>
+                                <span>Premium</span>
                             </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="carousel-card card-service-4">
-                                <i class="fas fa-file-visa card-icon"></i>
-                                <h4>Assistance Visa</h4>
-                                <p>Études, tourisme, affaires</p>
-                                <span>Suivi complet du dossier</span>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="carousel-card card-service-5">
-                                <i class="fas fa-map-marked-alt card-icon"></i>
-                                <h4>Planification de voyage</h4>
-                                <p>Voyages organisés</p>
-                                <span>Circuits personnalisés</span>
+                            <div class="k-why-item">
+                                <i class="fas fa-headset"></i>
+                                <span>Support 24/7</span>
                             </div>
                         </div>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#aboutCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#aboutCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
+                </div>
+
+            </div>
+
+            <!-- Colonne Droite : Carrousel Premium (sans noir) -->
+            <div class="k-carousel-col k-card-fade" style="transition-delay: 0.3s;">
+                <div class="k-carousel-wrapper">
+                    <div id="kAboutCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators k-indicators">
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="0" class="active"></button>
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="2"></button>
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="3"></button>
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="4"></button>
+                            <button type="button" data-bs-target="#kAboutCarousel" data-bs-slide-to="5"></button>
+                        </div>
+                        
+                        <div class="carousel-inner k-carousel-inner">
+                            <!-- Slide 1 : Violet -->
+                            <div class="carousel-item active">
+                                <div class="k-slide-card slide-violet">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-passport k-slide-icon"></i>
+                                        <h4>Pré-enrôlement</h4>
+                                        <p>Passeport & CNI</p>
+                                        <span class="k-slide-tag">Simplifié</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 2 : Cyan -->
+                            <div class="carousel-item">
+                                <div class="k-slide-card slide-cyan">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-plane-departure k-slide-icon"></i>
+                                        <h4>Billetterie</h4>
+                                        <p>Vols Nationaux & Internationaux</p>
+                                        <span class="k-slide-tag">Tarifs compétitifs</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 3 : Dégradé Violet → Cyan (remplace l'ancien "dark") -->
+                            <div class="carousel-item">
+                                <div class="k-slide-card slide-mix">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-hotel k-slide-icon"></i>
+                                        <h4>Réservation Hôtels</h4>
+                                        <p>Séjours nationaux & internationaux</p>
+                                        <span class="k-slide-tag">Confort & Luxe</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 4 : Violet foncé mais lumineux (sans noir) -->
+                            <div class="carousel-item">
+                                <div class="k-slide-card slide-violet-deep">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-graduation-cap k-slide-icon"></i>
+                                        <h4>Bourse & Visa Étudiant</h4>
+                                        <p>Études à l'étranger</p>
+                                        <span class="k-slide-tag">Accompagnement complet</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 5 : Cyan foncé mais lumineux -->
+                            <div class="carousel-item">
+                                <div class="k-slide-card slide-cyan-deep">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-file-signature k-slide-icon"></i>
+                                        <h4>Assistance Visa</h4>
+                                        <p>Tourisme & Affaires</p>
+                                        <span class="k-slide-tag">Suivi complet</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 6 : Dégradé Violet → Cyan -->
+                            <div class="carousel-item">
+                                <div class="k-slide-card slide-mix">
+                                    <div class="k-slide-content">
+                                        <i class="fas fa-map-marked-alt k-slide-icon"></i>
+                                        <h4>Planification</h4>
+                                        <p>Circuits personnalisés</p>
+                                        <span class="k-slide-tag">Sur mesure</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#kAboutCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon k-ctrl-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#kAboutCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon k-ctrl-icon"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="contact-stats-grid">
-            <div class="contact-card">
-                <h4><i class="fas fa-phone-alt"></i> Contactez-nous</h4>
-                <p><strong>Téléphone :</strong> +237 676 268 350</p>
-                <p><strong>Email :</strong> kta2k23@gmail.com</p>
-                <p class="tagline">"Votre voyage commence ici."</p>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number"><span id="servicesCounter">0</span></div>
-                    <div class="stat-label">Services proposés</div>
+
+        <!-- Section Contact & Statistiques -->
+        <div class="k-footer-grid">
+            
+            <div class="k-contact-card">
+                <div class="k-contact-icon">
+                    <i class="fas fa-phone-alt"></i>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number"><span id="clientsCounter">0</span>+</div>
-                    <div class="stat-label">Clients accompagnés</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number"><span id="yearsCounter">0</span></div>
-                    <div class="stat-label">Ans d'expertise</div>
+                <div>
+                    <h4>Contactez-nous</h4>
+                    <p><strong>Téléphone :</strong> +237 676 268 350</p>
+                    <p><strong>Email :</strong> kta2k23@gmail.com</p>
+                    <div class="k-tagline">"Votre voyage commence ici."</div>
                 </div>
             </div>
+
+            <div class="k-stats-grid">
+                <div class="k-stat-box">
+                    <div class="k-stat-number"><span id="servicesCounter">0</span></div>
+                    <div class="k-stat-label">Services</div>
+                </div>
+                <div class="k-stat-box">
+                    <div class="k-stat-number"><span id="clientsCounter">0</span>+</div>
+                    <div class="k-stat-label">Clients</div>
+                </div>
+                <div class="k-stat-box">
+                    <div class="k-stat-number"><span id="yearsCounter">0</span></div>
+                    <div class="k-stat-label">Ans d'expertise</div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
 
 <style>
-    /* ===== SECTION À PROPOS - SANS BORDURES ===== */
-    .about-section {
-        padding: 60px 0;
-        background: #F8FAFC;
+    /* ========================================
+       DESIGN SYSTEM KTA (SANS NOIR)
+       Couleurs : Violet #6C2BD9 & Cyan #00B4D8
+       ======================================== */
+    :root {
+        --k-violet: #6C2BD9;
+        --k-violet-dark: #4A1A8A;
+        --k-violet-light: #A78BFA;
+        --k-cyan: #00B4D8;
+        --k-cyan-dark: #0077B6;
+        --k-cyan-light: #48CAE4;
+        --k-white: #FFFFFF;
+        --k-bg: #F0F4F8;
+        --k-gray: #E2E8F0;
+        --k-text: #1E293B;
+        --k-muted: #64748B;
+        --k-shadow: rgba(108, 43, 217, 0.08);
     }
 
-    .section-title {
-        text-align: center;
-        font-size: 2.8rem;
-        font-weight: 800;
-        color: #0F172A;
+    .k-about-section {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--k-bg);
+        padding: 70px 0;
+        color: var(--k-text);
+    }
+
+    .k-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    /* ===== HEADER ===== */
+    .k-header {
         margin-bottom: 50px;
     }
 
-    .section-title span {
-        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+    .k-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: var(--k-white);
+        padding: 8px 24px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 20px rgba(108, 43, 217, 0.25);
     }
 
-    /* Grille principale */
-    .about-grid {
+    .k-title {
+        font-size: 3.2rem;
+        font-weight: 900;
+        margin-bottom: 18px;
+        letter-spacing: -1px;
+        color: #0F172A;
+    }
+
+    .k-gradient-text {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .k-subtitle {
+        font-size: 1.2rem;
+        color: var(--k-muted);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    /* ===== GRILLE PRINCIPALE ===== */
+    .k-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 50px;
-        margin-bottom: 60px;
+        gap: 40px;
+        margin-bottom: 50px;
     }
 
-    /* Contenu texte */
-    .about-content {
+    .k-content-col {
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        gap: 24px;
     }
 
-    .about-block {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-        border: none; /* SUPPRESSION BORDURE */
+    /* ===== CARTES ===== */
+    .k-card {
+        background: var(--k-white);
+        padding: 36px 32px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px var(--k-shadow);
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(108, 43, 217, 0.04);
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
     }
 
-    .about-block:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(139,92,246,0.1);
+    .k-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.12);
+        border-color: rgba(0, 180, 216, 0.15);
     }
 
-    .about-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #0F172A;
-        margin-bottom: 15px;
+    .k-card-icon-wrapper {
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(108, 43, 217, 0.08);
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: center;
+        color: var(--k-violet);
+        font-size: 1.3rem;
+        transition: all 0.3s ease;
     }
 
-    .about-title i {
-        color: #8B5CF6;
-        font-size: 1.4rem;
+    .k-card:hover .k-card-icon-wrapper {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: var(--k-white);
+        transform: scale(1.05);
     }
 
-    .about-text-content {
-        font-size: 1rem;
-        line-height: 1.8;
-        color: #475569;
-        margin: 0;
-    }
-
-    .about-text-content strong {
+    .k-card-content h3 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin-bottom: 12px;
         color: #0F172A;
     }
 
-    /* Listes de services */
-    .services-list, .why-list {
-        list-style: none;
-        padding: 0;
+    .k-card-content p {
+        font-size: 0.98rem;
+        color: #475569;
+        line-height: 1.75;
         margin: 0;
     }
 
-    .services-list li, .why-list li {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 10px 0;
-        font-size: 0.95rem;
-        color: #475569;
-        line-height: 1.6;
-        border-bottom: none; /* SUPPRESSION BORDURE */
+    .k-card-content strong {
+        color: #0F172A;
     }
 
-    .services-list li:last-child, .why-list li:last-child {
+    /* ===== LISTE SERVICES ===== */
+    .k-service-list {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0 0 0;
+    }
+
+    .k-service-list li {
+        display: flex;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--k-gray);
+        align-items: center;
+    }
+
+    .k-service-list li:last-child {
         border-bottom: none;
     }
 
-    .service-icon, .why-icon {
-        color: #8B5CF6;
-        font-size: 1.1rem;
-        margin-top: 3px;
+    .k-list-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(0, 180, 216, 0.10);
+        color: var(--k-cyan-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
         flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .k-service-list li:hover .k-list-icon {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: var(--k-white);
+    }
+
+    .k-service-list li div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .k-service-list li strong {
+        font-size: 0.95rem;
+        color: #0F172A;
+    }
+
+    .k-service-list li span {
+        font-size: 0.88rem;
+        color: var(--k-muted);
+    }
+
+    /* ===== GRILLE POURQUOI NOUS ===== */
+    .k-why-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    .k-why-item {
+        background: var(--k-bg);
+        padding: 12px 16px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(108, 43, 217, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .k-why-item:hover {
+        background: rgba(108, 43, 217, 0.04);
+        transform: translateY(-2px);
+        border-color: rgba(108, 43, 217, 0.12);
+    }
+
+    .k-why-item i {
+        color: var(--k-cyan-dark);
+        font-size: 1.1rem;
         width: 20px;
         text-align: center;
     }
 
-    .services-list strong {
-        color: #0F172A;
+    .k-why-item span {
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: #1E293B;
     }
 
-    /* Carrousel */
-    .about-carousel {
+    /* ===== CARROUSEL KTA (SANS NOIR) ===== */
+    .k-carousel-col {
         display: flex;
-        align-items: center;
+        align-items: stretch;
     }
 
-    .carousel {
+    .k-carousel-wrapper {
         width: 100%;
-        border-radius: 16px;
+        border-radius: 24px;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        border: none; /* SUPPRESSION BORDURE */
+        box-shadow: 0 12px 40px rgba(108, 43, 217, 0.15);
+        position: relative;
     }
 
-    .carousel-card {
-        height: 400px;
+    .k-slide-card {
+        height: 540px;
         display: flex;
-        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        align-items: center;
+        padding: 40px;
+        color: var(--k-white);
+        position: relative;
+    }
+
+    /* Dégradés lumineux (sans noir) */
+    .slide-violet { background: linear-gradient(135deg, #4A1A8A, #6C2BD9); }
+    .slide-cyan { background: linear-gradient(135deg, #0077B6, #00B4D8); }
+    .slide-violet-deep { background: linear-gradient(135deg, #3B1A6E, #6C2BD9); }
+    .slide-cyan-deep { background: linear-gradient(135deg, #005A8C, #00B4D8); }
+    .slide-mix { background: linear-gradient(135deg, #6C2BD9, #00B4D8); }
+
+    .k-slide-card::after {
+        content: '✈';
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        font-size: 120px;
+        opacity: 0.06;
+        pointer-events: none;
+        transform: rotate(-15deg);
+    }
+
+    .k-slide-content {
+        position: relative;
+        z-index: 2;
         text-align: center;
-        padding: 40px 30px;
-        color: white;
-        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
-        border: none; /* SUPPRESSION BORDURE */
+        max-width: 340px;
     }
 
-    .carousel-card .card-icon {
-        font-size: 3rem;
+    .k-slide-icon {
+        font-size: 3.5rem;
         margin-bottom: 20px;
-        color: rgba(255,255,255,0.9);
+        background: rgba(255, 255, 255, 0.12);
+        padding: 22px;
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: transform 0.4s ease;
     }
 
-    .carousel-card h4 {
-        font-size: 1.5rem;
-        font-weight: 700;
+    .carousel-item.active .k-slide-icon {
+        animation: kIconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes kIconPop {
+        0% { transform: scale(0.8); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .k-slide-content h4 {
+        font-size: 1.8rem;
+        font-weight: 800;
         margin-bottom: 10px;
+        color: var(--k-white);
     }
 
-    .carousel-card p {
-        font-size: 1rem;
-        opacity: 0.9;
-        margin-bottom: 8px;
+    .k-slide-content p {
+        font-size: 1.1rem;
+        opacity: 0.92;
+        margin-bottom: 22px;
+        color: rgba(255, 255, 255, 0.92);
     }
 
-    .carousel-card span {
-        font-size: 0.9rem;
-        opacity: 0.8;
-        font-weight: 500;
-        background: rgba(255,255,255,0.2);
-        padding: 5px 15px;
-        border-radius: 30px;
+    .k-slide-tag {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        color: var(--k-white);
     }
 
-    .card-service-1 { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
-    .card-service-2 { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
-    .card-service-3 { background: linear-gradient(135deg, #10B981, #047857); }
-    .card-service-4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
-    .card-service-5 { background: linear-gradient(135deg, #EF4444, #B91C1C); }
+    .k-indicators button {
+        background-color: var(--k-white) !important;
+        opacity: 0.4;
+        width: 10px !important;
+        height: 10px !important;
+        border-radius: 50% !important;
+        border: none;
+        margin: 0 5px !important;
+        transition: all 0.3s ease;
+    }
 
-    .carousel-control-prev, .carousel-control-next {
-        width: 40px;
-        height: 40px;
-        background: rgba(255,255,255,0.2);
+    .k-indicators button.active {
+        opacity: 1;
+        transform: scale(1.3);
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan)) !important;
+    }
+
+    .k-ctrl-icon {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         border-radius: 50%;
-        top: 50%;
-        transform: translateY(-50%);
-        border: none; /* SUPPRESSION BORDURE */
-    }
-
-    .carousel-control-prev:hover, .carousel-control-next:hover {
-        background: rgba(255,255,255,0.3);
-    }
-
-    /* Contact & Stats */
-    .contact-stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 30px;
-        margin-top: 20px;
-    }
-
-    .contact-card {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        border: none; /* SUPPRESSION BORDURE */
-    }
-
-    .contact-card h4 {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #0F172A;
-        margin-bottom: 20px;
+        width: 40px !important;
+        height: 40px !important;
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        transition: all 0.3s ease;
     }
 
-    .contact-card h4 i {
-        color: #8B5CF6;
+    .k-ctrl-icon:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
     }
 
-    .contact-card p {
+    .k-ctrl-icon::before {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--k-white);
+        font-size: 1rem;
+    }
+
+    .carousel-control-prev .k-ctrl-icon::before { content: "\f053"; }
+    .carousel-control-next .k-ctrl-icon::before { content: "\f054"; }
+
+    /* ===== CONTACT & STATS ===== */
+    .k-footer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 24px;
+        margin-top: 30px;
+    }
+
+    .k-contact-card {
+        background: var(--k-white);
+        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px var(--k-shadow);
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        border: 1px solid rgba(108, 43, 217, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .k-contact-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(108, 43, 217, 0.10);
+        border-color: rgba(0, 180, 216, 0.10);
+    }
+
+    .k-contact-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: var(--k-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 16px rgba(108, 43, 217, 0.25);
+    }
+
+    .k-contact-card h4 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #0F172A;
+    }
+
+    .k-contact-card p {
         font-size: 0.95rem;
         color: #475569;
-        margin-bottom: 10px;
+        margin: 4px 0;
     }
 
-    .contact-card strong {
-        color: #0F172A;
-    }
+    .k-contact-card strong { color: #0F172A; }
 
-    .tagline {
+    .k-tagline {
+        margin-top: 10px;
+        color: var(--k-violet) !important;
+        font-weight: 600;
         font-style: italic;
-        color: #8B5CF6 !important;
-        font-weight: 500;
-        margin-top: 15px;
+        font-size: 0.95rem;
     }
 
-    .stats-grid {
+    /* ===== STATISTIQUES ===== */
+    .k-stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 16px;
     }
 
-    .stat-item {
-        background: white;
-        padding: 30px 20px;
-        border-radius: 16px;
+    .k-stat-box {
+        background: var(--k-white);
+        padding: 24px 16px;
+        border-radius: 20px;
         text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px var(--k-shadow);
         transition: all 0.3s ease;
-        border: none; /* SUPPRESSION BORDURE */
+        border: 1px solid rgba(108, 43, 217, 0.04);
     }
 
-    .stat-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(139,92,246,0.1);
+    .k-stat-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 180, 216, 0.12);
+        border-color: rgba(0, 180, 216, 0.15);
     }
 
-    .stat-number {
+    .k-stat-number {
         font-size: 2.8rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        line-height: 1.2;
+        line-height: 1.1;
+        margin-bottom: 4px;
     }
 
-    .stat-label {
-        font-size: 0.9rem;
-        color: #64748B;
-        font-weight: 500;
-        margin-top: 5px;
+    .k-stat-label {
+        font-size: 0.88rem;
+        color: var(--k-muted);
+        font-weight: 600;
     }
 
-    /* Responsive */
+    /* ===== ANIMATIONS SCROLL ===== */
+    .k-card-fade {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .k-card-fade.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 992px) {
-        .about-grid {
+        .k-grid {
             grid-template-columns: 1fr;
             gap: 30px;
         }
-
-        .contact-stats-grid {
+        .k-footer-grid {
             grid-template-columns: 1fr;
         }
-
-        .stats-grid {
-            grid-template-columns: repeat(3, 1fr);
+        .k-title {
+            font-size: 2.5rem;
+        }
+        .k-slide-card {
+            height: 420px;
         }
     }
 
     @media (max-width: 768px) {
-        .section-title {
-            font-size: 2rem;
-        }
-
-        .carousel-card {
-            height: 300px;
-            padding: 30px 20px;
-        }
-
-        .carousel-card h4 {
-            font-size: 1.2rem;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .contact-stats-grid {
-            grid-template-columns: 1fr;
-        }
+        .k-about-section { padding: 40px 0; }
+        .k-title { font-size: 2.1rem; }
+        .k-card { flex-direction: column; padding: 24px; gap: 16px; }
+        .k-slide-card { height: 360px; }
+        .k-slide-content h4 { font-size: 1.5rem; }
+        .k-stats-grid { grid-template-columns: 1fr; }
+        .k-why-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 576px) {
-        .about-block {
-            padding: 20px;
-        }
+        .k-container { padding: 0 16px; }
+        .k-title { font-size: 1.8rem; }
+        .k-slide-card { height: 320px; padding: 20px; }
+        .k-slide-icon { font-size: 2.5rem; padding: 14px; }
+        .k-contact-card { flex-direction: column; align-items: center; text-align: center; }
+        .k-stat-number { font-size: 2.2rem; }
+    }
 
-        .services-list li, .why-list li {
-            font-size: 0.85rem;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-        }
+    @media (max-width: 400px) {
+        .k-badge { font-size: 0.7rem; padding: 6px 16px; }
+        .k-title { font-size: 1.55rem; }
+        .k-subtitle { font-size: 1rem; }
+        .k-card { padding: 18px; }
+        .k-card-content h3 { font-size: 1.15rem; }
+        .k-card-icon-wrapper { width: 44px; height: 44px; font-size: 1.1rem; }
+        .k-slide-card { height: 280px; padding: 16px; }
+        .k-slide-content h4 { font-size: 1.25rem; }
+        .k-why-item { padding: 14px 10px; }
+        .k-contact-icon { width: 44px; height: 44px; font-size: 0.95rem; }
+        .k-stats-grid { gap: 10px; }
+        .k-stat-box { padding: 18px 10px; }
+        .k-stat-number { font-size: 1.8rem; }
     }
 </style>
 
 <script>
-function animateCounter(elementId, start, end, duration) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-    
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const current = Math.floor(progress * (end - start) + start);
-        element.textContent = current;
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-    window.requestAnimationFrame(step);
-}
+    // ===== ANIMATION DES COMPTEURS =====
+    function animateCounter(elementId, start, end, duration) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = Math.floor(progress * (end - start) + start);
+            element.textContent = current.toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
 
-const observerOptions = {
-    threshold: 0.3,
-    rootMargin: '0px'
-};
+    const observerOptions = { threshold: 0.3, rootMargin: '0px' };
+    let countersStarted = false;
 
-let countersStarted = false;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !countersStarted) {
+                countersStarted = true;
+                animateCounter('servicesCounter', 0, 6, 1500);
+                animateCounter('clientsCounter', 0, 5000, 2500);
+                animateCounter('yearsCounter', 0, 15, 1500);
+            }
+        });
+    }, observerOptions);
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && !countersStarted) {
-            countersStarted = true;
-            animateCounter('servicesCounter', 0, 5, 1500);
-            animateCounter('clientsCounter', 0, 5000, 2500);
-            animateCounter('yearsCounter', 0, 15, 1500);
+    const statsSection = document.querySelector('.k-stats-grid');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+
+    // ===== ANIMATION FADE-IN & CARROUSEL =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const fadeElements = document.querySelectorAll('.k-card-fade');
+        
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(el => fadeObserver.observe(el));
+
+        var carousel = document.getElementById('kAboutCarousel');
+        if (carousel) {
+            new bootstrap.Carousel(carousel, {
+                interval: 4000,
+                wrap: true,
+                ride: 'carousel'
+            });
         }
     });
-}, observerOptions);
-
-const statsSection = document.querySelector('.stats-grid');
-if (statsSection) {
-    observer.observe(statsSection);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var carousel = document.getElementById('aboutCarousel');
-    if (carousel) {
-        new bootstrap.Carousel(carousel, {
-            interval: 3500,
-            wrap: true,
-            ride: 'carousel'
-        });
-    }
-});
 </script>
+
 {% endblock %}

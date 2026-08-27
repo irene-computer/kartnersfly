@@ -3,141 +3,505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration Kartners</title>
+    <title>Administration Kartners - {% block title %}Dashboard{% endblock %}</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --violet-primary: #8B5CF6;
             --violet-dark: #6B3FA0;
             --blue-primary: #3B82F6;
             --blue-dark: #1E3A8A;
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            background: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-100);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--gray-800);
+            min-height: 100vh;
         }
         
+        /* ===== HEADER ===== */
         .admin-header {
             background: linear-gradient(135deg, var(--violet-dark), var(--blue-dark));
             color: white;
-            padding: 15px 20px;
+            padding: 12px 24px;
             position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             width: 100%;
-            z-index: 1000;
+            z-index: 1050;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.15);
         }
         
         .admin-header .container-fluid {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 100%;
         }
         
         .admin-header .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .admin-header .logo img {
-            height: 40px;
+            height: 42px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         
         .admin-header .logo span {
-            font-size: 1.3rem;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
         
+        .admin-header .logo small {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            font-weight: 400;
+            display: block;
+            letter-spacing: 1px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        /* ===== SIDEBAR ===== */
         .admin-nav {
             background: white;
-            padding: 70px 0 0 0;
+            padding: 75px 0 0 0;
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 260px;
             height: 100vh;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            z-index: 1040;
+            transition: transform 0.3s ease;
+        }
+        
+        .admin-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .admin-nav::-webkit-scrollbar-thumb {
+            background: var(--gray-200);
+            border-radius: 4px;
         }
         
         .admin-nav ul {
             list-style: none;
-            padding: 0;
+            padding: 10px 0;
             margin: 0;
         }
         
-        .admin-nav li a {
-            display: block;
-            padding: 12px 20px;
-            color: #4A5568;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
+        .admin-nav .nav-section {
+            padding: 8px 20px 4px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gray-600);
+            font-weight: 600;
         }
         
-        .admin-nav li a:hover,
-        .admin-nav li a.active {
+        .admin-nav li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+            font-weight: 500;
+            gap: 12px;
+        }
+        
+        .admin-nav li a i {
+            width: 22px;
+            font-size: 1rem;
+            text-align: center;
+            color: var(--gray-600);
+            transition: color 0.25s ease;
+        }
+        
+        .admin-nav li a:hover {
             background: #F3E8FF;
             color: var(--violet-primary);
             border-left-color: var(--violet-primary);
         }
         
-        .admin-nav li a i {
-            width: 25px;
-            margin-right: 10px;
+        .admin-nav li a:hover i {
+            color: var(--violet-primary);
         }
         
+        .admin-nav li a.active {
+            background: #F3E8FF;
+            color: var(--violet-primary);
+            border-left-color: var(--violet-primary);
+            font-weight: 600;
+        }
+        
+        .admin-nav li a.active i {
+            color: var(--violet-primary);
+        }
+        
+        .admin-nav li a .badge-nav {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        /* ===== MAIN CONTENT ===== */
         .admin-content {
-            margin-left: 250px;
-            padding: 80px 30px 30px 30px;
+            margin-left: 260px;
+            padding: 85px 30px 30px 30px;
+            min-height: 100vh;
         }
         
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
+        /* ===== FLASH MESSAGES ===== */
+        .alert-custom {
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .alert-custom .btn-close {
+            font-size: 0.7rem;
+        }
+        
+        /* ===== STATS CARDS ===== */
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 14px;
+        }
+        
+        .stat-card .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--gray-800);
+            letter-spacing: -0.5px;
+        }
+        
+        .stat-card .stat-label {
+            color: var(--gray-600);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .stat-card .stat-change {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-change.up { color: var(--success); }
+        .stat-change.down { color: var(--danger); }
+        
+        /* ===== TABLES ===== */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        
+        .table-custom {
+            margin-bottom: 0;
+        }
+        
+        .table-custom th {
+            border-top: none;
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 12px 12px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        .table-custom td {
+            padding: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .table-custom tbody tr:hover {
+            background-color: #FAFAFE;
+        }
+        
+        /* ===== BADGES ===== */
+        .badge-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .badge-pending { background: #FEF3C7; color: #D97706; }
+        .badge-confirmed { background: #D1FAE5; color: #059669; }
+        .badge-cancelled { background: #FEE2E2; color: #DC2626; }
+        .badge-en-cours { background: #DBEAFE; color: #2563EB; }
+        .badge-success { background: #D1FAE5; color: #059669; }
+        .badge-warning { background: #FEF3C7; color: #D97706; }
+        .badge-danger { background: #FEE2E2; color: #DC2626; }
+        .badge-info { background: #DBEAFE; color: #2563EB; }
+        
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
             border: none;
             color: white;
             padding: 8px 20px;
-            border-radius: 25px;
-            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
             transition: all 0.3s ease;
         }
         
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.3);
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139,92,246,0.3);
             color: white;
         }
         
-        @media (max-width: 768px) {
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
             .admin-nav {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding-top: 60px;
+                transform: translateX(-100%);
+                width: 280px;
             }
+            
+            .admin-nav.mobile-open {
+                transform: translateX(0);
+            }
+            
             .admin-content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 80px 20px 20px 20px;
+            }
+            
+            .menu-toggle {
+                display: flex !important;
             }
         }
+        
+        @media (min-width: 993px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        /* Overlay mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1039;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .page-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--gray-800);
+        }
+        
+        .page-header .subtitle {
+            color: var(--gray-600);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== FORMULAIRE ===== */
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 10px 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--violet-primary);
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+        }
+        
+        .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+        
+        /* ===== MISC ===== */
+        .text-muted { color: var(--gray-600) !important; }
+        
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 1rem; }
+        
+        .flex-wrap { flex-wrap: wrap; }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
+<!-- Overlay pour mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Header -->
 <div class="admin-header">
     <div class="container-fluid">
         <div class="logo">
-            <img src="/static/images/kta.png" alt="Logo" onerror="this.src='https://placehold.co/40x40/8B5CF6/white?text=K'">
-            <span>Kartners Admin</span>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/static/images/kta.png" alt="Logo" onerror="this.src='https://placehold.co/42x42/8B5CF6/white?text=K'">
+            <div>
+                <span>Kartners Admin</span>
+                <small>Panel de gestion</small>
+            </div>
         </div>
-        <a href="/admin/logout" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Deconnexion
-        </a>
+        <div class="header-actions">
+            <span class="d-none d-md-inline text-white-50" style="font-size:0.8rem;">
+                <i class="fas fa-user-circle"></i> {{ session.get('admin_username', 'Admin') }}
+            </span>
+            <a href="/admin/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span class="d-none d-sm-inline">Déconnexion</span>
+            </a>
+        </div>
     </div>
 </div>
 
-<div class="admin-nav">
+<!-- Sidebar -->
+<nav class="admin-nav" id="adminNav">
     <ul>
+        <li class="nav-section">Navigation</li>
         <li>
             <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
                 <i class="fas fa-tachometer-alt"></i> Tableau de bord
@@ -146,6 +510,9 @@
         <li>
             <a href="/admin/messages" class="{% if request.path == '/admin/messages' %}active{% endif %}">
                 <i class="fas fa-envelope"></i> Messages
+                {% if messages_non_lus is defined and messages_non_lus > 0 %}
+                    <span class="badge-nav">{{ messages_non_lus }}</span>
+                {% endif %}
             </a>
         </li>
         <li>
@@ -160,16 +527,118 @@
         </li>
         <li>
             <a href="/admin/bookings" class="{% if request.path == '/admin/bookings' %}active{% endif %}">
-                <i class="fas fa-calendar-check"></i> Reservations
+                <i class="fas fa-calendar-check"></i> Réservations
+                {% if bookings_en_attente is defined and bookings_en_attente > 0 %}
+                    <span class="badge-nav">{{ bookings_en_attente }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="/admin/scholarships" class="{% if request.path == '/admin/scholarships' %}active{% endif %}">
+                <i class="fas fa-graduation-cap"></i> Bourses
+                {% if scholarships_pending is defined and scholarships_pending > 0 %}
+                    <span class="badge-nav">{{ scholarships_pending }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-section mt-3">Contenu</li>
+        <li>
+            <a href="/admin/scholarship_opportunities" class="{% if request.path == '/admin/scholarship_opportunities' %}active{% endif %}">
+                <i class="fas fa-bullhorn"></i> Annonces bourses
+            </a>
+        </li>
+        <li>
+            <a href="/admin/newsletter" class="{% if request.path == '/admin/newsletter' %}active{% endif %}">
+                <i class="fas fa-newspaper"></i> Newsletter
+                {% if newsletter_count is defined and newsletter_count > 0 %}
+                    <span class="badge-nav">{{ newsletter_count }}</span>
+                {% endif %}
             </a>
         </li>
     </ul>
-</div>
+</nav>
 
-<div class="admin-content">
+<!-- Main Content -->
+<main class="admin-content">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show alert-custom" role="alert">
+                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Page title -->
+    <div class="page-header">
+        <div>
+            <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+            <p class="subtitle">{% block page_subtitle %}{% endblock %}</p>
+        </div>
+        {% block page_actions %}{% endblock %}
+    </div>
+    
     {% block admin_content %}{% endblock %}
-</div>
+</main>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ===== MENU MOBILE =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const adminNav = document.getElementById('adminNav');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        function toggleMenu() {
+            adminNav.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = adminNav.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                adminNav.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+        
+        // Fermer le menu au clic sur un lien (mobile)
+        document.querySelectorAll('.admin-nav a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    adminNav.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+        
+        // ===== GESTION DES FLASH MESSAGES =====
+        setTimeout(function() {
+            document.querySelectorAll('.alert-custom').forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                setTimeout(function() {
+                    bsAlert.close();
+                }, 5000);
+            });
+        }, 1000);
+    });
+    
+    // ===== CONFIRMATION DE SUPPRESSION =====
+    function confirmDelete(message) {
+        return confirm(message || 'Confirmer la suppression ? Cette action est irréversible.');
+    }
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

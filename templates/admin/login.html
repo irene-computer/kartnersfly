@@ -3,182 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration Kartners - Connexion</title>
+    <title>Administration - Kartners</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --violet-primary: #8B5CF6;
-            --violet-dark: #6B3FA0;
-            --blue-primary: #3B82F6;
-            --blue-dark: #1E3A8A;
-        }
-        
         body {
-            background: linear-gradient(135deg, var(--violet-dark) 0%, var(--blue-dark) 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6B3FA0, #1E3A8A);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
         .login-container {
-            width: 100%;
             max-width: 400px;
+            width: 100%;
             padding: 20px;
         }
-        
         .login-card {
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .login-card .logo {
             text-align: center;
-        }
-        
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-        }
-        
-        .login-logo i {
-            font-size: 40px;
-            color: white;
-        }
-        
-        .login-card h2 {
-            color: var(--violet-dark);
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .login-card p {
-            color: #6c757d;
-            font-size: 0.9rem;
             margin-bottom: 30px;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+        .login-card .logo h2 {
+            color: #6B3FA0;
+            font-weight: 700;
         }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #4A5568;
+        .login-card .logo p {
+            color: #6c757d;
         }
-        
-        .input-group {
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid #E2E8F0;
-            transition: all 0.3s ease;
-        }
-        
-        .input-group:focus-within {
-            border-color: var(--violet-primary);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        
-        .input-group-text {
-            background: #F8FAFC;
-            border: none;
-            color: var(--violet-primary);
-        }
-        
         .form-control {
-            border: none;
-            padding: 12px 15px;
-            font-size: 1rem;
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
         }
-        
         .form-control:focus {
-            outline: none;
-            box-shadow: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
         }
-        
         .btn-login {
-            background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-            color: white;
+            background: linear-gradient(135deg, #8B5CF6, #3B82F6);
             border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
+            padding: 12px;
+            border-radius: 12px;
             font-weight: 600;
+            color: white;
             width: 100%;
             transition: all 0.3s ease;
-            cursor: pointer;
-            font-size: 1rem;
         }
-        
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(139,92,246,0.3);
         }
-        
-        .alert {
+        .alert-danger {
             border-radius: 12px;
-            margin-bottom: 20px;
-            padding: 12px;
-            font-size: 0.9rem;
-        }
-        
-        .footer-text {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #9ca3af;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-card">
-            <div class="login-logo">
-                <i class="fas fa-plane"></i>
+            <div class="logo">
+                <h2>KARTNERS</h2>
+                <p>Administration</p>
             </div>
-            <h2>Kartners Admin</h2>
-            <p>Acces reserve au personnel autorise</p>
             
             {% if error %}
             <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
             </div>
             {% endif %}
             
             <form method="POST">
-                <div class="form-group">
-                    <label><i class="fas fa-user me-2"></i> Nom d'utilisateur</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="username" class="form-control" placeholder="admin" required autofocus>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Nom d'utilisateur</label>
+                    <input type="text" name="username" class="form-control" placeholder="admin" required>
                 </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-lock me-2"></i> Mot de passe</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
-                
                 <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>
             </form>
-            
-            <div class="footer-text">
-                <i class="fas fa-shield-alt me-1"></i> Connexion securisee
-            </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

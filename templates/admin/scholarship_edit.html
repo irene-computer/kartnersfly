@@ -1,0 +1,340 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Modifier la bourse{% endblock %}
+{% block page_title %}Modifier l'opportunité de bourse{% endblock %}
+{% block page_subtitle %}Modifiez les informations de la bourse{% endblock %}
+
+{% block admin_content %}
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Modifier la bourse</h5>
+            </div>
+            <div class="card-body">
+                <!-- Formulaire avec support des fichiers -->
+                <form method="POST" action="{{ url_for('admin_scholarship_edit', id=opportunity.id) }}" enctype="multipart/form-data">
+                    
+                    <!-- ===== Informations principales ===== -->
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Titre de la bourse <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" value="{{ opportunity.title }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Pays <span class="text-danger">*</span></label>
+                            <div class="position-relative">
+                                <input type="text" name="country" class="form-control" 
+                                       value="{{ opportunity.country }}"
+                                       list="countryList" required>
+                                <datalist id="countryList">
+                                    <option value="France">France</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Belgique">Belgique</option>
+                                    <option value="Maroc">Maroc</option>
+                                    <option value="Turquie">Turquie</option>
+                                    <option value="Allemagne">Allemagne</option>
+                                    <option value="Suisse">Suisse</option>
+                                    <option value="Royaume-Uni">Royaume-Uni</option>
+                                    <option value="États-Unis">États-Unis</option>
+                                    <option value="Sénégal">Sénégal</option>
+                                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                                    <option value="Cameroun">Cameroun</option>
+                                    <option value="Gabon">Gabon</option>
+                                    <option value="Togo">Togo</option>
+                                    <option value="Bénin">Bénin</option>
+                                    <option value="Burkina Faso">Burkina Faso</option>
+                                    <option value="Mali">Mali</option>
+                                    <option value="Niger">Niger</option>
+                                    <option value="RDC">RDC</option>
+                                    <option value="Congo">Congo</option>
+                                    <option value="Angola">Angola</option>
+                                    <option value="Afrique du Sud">Afrique du Sud</option>
+                                    <option value="Égypte">Égypte</option>
+                                    <option value="Tunisie">Tunisie</option>
+                                    <option value="Algérie">Algérie</option>
+                                    <option value="Mauritanie">Mauritanie</option>
+                                    <option value="Espagne">Espagne</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Italie">Italie</option>
+                                    <option value="Pays-Bas">Pays-Bas</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Suède">Suède</option>
+                                    <option value="Norvège">Norvège</option>
+                                    <option value="Danemark">Danemark</option>
+                                    <option value="Finlande">Finlande</option>
+                                    <option value="Pologne">Pologne</option>
+                                    <option value="République Tchèque">République Tchèque</option>
+                                    <option value="Hongrie">Hongrie</option>
+                                    <option value="Grèce">Grèce</option>
+                                    <option value="Chine">Chine</option>
+                                    <option value="Japon">Japon</option>
+                                    <option value="Corée du Sud">Corée du Sud</option>
+                                    <option value="Inde">Inde</option>
+                                    <option value="Australie">Australie</option>
+                                    <option value="Nouvelle-Zélande">Nouvelle-Zélande</option>
+                                    <option value="Brésil">Brésil</option>
+                                    <option value="Argentine">Argentine</option>
+                                    <option value="Mexique">Mexique</option>
+                                    <option value="Russie">Russie</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                </datalist>
+                            </div>
+                            <small class="text-muted">Vous pouvez saisir n'importe quel pays</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Niveau d'étude <span class="text-danger">*</span></label>
+                            <select name="study_level" class="form-select" required>
+                                <option value="Bac" {% if opportunity.study_level == 'Bac' %}selected{% endif %}>Bac / Baccalauréat</option>
+                                <option value="Licence" {% if opportunity.study_level == 'Licence' %}selected{% endif %}>Licence (Bachelor)</option>
+                                <option value="Master" {% if opportunity.study_level == 'Master' %}selected{% endif %}>Master</option>
+                                <option value="Doctorat" {% if opportunity.study_level == 'Doctorat' %}selected{% endif %}>Doctorat / PhD</option>
+                                <option value="Formation" {% if opportunity.study_level == 'Formation' %}selected{% endif %}>Formation professionnelle</option>
+                                <option value="Autre" {% if opportunity.study_level == 'Autre' %}selected{% endif %}>Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Domaine d'étude <span class="text-danger">*</span></label>
+                            <select name="field_of_study" class="form-select" required>
+                                <option value="Médecine" {% if opportunity.field_of_study == 'Médecine' %}selected{% endif %}>Médecine / Santé</option>
+                                <option value="Ingénieur" {% if opportunity.field_of_study == 'Ingénieur' %}selected{% endif %}>Ingénierie / Technologie</option>
+                                <option value="Commerce" {% if opportunity.field_of_study == 'Commerce' %}selected{% endif %}>Commerce / Gestion</option>
+                                <option value="Droit" {% if opportunity.field_of_study == 'Droit' %}selected{% endif %}>Droit</option>
+                                <option value="Lettres" {% if opportunity.field_of_study == 'Lettres' %}selected{% endif %}>Lettres / Arts</option>
+                                <option value="Sciences" {% if opportunity.field_of_study == 'Sciences' %}selected{% endif %}>Sciences fondamentales</option>
+                                <option value="Informatique" {% if opportunity.field_of_study == 'Informatique' %}selected{% endif %}>Informatique / Data</option>
+                                <option value="Autre" {% if opportunity.field_of_study == 'Autre' %}selected{% endif %}>Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ===== Période de validité ===== -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" name="start_date" class="form-control" id="start_date" 
+                                   value="{{ opportunity.start_date if opportunity.start_date else '' }}">
+                            <small class="text-muted">Début de la période de candidature</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" name="end_date" class="form-control" id="end_date" 
+                                   value="{{ opportunity.end_date if opportunity.end_date else '' }}">
+                            <small class="text-muted">Fin de la période de candidature</small>
+                        </div>
+                    </div>
+
+                    <!-- ===== Images : drapeau et illustration ===== -->
+                    <hr class="my-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <i class="fas fa-flag text-primary"></i> Drapeau du pays
+                                </div>
+                                <div class="card-body">
+                                    <!-- Affichage de l'image actuelle -->
+                                    {% if opportunity.flag_url %}
+                                    <div class="text-center mb-3">
+                                        <img src="{% if opportunity.flag_url.startswith('http') %}{{ opportunity.flag_url }}{% else %}{{ url_for('static', filename=opportunity.flag_url) }}{% endif %}" 
+                                             alt="Drapeau actuel" 
+                                             style="max-width:120px; max-height:80px; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                        <br>
+                                        <small class="text-muted">Drapeau actuel</small>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Télécharger un nouveau drapeau</label>
+                                        <input type="file" name="flag_image" class="form-control" accept="image/*" onchange="previewImage(this, 'flagPreviewEdit')">
+                                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">OU URL du drapeau</label>
+                                        <input type="url" name="flag_url" class="form-control" value="{{ opportunity.flag_url or '' }}" placeholder="https://exemple.com/drapeau.png">
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <img id="flagPreviewEdit" src="" alt="Aperçu du drapeau" style="max-width:120px; max-height:80px; display:none; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <i class="fas fa-image text-primary"></i> Image de la bourse
+                                </div>
+                                <div class="card-body">
+                                    <!-- Affichage de l'image actuelle -->
+                                    {% if opportunity.image_url %}
+                                    <div class="text-center mb-3">
+                                        <img src="{% if opportunity.image_url.startswith('http') %}{{ opportunity.image_url }}{% else %}{{ url_for('static', filename=opportunity.image_url) }}{% endif %}" 
+                                             alt="Image actuelle" 
+                                             style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                        <br>
+                                        <small class="text-muted">Image actuelle</small>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Télécharger une nouvelle image</label>
+                                        <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImage(this, 'imagePreviewEdit')">
+                                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">OU URL de l'image</label>
+                                        <input type="url" name="image_url" class="form-control" value="{{ opportunity.image_url or '' }}" placeholder="https://exemple.com/image.jpg">
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <img id="imagePreviewEdit" src="" alt="Aperçu de l'image" style="max-width:200px; max-height:150px; display:none; border:1px solid #ddd; border-radius:8px; padding:4px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Description & Avantages ===== -->
+                    <hr class="my-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Description de la bourse <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control" rows="4" required>{{ opportunity.description }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Avantages (montant, couverture, etc.)</label>
+                            <textarea name="benefits" class="form-control" rows="3">{{ opportunity.benefits or '' }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Conditions d'éligibilité</label>
+                            <textarea name="requirements" class="form-control" rows="3">{{ opportunity.requirements or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- ===== Boutons d'action ===== -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Enregistrer les modifications
+                        </button>
+                        <a href="{{ url_for('admin_scholarship_opportunities') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== Validation des dates =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+
+        if (startDate && endDate) {
+            function validateDates() {
+                if (startDate.value && endDate.value && endDate.value < startDate.value) {
+                    alert('La date de fin doit être postérieure à la date de début');
+                    endDate.value = '';
+                }
+            }
+            endDate.addEventListener('change', validateDates);
+            startDate.addEventListener('change', function() {
+                if (endDate.value && this.value && endDate.value < this.value) {
+                    alert('La date de fin doit être postérieure à la date de début');
+                    endDate.value = '';
+                }
+            });
+        }
+    });
+
+    // ===== Prévisualisation des images =====
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (!preview) return;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    }
+
+    // ===== Nettoyer les champs URL quand un fichier est sélectionné =====
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const parent = this.closest('.card-body');
+            if (parent) {
+                const urlInput = parent.querySelector('input[type="url"]');
+                if (urlInput && this.files.length > 0) {
+                    urlInput.value = '';
+                }
+            }
+        });
+    });
+
+    // ===== Inversement : vider le file input si une URL est saisie =====
+    document.querySelectorAll('input[type="url"]').forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                const parent = this.closest('.card-body');
+                if (parent) {
+                    const fileInput = parent.querySelector('input[type="file"]');
+                    if (fileInput) {
+                        fileInput.value = '';
+                        // Réinitialiser l'aperçu
+                        const preview = parent.querySelector('img[id$="PreviewEdit"]');
+                        if (preview) {
+                            preview.src = '';
+                            preview.style.display = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #1E293B;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+    }
+
+    .card-header {
+        border-radius: 16px 16px 0 0 !important;
+        font-weight: 600;
+    }
+
+    .text-danger {
+        color: #EF4444 !important;
+        font-weight: 700;
+    }
+</style>
+
+{% endblock %}

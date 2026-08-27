@@ -1,0 +1,263 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestion des bourses{% endblock %}
+{% block page_title %}Opportunités de bourse{% endblock %}
+{% block page_subtitle %}Gérez les bourses disponibles avec leurs périodes de validité{% endblock %}
+
+{% block admin_content %}
+
+<!-- ===== BARRE D'OUTILS ===== -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <span class="badge bg-primary fs-6 px-3 py-2">{{ opportunities|length }} bourse(s)</span>
+        <span class="badge bg-success ms-2" id="activeCount">0 active(s)</span>
+        <span class="badge bg-warning text-dark ms-2" id="upcomingCount">0 à venir</span>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <div class="input-group" style="max-width: 280px;">
+            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Rechercher...">
+        </div>
+        <a href="{{ url_for('admin_scholarship_add') }}" class="btn btn-primary-custom">
+            <i class="fas fa-plus-circle me-1"></i> Ajouter
+        </a>
+    </div>
+</div>
+
+<!-- ===== TABLEAU DES BOURSES ===== -->
+<div class="table-container card shadow-sm border-0">
+    <div class="card-body p-0">
+        {% if opportunities %}
+            <div class="table-responsive">
+                <table class="table table-hover table-custom mb-0" id="scholarshipTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 70px;">Drapeau</th>
+                            <th>Titre</th>
+                            <th>Pays</th>
+                            <th>Niveau</th>
+                            <th>Domaine</th>
+                            <th style="width: 110px;">Début</th>
+                            <th style="width: 110px;">Fin</th>
+                            <th>Statut</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for opp in opportunities %}
+                            {% set today = now().date() %}
+                            {% set is_active = opp.start_date <= today.isoformat() and opp.end_date >= today.isoformat() if opp.start_date and opp.end_date else False %}
+                            {% set is_upcoming = opp.start_date > today.isoformat() if opp.start_date else False %}
+                            {% set is_expired = opp.end_date < today.isoformat() if opp.end_date else False %}
+                            {% set status_class = 'success' if is_active else 'warning' if is_upcoming else 'danger' if is_expired else 'secondary' %}
+                            {% set status_label = 'Active' if is_active else 'À venir' if is_upcoming else 'Terminée' if is_expired else 'Non définie' %}
+
+                            <tr data-title="{{ opp.title|lower }}" data-country="{{ opp.country|lower }}" data-status="{{ status_label|lower }}" data-id="{{ opp.id }}">
+                                <td class="fw-bold text-muted">{{ opp.id }}</td>
+                                <td>
+                                    {% if opp.flag_image or opp.flag_url %}
+                                        <img src="{{ opp.flag_url or url_for('static', filename=opp.flag_image) if opp.flag_image else opp.flag_url }}" 
+                                             alt="Drapeau {{ opp.country }}" 
+                                             style="width: 32px; height: 22px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6;"
+                                             onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-muted\'><i class=\'fas fa-flag\'></i></span>';">
+                                    {% else %}
+                                        <span class="text-muted"><i class="fas fa-flag"></i></span>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ opp.title }}</strong></td>
+                                <td>{{ opp.country }}</td>
+                                <td>{{ opp.study_level }}</td>
+                                <td>{{ opp.field_of_study }}</td>
+                                <td class="text-muted small">{{ opp.start_date or '-' }}</td>
+                                <td class="text-muted small">{{ opp.end_date or '-' }}</td>
+                                <td>
+                                    <span class="badge-status badge-{{ status_class }}">{{ status_label }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('admin_scholarship_edit', id=opp.id) }}" class="btn btn-sm btn-primary-custom" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ url_for('admin_scholarship_opportunity_delete', id=opp.id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete('Voulez-vous vraiment supprimer cette bourse ? Cette action est irréversible.');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Ligne de détails supplémentaires (collapse) -->
+                            <tr class="detail-row" data-id="{{ opp.id }}" style="display: none;">
+                                <td colspan="10" class="p-3 bg-light">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Description :</strong><br>
+                                            <span class="text-muted small">{{ opp.description or 'Non renseignée' }}</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Avantages :</strong><br>
+                                            <span class="text-muted small">{{ opp.benefits or 'Non renseignés' }}</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Conditions :</strong><br>
+                                            <span class="text-muted small">{{ opp.requirements or 'Non renseignées' }}</span>
+                                        </div>
+                                        <div class="col-md-2 text-end">
+                                            <button class="btn btn-sm btn-outline-secondary close-detail" data-id="{{ opp.id }}">
+                                                <i class="fas fa-chevron-up"></i> Réduire
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-graduation-cap fa-3x text-muted mb-3 d-block"></i>
+                <h5>Aucune bourse disponible pour le moment</h5>
+                <p class="text-muted">Cliquez sur <strong>"Ajouter"</strong> pour commencer à enregistrer des opportunités.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ====== STYLES SPÉCIFIQUES ====== -->
+<style>
+    .badge-status {
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .badge-status.badge-success { background: #D1FAE5; color: #059669; }
+    .badge-status.badge-warning { background: #FEF3C7; color: #D97706; }
+    .badge-status.badge-danger { background: #FEE2E2; color: #DC2626; }
+    .badge-status.badge-secondary { background: #E2E8F0; color: #64748B; }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #6C2BD9, #00B4D8);
+        color: #FFFFFF;
+        border: none;
+        border-radius: 50px;
+        padding: 8px 24px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(108, 43, 217, 0.3);
+        color: #FFFFFF;
+    }
+    .btn-sm {
+        font-size: 0.75rem;
+        border-radius: 8px;
+        padding: 4px 10px;
+    }
+    .table-custom th {
+        font-weight: 700;
+        color: #1E293B;
+        border-bottom: 2px solid #E2E8F0;
+        padding: 12px 10px;
+    }
+    .table-custom td {
+        vertical-align: middle;
+        padding: 10px;
+    }
+    .table-custom tbody tr {
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .table-custom tbody tr:hover {
+        background: #F8FAFC;
+    }
+    .detail-row td {
+        border-top: none !important;
+    }
+    .input-group-text {
+        background: #FFFFFF;
+        border-right: none;
+    }
+    .input-group .form-control {
+        border-left: none;
+    }
+    .input-group .form-control:focus {
+        border-color: #8B5CF6;
+        box-shadow: none;
+    }
+</style>
+
+<!-- ====== JAVASCRIPT ====== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ---- Compteurs de statut ----
+        const activeCount = document.querySelectorAll('.badge-success').length;
+        const upcomingCount = document.querySelectorAll('.badge-warning').length;
+        document.getElementById('activeCount').textContent = activeCount + ' active(s)';
+        document.getElementById('upcomingCount').textContent = upcomingCount + ' à venir';
+
+        // ---- Expansion / Réduction des détails ----
+        document.querySelectorAll('#scholarshipTable tbody tr:not(.detail-row)').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Ignorer si clic sur un bouton d'action
+                if (e.target.closest('.btn') || e.target.closest('form')) return;
+                const id = this.dataset.id;
+                const detailRow = document.querySelector(`.detail-row[data-id="${id}"]`);
+                if (detailRow) {
+                    const isVisible = detailRow.style.display !== 'none';
+                    // Fermer tous les autres détails
+                    document.querySelectorAll('.detail-row').forEach(r => r.style.display = 'none');
+                    if (!isVisible) {
+                        detailRow.style.display = 'table-row';
+                    }
+                }
+            });
+        });
+
+        // Fermer les détails via le bouton "Réduire"
+        document.querySelectorAll('.close-detail').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.dataset.id;
+                const detailRow = document.querySelector(`.detail-row[data-id="${id}"]`);
+                if (detailRow) {
+                    detailRow.style.display = 'none';
+                }
+            });
+        });
+
+        // ---- Recherche en temps réel ----
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const filter = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('#scholarshipTable tbody tr:not(.detail-row)');
+                rows.forEach(row => {
+                    const title = row.dataset.title || '';
+                    const country = row.dataset.country || '';
+                    const status = row.dataset.status || '';
+                    const match = title.includes(filter) || country.includes(filter) || status.includes(filter);
+                    row.style.display = match ? '' : 'none';
+                    // Cacher la ligne de détails associée
+                    const id = row.dataset.id;
+                    const detailRow = document.querySelector(`.detail-row[data-id="${id}"]`);
+                    if (detailRow && !match) {
+                        detailRow.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // ---- Confirmation de suppression (déjà gérée par l'attribut onsubmit) ----
+        window.confirmDelete = function(message) {
+            return confirm(message);
+        };
+    });
+</script>
+
+{% endblock %}

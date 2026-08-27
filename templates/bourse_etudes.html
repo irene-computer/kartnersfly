@@ -1,0 +1,1534 @@
+{% extends "base.html" %}
+
+{% block title %}Bourse d'études & Visa étudiant - Kartners Travel Agency{% endblock %}
+
+{% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Flag icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+
+<div class="k-student-page">
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="k-hero">
+        <div class="k-container k-hero-inner">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <span class="k-badge"><i class="fas fa-graduation-cap"></i> Bourses d'études & Visa étudiant</span>
+                    <h1 class="k-hero-title">Du dossier de bourse à l'embarquement, <span class="k-gradient-text">un seul interlocuteur</span>.</h1>
+                    <p class="k-hero-lead">Kartners Travel Agency prend en charge la recherche de bourse, la constitution de votre dossier académique et la procédure de visa étudiant pour partir étudier à l'étranger l'esprit tranquille.</p>
+                    <div class="k-cta-row">
+                        <a href="#formulaire" class="k-btn k-btn-primary"><i class="fas fa-calendar-check"></i> Déposer ma candidature</a>
+                        <a href="https://wa.me/237676268350" target="_blank" rel="noopener noreferrer" class="k-btn k-btn-ghost"><i class="fab fa-whatsapp"></i> Discuter sur WhatsApp</a>
+                    </div>
+                </div>
+                <div class="col-lg-5 mt-4 mt-lg-0">
+                    <div class="k-card-float">
+                        <div class="stub-head">
+                            <i class="fas fa-passport"></i>
+                            <strong>Dossier Étudiant</strong>
+                        </div>
+                        <div class="row-mini"><span>Statut bourse</span><span>Éligible</span></div>
+                        <div class="row-mini"><span>Dossier académique</span><span>En cours</span></div>
+                        <div class="row-mini"><span>Visa étudiant</span><span>Accompagné</span></div>
+                        <div class="row-mini"><span>Interlocuteur</span><span class="highlight">Kartners</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STATS BAR ===== -->
+    <div class="k-container">
+        <div class="k-stats-bar">
+            <div class="k-stat-item">
+                <div class="num">200<span>+</span></div>
+                <div class="lab">Dossiers accompagnés</div>
+            </div>
+            <div class="k-stat-item">
+                <div class="num">12</div>
+                <div class="lab">Pays de destination</div>
+            </div>
+            <div class="k-stat-item">
+                <div class="num">87<span>%</span></div>
+                <div class="lab">Taux de succès visa</div>
+            </div>
+            <div class="k-stat-item">
+                <div class="num">5</div>
+                <div class="lab">Ans d'accompagnement</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BOURSES DISPONIBLES ===== -->
+    <section class="k-section">
+        <div class="k-container">
+            <span class="k-section-tag">Opportunités</span>
+            <h2 class="k-section-title">Bourses disponibles</h2>
+            <p class="k-section-sub">Découvrez les opportunités de bourses actuellement disponibles dans différents pays.</p>
+
+            {% if scholarship_opportunities %}
+                <div class="k-scholarships-grid">
+                    {% for opp in scholarship_opportunities %}
+                    <div class="k-scholarship-card" 
+                         data-id="{{ opp.id }}"
+                         data-title="{{ opp.title }}"
+                         data-country="{{ opp.country }}"
+                         data-description="{{ opp.description }}"
+                         data-benefits="{{ opp.benefits or '' }}"
+                         data-requirements="{{ opp.requirements or '' }}"
+                         data-start_date="{{ opp.start_date or '' }}"
+                         data-end_date="{{ opp.end_date or '' }}"
+                         data-study_level="{{ opp.study_level }}"
+                         data-field_of_study="{{ opp.field_of_study }}"
+                         data-image-url="{% if opp.image_url %}{% if opp.image_url.startswith('http') %}{{ opp.image_url }}{% else %}{{ url_for('static', filename=opp.image_url if opp.image_url.startswith('images/') else 'images/' ~ opp.image_url) }}{% endif %}{% endif %}"
+                         data-flag-url="{% if opp.flag_url %}{% if opp.flag_url.startswith('http') %}{{ opp.flag_url }}{% else %}{{ url_for('static', filename=opp.flag_url if opp.flag_url.startswith('images/') else 'images/' ~ opp.flag_url) }}{% endif %}{% endif %}">
+                        
+                        <!-- ===== IMAGE DE COUVERTURE ===== -->
+                        <div class="k-card-img-wrapper">
+                            {% if opp.image_url and opp.image_url|length > 0 %}
+                                {% if opp.image_url.startswith('http') or opp.image_url.startswith('images/') %}
+                                    {% set image_src = opp.image_url %}
+                                {% else %}
+                                    {% set image_src = 'images/' ~ opp.image_url %}
+                                {% endif %}
+                                <img src="{{ image_src if image_src.startswith('http') else url_for('static', filename=image_src) }}"
+                                     alt="{{ opp.country }}"
+                                     class="k-card-img"
+                                     loading="lazy"
+                                     onerror="this.style.display='none'; this.parentElement.querySelector('.k-card-img-placeholder').style.display='flex';">
+                            {% endif %}
+                            <div class="k-card-img-placeholder"
+                                 style="{% if opp.image_url and opp.image_url|length > 0 %}display:none;{% else %}display:flex;{% endif %}
+                                        align-items:center; justify-content:center; flex-direction:column; width:100%; height:100%;">
+                                <div class="placeholder-flag">🌍</div>
+                                <div class="placeholder-name">{{ opp.country }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ===== CONTENU ===== -->
+                        <div class="card-header-k">
+                            <div class="k-country-with-flag">
+                                {% if opp.flag_url and opp.flag_url|length > 0 %}
+                                    {% if opp.flag_url.startswith('http') %}
+                                        {% set flag_src = opp.flag_url %}
+                                    {% elif opp.flag_url.startswith('images/') %}
+                                        {% set flag_src = url_for('static', filename=opp.flag_url) %}
+                                    {% else %}
+                                        {% set flag_src = url_for('static', filename='images/' ~ opp.flag_url) %}
+                                    {% endif %}
+                                    <img src="{{ flag_src }}" alt="{{ opp.country }}" class="k-flag-img">
+                                {% else %}
+                                    <span class="k-flag-emoji">🇺🇳</span>
+                                {% endif %}
+                                <span class="country-badge">
+                                    <i class="fas fa-map-marker-alt"></i> {{ opp.country }}
+                                </span>
+                            </div>
+                            <h3>{{ opp.title }}</h3>
+                        </div>
+                        <div class="card-body-k">
+                            <p>{{ opp.description[:120] }}{% if opp.description|length > 120 %}...{% endif %}</p>
+                            <div class="meta-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Niveau : <strong>{{ opp.study_level }}</strong></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-book"></i>
+                                <span>Domaine : <strong>{{ opp.field_of_study }}</strong></span>
+                            </div>
+                            {% if opp.benefits %}
+                            <div class="meta-item">
+                                <i class="fas fa-gift"></i>
+                                <span>{{ opp.benefits[:60] }}{% if opp.benefits|length > 60 %}...{% endif %}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer-k">
+                            <div class="deadline">
+                                <i class="fas fa-calendar-alt"></i>
+                                {% if opp.start_date and opp.end_date %}
+                                    Du {{ opp.start_date[:10] }} au {{ opp.end_date[:10] }}
+                                {% elif opp.end_date %}
+                                    Jusqu'au <strong>{{ opp.end_date[:10] }}</strong>
+                                {% elif opp.start_date %}
+                                    À partir du <strong>{{ opp.start_date[:10] }}</strong>
+                                {% else %}
+                                    Date non définie
+                                {% endif %}
+                            </div>
+                            <div class="k-card-actions">
+                                <button class="k-btn-details" onclick="openScholarshipDetails(this)">
+                                    <i class="fas fa-expand"></i> Voir plus
+                                </button>
+                                <a href="#formulaire" class="k-btn-outline">Je suis intéressé</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="k-empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h4>Aucune bourse disponible pour le moment</h4>
+                    <p>Revenez régulièrement pour découvrir les nouvelles opportunités.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- ===== PARCOURS ===== -->
+    <section class="k-section k-bg-white">
+        <div class="k-container">
+            <span class="k-section-tag">Le parcours</span>
+            <h2 class="k-section-title">Quatre étapes, un accompagnement continu</h2>
+            <p class="k-section-sub">Chaque dossier suit le même fil, du bilan initial jusqu'à l'arrivée sur le campus. Vous gardez un seul point de contact à chaque étape.</p>
+
+            <div class="k-journey">
+                <div class="k-journey-track"><i class="fas fa-plane"></i></div>
+                <div class="k-journey-grid">
+                    <div class="k-step-item">
+                        <div class="k-step-badge">01</div>
+                        <h4>Bilan & orientation</h4>
+                        <p>Profil académique, budget, pays et filières compatibles avec vos objectifs de bourse.</p>
+                    </div>
+                    <div class="k-step-item">
+                        <div class="k-step-badge">02</div>
+                        <h4>Recherche de bourse</h4>
+                        <p>Sélection des programmes accessibles (gouvernementaux, universitaires, Erasmus+, Campus France...) et dépôt de candidature.</p>
+                    </div>
+                    <div class="k-step-item">
+                        <div class="k-step-badge">03</div>
+                        <h4>Constitution du dossier</h4>
+                        <p>Relevés de notes, traduction, légalisation, lettre de motivation et CV académique mis aux normes.</p>
+                    </div>
+                    <div class="k-step-item">
+                        <div class="k-step-badge">04</div>
+                        <h4>Visa étudiant & départ</h4>
+                        <p>Préparation à l'entretien consulaire, dépôt du dossier visa, billet d'avion et briefing pré-départ.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DESTINATIONS (avec drapeaux flag-icons) ===== -->
+    <section class="k-section k-destinations-section">
+        <div class="k-container">
+            <span class="k-section-tag">Destinations</span>
+            <h2 class="k-section-title">Où partent nos étudiants</h2>
+            <p class="k-section-sub">Les destinations et programmes de bourse les plus demandés par nos candidats.</p>
+
+            <div class="k-dest-grid">
+                <!-- France -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-fr" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>France</h5>
+                    <span>Campus France, bourses d'excellence</span>
+                </div>
+                <!-- Canada -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-ca" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>Canada</h5>
+                    <span>Bourses provinciales & universitaires</span>
+                </div>
+                <!-- Belgique -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-be" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>Belgique</h5>
+                    <span>Bourses ARES, universités francophones</span>
+                </div>
+                <!-- Maroc -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-ma" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>Maroc</h5>
+                    <span>Bourses AMCI, filières techniques</span>
+                </div>
+                <!-- Turquie -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-tr" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>Turquie</h5>
+                    <span>Türkiye Bursları (bourses d'État)</span>
+                </div>
+                <!-- Allemagne -->
+                <div class="k-dest-card">
+                    <div class="k-dest-flag-wrapper">
+                        <span class="fi fi-de" style="font-size: 48px; line-height: 1;"></span>
+                    </div>
+                    <h5>Allemagne</h5>
+                    <span>DAAD, frais universitaires réduits</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FORMULES ===== -->
+    <section class="k-section k-bg-white">
+        <div class="k-container">
+            <span class="k-section-tag">Nos formules</span>
+            <h2 class="k-section-title">Un accompagnement adapté à chaque étape</h2>
+            <p class="k-section-sub">Tarifs communiqués après le bilan gratuit, selon le pays visé et l'état d'avancement de votre dossier.</p>
+
+            <div class="k-plans-grid">
+                <div class="k-plan-card">
+                    <div class="k-plan-tag">Orientation</div>
+                    <h3>Bilan & orientation</h3>
+                    <div class="k-plan-price">Pour cadrer votre projet d'études</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Évaluation du profil académique</li>
+                        <li><i class="fas fa-check"></i> Sélection des pays et filières éligibles</li>
+                        <li><i class="fas fa-check"></i> Liste des bourses accessibles</li>
+                        <li><i class="fas fa-check"></i> Feuille de route personnalisée</li>
+                    </ul>
+                    <a href="#formulaire" class="k-btn k-btn-secondary">Démarrer le bilan</a>
+                </div>
+
+                <div class="k-plan-card k-plan-featured">
+                    <div class="k-plan-tag">Formule complète</div>
+                    <h3>Bourse, dossier & visa</h3>
+                    <div class="k-plan-price">Accompagnement de bout en bout</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Recherche et candidature à la bourse</li>
+                        <li><i class="fas fa-check"></i> Constitution complète du dossier académique</li>
+                        <li><i class="fas fa-check"></i> Préparation à l'entretien de visa étudiant</li>
+                        <li><i class="fas fa-check"></i> Dépôt et suivi du dossier consulaire</li>
+                        <li><i class="fas fa-check"></i> Réservation du billet d'avion</li>
+                    </ul>
+                    <a href="#formulaire" class="k-btn k-btn-primary">Demander un devis</a>
+                </div>
+
+                <div class="k-plan-card">
+                    <div class="k-plan-tag">Après le visa</div>
+                    <h3>Accompagnement pré-départ</h3>
+                    <div class="k-plan-price">Pour un départ sans imprévu</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Réservation du logement étudiant</li>
+                        <li><i class="fas fa-check"></i> Assurance voyage & santé</li>
+                        <li><i class="fas fa-check"></i> Réservation de billet d'avion tarif étudiant</li>
+                        <li><i class="fas fa-check"></i> Accompagnement à l'arrivée et intégration</li>
+                    </ul>
+                    <a href="#formulaire" class="k-btn k-btn-secondary">En savoir plus</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== POURQUOI NOUS ===== -->
+    <section class="k-section">
+        <div class="k-container">
+            <span class="k-section-tag">Pourquoi KTA</span>
+            <h2 class="k-section-title">Ce qui fait notre différence</h2>
+            <p class="k-section-sub">Un suivi rigoureux et transparent pour maximiser vos chances de succès.</p>
+
+            <div class="k-why-grid">
+                <div class="k-why-item">
+                    <i class="fas fa-user-check"></i>
+                    <h5>Expertise dédiée</h5>
+                    <p>Des conseillers spécialisés dans les procédures de bourses et d'admissions internationales.</p>
+                </div>
+                <div class="k-why-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h5>Transparence totale</h5>
+                    <p>Un bilan d'éligibilité honnête avant toute prise en charge pour éviter les démarches inutiles.</p>
+                </div>
+                <div class="k-why-item">
+                    <i class="fas fa-file-contract"></i>
+                    <h5>Dossier optimisé</h5>
+                    <p>Relecture, correction et valorisation de vos pièces justificatives pour faire la différence.</p>
+                </div>
+                <div class="k-why-item">
+                    <i class="fas fa-headset"></i>
+                    <h5>Suivi continu</h5>
+                    <p>Un interlocuteur unique disponible sur WhatsApp et par téléphone à chaque étape du projet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FORMULAIRE DE CANDIDATURE ===== -->
+    <section class="k-section k-bg-white" id="formulaire">
+        <div class="k-container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="k-form-card">
+                        <div class="text-center mb-4">
+                            <span class="k-section-tag">Candidature</span>
+                            <h2>Déposez votre dossier d'études</h2>
+                            <p class="k-section-sub mx-auto">Remplissez le formulaire ci-dessous et notre équipe vous recontactera sous 24h pour étudier votre éligibilité.</p>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('api_scholarship') }}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nom complet *</label>
+                                    <input type="text" name="full_name" class="form-control" placeholder="ex: Jean Dupont" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" name="email" class="form-control" placeholder="ex: jean.dupont@gmail.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Téléphone / WhatsApp *</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+237 600 000 000" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Niveau d'études actuel *</label>
+                                    <select name="study_level" class="form-select" required>
+                                        <option value="" selected disabled>Sélectionner le niveau</option>
+                                        <option value="Baccalauréat">Baccalauréat</option>
+                                        <option value="Licence">Licence (BACC+3)</option>
+                                        <option value="Master">Master (BACC+5)</option>
+                                        <option value="Doctorat">Doctorat</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Pays de destination souhaité *</label>
+                                    <select name="country" class="form-select" required>
+                                        <option value="" selected disabled>Choisir une destination</option>
+                                        <option value="France">France</option>
+                                        <option value="Canada">Canada</option>
+                                        <option value="Belgique">Belgique</option>
+                                        <option value="Maroc">Maroc</option>
+                                        <option value="Turquie">Turquie</option>
+                                        <option value="Allemagne">Allemagne</option>
+                                        <option value="Suisse">Suisse</option>
+                                        <option value="Royaume-Uni">Royaume-Uni</option>
+                                        <option value="États-Unis">États-Unis</option>
+                                        <option value="Autre">Autre destination</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Domaine d'études visé *</label>
+                                    <select name="field_of_study" class="form-select" required>
+                                        <option value="" selected disabled>Sélectionner un domaine</option>
+                                        <option value="Medecine">Médecine / Santé</option>
+                                        <option value="Ingenieur">Ingénierie / Technologie</option>
+                                        <option value="Commerce">Commerce / Gestion</option>
+                                        <option value="Droit">Droit</option>
+                                        <option value="Lettres">Lettres / Arts</option>
+                                        <option value="Sciences">Sciences fondamentales</option>
+                                        <option value="Informatique">Informatique / Data</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Message / Précisions sur votre projet</label>
+                                    <textarea name="message" class="form-control" rows="4" placeholder="Dites-nous en plus sur vos attentes, vos notes ou vos questions..."></textarea>
+                                </div>
+                                <div class="col-12 text-center mt-4">
+                                    <button type="submit" class="k-btn-submit" id="submitBtn">
+                                        <i class="fas fa-paper-plane me-2"></i> Envoyer ma candidature
+                                    </button>
+                                    <div id="formFeedback" class="mt-3 small"></div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="k-section">
+        <div class="k-container">
+            <div class="text-center mb-5">
+                <span class="k-section-tag">FAQ</span>
+                <h2 class="k-section-title">Questions fréquentes</h2>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="k-faq-wrapper">
+                        <div class="k-faq-item">
+                            <div class="k-faq-q">
+                                <span>Comment savoir si je suis éligible à une bourse ?</span>
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="k-faq-a">
+                                Nous effectuons une étude gratuite de votre dossier académique (relevés de notes, diplômes, niveau de langue) afin de déterminer les bourses et destinations pour lesquelles vous avez les meilleures chances d'admission.
+                            </div>
+                        </div>
+
+                        <div class="k-faq-item">
+                            <div class="k-faq-q">
+                                <span>Quels sont les délais pour candidater à une bourse ?</span>
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="k-faq-a">
+                                Les campagnes de bourses ouvrent généralement entre 6 et 10 mois avant la rentrée académique. Nous vous conseillons de vous préparer dès le mois d'octobre pour les rentrées de septembre suivant.
+                            </div>
+                        </div>
+
+                        <div class="k-faq-item">
+                            <div class="k-faq-q">
+                                <span>Proposez-vous une garantie de résultat pour le visa ?</span>
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="k-faq-a">
+                                La décision finale d'octroi de visa appartient exclusivement aux ambassades et consulats. Cependant, notre taux de réussite de 87% repose sur un contrôle rigoureux et une conformité irréprochable de vos pièces consulaires.
+                            </div>
+                        </div>
+
+                        <div class="k-faq-item">
+                            <div class="k-faq-q">
+                                <span>Puis-je candidater sans bourse, avec financement personnel ?</span>
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="k-faq-a">
+                                Oui, l'accompagnement dossier et visa reste disponible même sans candidature à une bourse spécifique. Nous vous aidons à préparer votre projet d'études, quel que soit votre mode de financement.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA FINAL ===== -->
+    <section class="k-section tight pt-0">
+        <div class="k-container">
+            <div class="k-cta-final">
+                <div>
+                    <h3>Prêt à concrétiser votre projet d'études à l'étranger ?</h3>
+                    <p>Rejoignez les centaines d'étudiants accompagnés avec succès par Kartners.</p>
+                </div>
+                <div>
+                    <a href="#formulaire" class="k-btn k-btn-white"><i class="fas fa-paper-plane me-2"></i> Déposer mon dossier</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- ===== MODALE DÉTAILS BOURSE ===== -->
+<div class="modal fade" id="scholarshipModal" tabindex="-1" aria-labelledby="scholarshipModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content k-modal-content">
+            <div class="modal-header k-modal-header">
+                <div>
+                    <div class="k-modal-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3 class="modal-title" id="scholarshipModalLabel">Détails de la bourse</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="k-modal-image-wrapper">
+                            <img id="modalImage" src="" alt="Image de la bourse" class="img-fluid rounded">
+                            <div class="k-modal-placeholder" id="modalPlaceholder" style="display:none; background: linear-gradient(135deg, var(--k-violet-dark), var(--k-cyan-dark)); color:white; padding:60px 20px; text-align:center; border-radius:12px;">
+                                <div style="font-size:4rem;">🌍</div>
+                                <div style="font-weight:700; font-size:1.2rem; margin-top:8px;" id="modalPlaceholderCountry"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="k-modal-details">
+                            <div class="k-modal-country">
+                                <span id="modalFlag"></span>
+                                <span id="modalCountry" class="ms-2" style="font-weight:600;"></span>
+                            </div>
+                            <h4 id="modalTitle" style="font-weight:800; margin-top:12px;"></h4>
+                            <div class="k-modal-meta">
+                                <span><i class="fas fa-graduation-cap text-violet"></i> <strong>Niveau :</strong> <span id="modalLevel"></span></span>
+                                <span><i class="fas fa-book text-violet"></i> <strong>Domaine :</strong> <span id="modalField"></span></span>
+                            </div>
+                            <div class="k-modal-description mt-3">
+                                <h6><i class="fas fa-align-left text-violet"></i> Description</h6>
+                                <p id="modalDescription"></p>
+                            </div>
+                            <div class="k-modal-benefits" id="modalBenefitsWrapper" style="display:none;">
+                                <h6><i class="fas fa-gift text-violet"></i> Avantages</h6>
+                                <p id="modalBenefits"></p>
+                            </div>
+                            <div class="k-modal-requirements" id="modalRequirementsWrapper" style="display:none;">
+                                <h6><i class="fas fa-check-circle text-violet"></i> Conditions d'éligibilité</h6>
+                                <p id="modalRequirements"></p>
+                            </div>
+                            <div class="k-modal-dates">
+                                <i class="fas fa-calendar-alt text-violet"></i>
+                                <span id="modalDates"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="#formulaire" class="k-btn k-btn-primary" id="modalCta">Je suis intéressé</a>
+                    <button type="button" class="k-btn k-btn-secondary ms-2" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ===== DESIGN SYSTEM KTA - VIOLET & CYAN ===== */
+    :root {
+        --k-violet: #6C2BD9;
+        --k-violet-dark: #4A1A8A;
+        --k-violet-light: #8B5CF6;
+        --k-cyan: #00B4D8;
+        --k-cyan-dark: #0077B6;
+        --k-cyan-light: #48CAE4;
+        --k-body: #1E293B;
+        --k-muted: #64748B;
+        --k-bg: #F8FAFC;
+        --k-border: #E2E8F0;
+        --k-white: #FFFFFF;
+    }
+
+    .k-student-page {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--k-body);
+        background: var(--k-bg);
+    }
+
+    .k-container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    /* BADGES & TAGS */
+    .k-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #FFFFFF;
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .k-section-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .k-section-title {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .k-section-sub {
+        font-size: 1.05rem;
+        color: var(--k-muted);
+        max-width: 640px;
+        line-height: 1.6;
+    }
+
+    .k-gradient-text {
+        background: linear-gradient(135deg, #FFFFFF 0%, var(--k-cyan-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* HERO */
+    .k-hero {
+        background: linear-gradient(135deg, var(--k-violet-dark) 0%, var(--k-violet) 50%, var(--k-cyan-dark) 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 90px 0 120px;
+        color: #FFFFFF;
+    }
+
+    .k-hero::after {
+        content: '✈';
+        font-size: 260px;
+        position: absolute;
+        bottom: -60px;
+        right: -30px;
+        opacity: 0.05;
+        pointer-events: none;
+        color: #FFFFFF;
+        transform: rotate(-15deg);
+    }
+
+    .k-hero-inner { position: relative; z-index: 2; }
+
+    .k-hero-title {
+        font-size: clamp(2.2rem, 4vw, 3.4rem);
+        line-height: 1.15;
+        font-weight: 900;
+        margin: 20px 0;
+        color: #FFFFFF;
+    }
+
+    .k-hero-lead {
+        font-size: 1.1rem;
+        line-height: 1.75;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 600px;
+        margin-bottom: 35px;
+    }
+
+    .k-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .k-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 30px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .k-btn-primary {
+        background: linear-gradient(135deg, var(--k-cyan), var(--k-cyan-dark));
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 25px rgba(0, 163, 224, 0.3);
+    }
+    .k-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 163, 224, 0.4);
+        color: #FFFFFF !important;
+    }
+
+    .k-btn-secondary {
+        background: #F1F5F9;
+        color: var(--k-body) !important;
+    }
+    .k-btn-secondary:hover {
+        background: #E2E8F0;
+        transform: translateY(-2px);
+    }
+
+    .k-btn-ghost {
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #FFFFFF !important;
+    }
+    .k-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .k-btn-white {
+        background: #FFFFFF;
+        color: var(--k-violet-dark) !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .k-btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .k-card-float {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 28px 24px;
+        max-width: 360px;
+        margin-left: auto;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .k-card-float .stub-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .k-card-float .stub-head i { color: var(--k-cyan-light); font-size: 1.2rem; }
+    .k-card-float .stub-head strong { font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+    .k-card-float .row-mini { display: flex; justify-content: space-between; padding: 12px 0; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .k-card-float .row-mini:last-child { border-bottom: none; }
+    .k-card-float .row-mini span:first-child { color: rgba(255,255,255,0.65); }
+    .k-card-float .row-mini span:last-child { font-weight: 700; color: #FFFFFF; }
+    .k-card-float .row-mini span.highlight { color: var(--k-cyan-light); }
+
+    /* STATS */
+    .k-stats-bar {
+        background: #FFFFFF;
+        border-radius: 24px;
+        margin-top: -50px;
+        position: relative;
+        z-index: 3;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border: 1px solid var(--k-border);
+    }
+    .k-stat-item { text-align: center; padding: 28px 16px; }
+    .k-stat-item + .k-stat-item { border-left: 1px solid var(--k-border); }
+    .k-stat-item .num { font-size: 2.2rem; font-weight: 900; color: var(--k-violet); line-height: 1; }
+    .k-stat-item .num span { color: var(--k-cyan); }
+    .k-stat-item .lab { font-size: 0.85rem; color: var(--k-muted); margin-top: 6px; font-weight: 600; }
+
+    /* SECTIONS */
+    .k-section { padding: 80px 0; }
+    .k-section.tight { padding: 50px 0; }
+    .k-bg-white { background: #FFFFFF; }
+
+    /* CARTES BOURSES */
+    .k-scholarships-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        margin-top: 40px;
+    }
+
+    .k-scholarship-card {
+        background: #FFFFFF;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        transition: all 0.35s ease;
+        border: 1px solid var(--k-border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .k-scholarship-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 35px rgba(108, 43, 217, 0.12);
+        border-color: var(--k-violet-light);
+    }
+
+    .k-card-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #F1F5F9;
+    }
+
+    .k-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .k-scholarship-card:hover .k-card-img { transform: scale(1.06); }
+
+    .k-card-img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, var(--k-violet-dark), var(--k-cyan-dark));
+    }
+    .k-card-img-placeholder .placeholder-flag { font-size: 2.5rem; margin-bottom: 4px; }
+    .k-card-img-placeholder .placeholder-name { font-size: 1.1rem; font-weight: 700; background: rgba(0,0,0,0.25); padding: 4px 16px; border-radius: 20px; }
+
+    .k-country-with-flag {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .k-flag-img {
+        width: 32px;
+        height: 22px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .k-flag-emoji {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .card-header-k {
+        background: #FFFFFF;
+        padding: 20px 24px 10px;
+    }
+
+    .card-header-k .country-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(108, 43, 217, 0.08);
+        color: var(--k-violet);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .card-header-k h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0F172A;
+    }
+
+    .card-body-k {
+        padding: 0 24px 20px;
+        flex-grow: 1;
+    }
+
+    .card-body-k p {
+        color: var(--k-muted);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+
+    .card-body-k .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--k-body);
+        padding: 5px 0;
+    }
+
+    .card-body-k .meta-item i {
+        color: var(--k-cyan-dark);
+        width: 16px;
+    }
+
+    .card-footer-k {
+        padding: 16px 24px;
+        border-top: 1px solid var(--k-border);
+        background: var(--k-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .card-footer-k .deadline {
+        font-size: 0.8rem;
+        color: var(--k-muted);
+        text-align: center;
+    }
+
+    .k-card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .k-btn-details {
+        padding: 8px 20px;
+        border: 2px solid var(--k-cyan);
+        border-radius: 50px;
+        background: transparent;
+        color: var(--k-cyan-dark);
+        font-weight: 700;
+        font-size: 0.82rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .k-btn-details:hover {
+        background: var(--k-cyan);
+        color: #FFFFFF;
+        transform: translateY(-2px);
+    }
+
+    .k-btn-outline {
+        padding: 8px 20px;
+        border: 2px solid var(--k-violet);
+        border-radius: 50px;
+        color: var(--k-violet);
+        font-weight: 700;
+        font-size: 0.82rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .k-btn-outline:hover {
+        background: var(--k-violet);
+        color: #FFFFFF;
+    }
+
+    .k-empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--k-muted);
+    }
+    .k-empty-state i { font-size: 3rem; color: #CBD5E1; margin-bottom: 15px; display: block; }
+
+    /* JOURNEY */
+    .k-journey { position: relative; margin-top: 60px; }
+    .k-journey-track {
+        position: absolute;
+        top: 45px; left: 8%; right: 8%;
+        height: 2px;
+        background: repeating-linear-gradient(to right, var(--k-violet) 0, var(--k-violet) 8px, transparent 8px, transparent 16px);
+        z-index: 0;
+    }
+    .k-journey-track i {
+        position: absolute; top: -11px; left: 45%;
+        color: var(--k-violet);
+        font-size: 1.3rem;
+    }
+    .k-journey-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        position: relative;
+        z-index: 1;
+    }
+    .k-step-item .k-step-badge {
+        width: 90px; height: 90px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        border: 3px solid var(--k-violet);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--k-violet);
+        box-shadow: 0 8px 20px rgba(108, 43, 217, 0.1);
+    }
+    .k-step-item h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; color: #0F172A; }
+    .k-step-item p { font-size: 0.9rem; color: var(--k-muted); line-height: 1.6; margin: 0; }
+
+    /* ===== DESTINATIONS REFONTE ===== */
+    .k-destinations-section {
+        background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+    }
+
+    .k-dest-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        margin-top: 48px;
+    }
+
+    .k-dest-card {
+        background: linear-gradient(145deg, var(--k-violet) 0%, var(--k-cyan) 100%);
+        border-radius: 24px;
+        padding: 32px 24px 28px;
+        color: #FFFFFF;
+        position: relative;
+        overflow: hidden;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+        box-shadow: 0 8px 30px rgba(108, 43, 217, 0.20);
+        border: none;
+    }
+
+    .k-dest-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 45px rgba(108, 43, 217, 0.30);
+    }
+
+    .k-dest-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.10) 0%, transparent 70%);
+        pointer-events: none;
+        border-radius: 24px;
+    }
+
+    .k-dest-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .k-dest-flag-wrapper {
+        margin-bottom: 16px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 12px;
+        padding: 6px 10px;
+        display: inline-flex;
+        align-items: center;
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .k-dest-flag-wrapper .fi {
+        font-size: 48px !important;
+        line-height: 1;
+        border-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .k-dest-card h5 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 0 0 4px;
+        letter-spacing: -0.5px;
+        color: #FFFFFF;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+
+    .k-dest-card span {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 400;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+
+    /* PLANS */
+    .k-plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+    .k-plan-card {
+        background: #FFFFFF;
+        border: 1px solid var(--k-border);
+        border-radius: 24px;
+        padding: 36px 28px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    .k-plan-card.k-plan-featured {
+        background: linear-gradient(135deg, var(--k-violet) 0%, var(--k-cyan) 100%);
+        color: #FFFFFF;
+        border: none;
+        transform: scale(1.03);
+        box-shadow: 0 20px 45px rgba(108, 43, 217, 0.25);
+    }
+    .k-plan-tag { font-size: 0.75rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--k-violet); margin-bottom: 10px; }
+    .k-plan-card.k-plan-featured .k-plan-tag { color: var(--k-cyan-light); }
+    .k-plan-card h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; }
+    .k-plan-price { font-size: 0.9rem; color: var(--k-muted); margin-bottom: 24px; }
+    .k-plan-card.k-plan-featured .k-plan-price { color: rgba(255,255,255,0.75); }
+    .k-plan-card ul { list-style: none; padding: 0; margin: 0 0 30px; flex-grow: 1; }
+    .k-plan-card ul li { display: flex; gap: 12px; font-size: 0.9rem; padding: 9px 0; line-height: 1.5; }
+    .k-plan-card ul li i { color: var(--k-cyan-dark); margin-top: 3px; }
+    .k-plan-card.k-plan-featured ul li i { color: var(--k-cyan-light); }
+    .k-plan-card .k-btn { width: 100%; }
+
+    /* WHY */
+    .k-why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+    .k-why-item {
+        background: #FFFFFF;
+        padding: 28px 20px;
+        border-radius: 20px;
+        border: 1px solid var(--k-border);
+    }
+    .k-why-item i {
+        width: 50px; height: 50px;
+        border-radius: 14px;
+        background: rgba(108, 43, 217, 0.08);
+        color: var(--k-violet);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 18px;
+    }
+    .k-why-item h5 { font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; color: #0F172A; }
+    .k-why-item p { font-size: 0.88rem; color: var(--k-muted); line-height: 1.6; margin: 0; }
+
+    /* FORM */
+    .k-form-card {
+        background: #FFFFFF;
+        border-radius: 24px;
+        padding: 50px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+        border: 1px solid var(--k-border);
+    }
+    .k-form-card .form-control, .k-form-card .form-select {
+        border: 2px solid var(--k-border);
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+    .k-form-card .form-control:focus, .k-form-card .form-select:focus {
+        border-color: var(--k-cyan);
+        box-shadow: 0 0 0 4px rgba(0, 163, 224, 0.12);
+    }
+    .k-form-card label { font-weight: 700; font-size: 0.88rem; color: #0F172A; margin-bottom: 6px; }
+    
+    .k-btn-submit {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark));
+        color: #FFFFFF;
+        border: none;
+        padding: 16px 45px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(108, 43, 217, 0.25);
+    }
+    .k-btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(108, 43, 217, 0.35);
+    }
+
+    /* FAQ */
+    .k-faq-wrapper { margin-top: 20px; }
+    .k-faq-item {
+        background: #FFFFFF;
+        border-radius: 16px;
+        border: 1px solid var(--k-border);
+        padding: 20px 24px;
+        margin-bottom: 14px;
+    }
+    .k-faq-q {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 700;
+        color: #0F172A;
+        font-size: 1.05rem;
+    }
+    .k-faq-q i { color: var(--k-violet); transition: transform 0.3s ease; }
+    .k-faq-item.open .k-faq-q i { transform: rotate(45deg); }
+    .k-faq-a {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease, margin-top 0.35s ease;
+        color: var(--k-muted);
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+    .k-faq-item.open .k-faq-a { max-height: 200px; margin-top: 14px; }
+
+    /* CTA */
+    .k-cta-final {
+        background: linear-gradient(135deg, var(--k-violet) 0%, var(--k-cyan) 100%);
+        border-radius: 28px;
+        padding: 50px;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.2);
+    }
+    .k-cta-final h3 { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; color: #FFFFFF; }
+    .k-cta-final p { color: rgba(255,255,255,0.85); margin: 0; font-size: 1.05rem; }
+
+    /* ===== MODALE ===== */
+    .k-modal-content {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
+    }
+
+    .k-modal-header {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: #FFFFFF;
+        padding: 28px 30px;
+        border: none;
+    }
+
+    .k-modal-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        font-size: 1.4rem;
+    }
+
+    .k-modal-header h3 {
+        color: #FFFFFF;
+        font-weight: 700;
+    }
+
+    .k-modal-image-wrapper {
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #F1F5F9;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .k-modal-image-wrapper img {
+        width: 100%;
+        height: auto;
+        max-height: 350px;
+        object-fit: cover;
+    }
+
+    .k-modal-details {
+        padding: 0 8px;
+    }
+
+    .k-modal-country {
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        color: var(--k-muted);
+    }
+
+    .k-modal-country #modalFlag img,
+    .k-modal-country #modalFlag span {
+        width: 32px;
+        height: 22px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .k-modal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 8px;
+        font-size: 0.9rem;
+    }
+
+    .k-modal-meta span {
+        background: #F1F5F9;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .k-modal-description p,
+    .k-modal-benefits p,
+    .k-modal-requirements p {
+        color: var(--k-muted);
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .k-modal-dates {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        color: var(--k-muted);
+    }
+
+    .text-violet {
+        color: var(--k-violet);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .k-stats-bar { grid-template-columns: repeat(2, 1fr); }
+        .k-stat-item:nth-child(2) { border-left: 1px solid var(--k-border); }
+        .k-stat-item:nth-child(3) { border-left: none; border-top: 1px solid var(--k-border); }
+        .k-scholarships-grid, .k-plans-grid, .k-why-grid { grid-template-columns: repeat(2, 1fr); }
+        .k-journey-grid { grid-template-columns: repeat(2, 1fr); }
+        .k-journey-track { display: none; }
+        .k-plan-card.k-plan-featured { transform: none; }
+        .k-card-float { margin: 30px auto 0; }
+        .k-dest-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .k-dest-card { min-height: 190px; padding: 24px 20px; }
+        .k-dest-flag-wrapper .fi { font-size: 40px !important; }
+        .k-dest-card h5 { font-size: 1.3rem; }
+        .k-cta-final { flex-direction: column; text-align: center; padding: 36px 28px; }
+        .k-form-card { padding: 30px; }
+        .k-flag-img { width: 28px; height: 20px; }
+        .k-modal-image-wrapper img { max-height: 250px; }
+    }
+
+    @media (max-width: 576px) {
+        .k-stats-bar { grid-template-columns: 1fr; }
+        .k-stat-item + .k-stat-item { border-left: none; border-top: 1px solid var(--k-border); }
+        .k-scholarships-grid, .k-plans-grid, .k-why-grid { grid-template-columns: 1fr; }
+        .k-journey-grid { grid-template-columns: 1fr; }
+        .k-dest-grid { grid-template-columns: 1fr; gap: 16px; }
+        .k-dest-card { min-height: 160px; padding: 20px 18px; align-items: center; text-align: center; }
+        .k-dest-flag-wrapper { align-self: center; }
+        .k-dest-flag-wrapper .fi { font-size: 48px !important; }
+        .k-dest-card h5 { font-size: 1.4rem; }
+        .k-cta-final { padding: 28px 20px; }
+        .k-form-card { padding: 20px; }
+        .k-hero { padding: 60px 0 80px; }
+        .k-card-float { max-width: 100%; }
+        .k-flag-img { width: 24px; height: 18px; }
+        .k-flag-emoji { font-size: 20px; }
+        .k-modal-image-wrapper img { max-height: 200px; }
+        .k-modal-details { padding: 0; }
+        .k-card-actions { flex-direction: column; align-items: stretch; }
+        .k-btn-details, .k-btn-outline { justify-content: center; }
+    }
+</style>
+
+<script>
+    // ===== OUVERTURE DE LA MODALE AVEC LES DONNÉES =====
+    function openScholarshipDetails(btn) {
+        const card = btn.closest('.k-scholarship-card');
+        if (!card) return;
+
+        // Récupération des données via les attributs data-*
+        const data = {
+            id: card.dataset.id || '',
+            title: card.dataset.title || '',
+            country: card.dataset.country || '',
+            description: card.dataset.description || '',
+            benefits: card.dataset.benefits || '',
+            requirements: card.dataset.requirements || '',
+            start_date: card.dataset.start_date || '',
+            end_date: card.dataset.end_date || '',
+            study_level: card.dataset.study_level || '',
+            field_of_study: card.dataset.field_of_study || '',
+            image_url: card.dataset.imageUrl || '',
+            flag_url: card.dataset.flagUrl || ''
+        };
+
+        // Remplir la modale
+        document.getElementById('modalTitle').textContent = data.title;
+        document.getElementById('modalCountry').textContent = data.country;
+        document.getElementById('modalLevel').textContent = data.study_level;
+        document.getElementById('modalField').textContent = data.field_of_study;
+        document.getElementById('modalDescription').textContent = data.description;
+
+        // Avantages
+        const benefitsWrapper = document.getElementById('modalBenefitsWrapper');
+        const benefitsEl = document.getElementById('modalBenefits');
+        if (data.benefits) {
+            benefitsEl.textContent = data.benefits;
+            benefitsWrapper.style.display = 'block';
+        } else {
+            benefitsWrapper.style.display = 'none';
+        }
+
+        // Conditions
+        const requirementsWrapper = document.getElementById('modalRequirementsWrapper');
+        const requirementsEl = document.getElementById('modalRequirements');
+        if (data.requirements) {
+            requirementsEl.textContent = data.requirements;
+            requirementsWrapper.style.display = 'block';
+        } else {
+            requirementsWrapper.style.display = 'none';
+        }
+
+        // Dates
+        const datesEl = document.getElementById('modalDates');
+        if (data.start_date && data.end_date) {
+            datesEl.textContent = `Du ${data.start_date.slice(0,10)} au ${data.end_date.slice(0,10)}`;
+        } else if (data.end_date) {
+            datesEl.textContent = `Jusqu'au ${data.end_date.slice(0,10)}`;
+        } else if (data.start_date) {
+            datesEl.textContent = `À partir du ${data.start_date.slice(0,10)}`;
+        } else {
+            datesEl.textContent = 'Date non définie';
+        }
+
+        // Image
+        const modalImg = document.getElementById('modalImage');
+        const modalPlaceholder = document.getElementById('modalPlaceholder');
+        const modalPlaceholderCountry = document.getElementById('modalPlaceholderCountry');
+        if (data.image_url) {
+            modalImg.src = data.image_url;
+            modalImg.style.display = 'block';
+            modalPlaceholder.style.display = 'none';
+        } else {
+            modalImg.style.display = 'none';
+            modalPlaceholderCountry.textContent = data.country || 'Pays';
+            modalPlaceholder.style.display = 'block';
+        }
+
+        // Drapeau
+        const flagContainer = document.getElementById('modalFlag');
+        if (data.flag_url) {
+            flagContainer.innerHTML = `<img src="${data.flag_url}" alt="Drapeau ${data.country}" style="width:32px; height:22px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;">`;
+        } else {
+            flagContainer.innerHTML = `<span style="font-size:24px;">🇺🇳</span>`;
+        }
+
+        // Modale Bootstrap
+        const modal = new bootstrap.Modal(document.getElementById('scholarshipModal'));
+        modal.show();
+    }
+
+    // ===== GESTION DU FORMULAIRE =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // FAQ accordion
+        const faqItems = document.querySelectorAll('.k-faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.k-faq-q');
+            question.addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                faqItems.forEach(i => i.classList.remove('open'));
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+
+        // Formulaire candidature
+        const form = document.querySelector('form[action*="api_scholarship"]');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedback = document.getElementById('formFeedback');
+
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                if (!data.full_name || !data.email || !data.phone || !data.study_level || !data.country || !data.field_of_study) {
+                    feedback.innerHTML = '<span style="color: #EF4444;">Veuillez remplir tous les champs obligatoires.</span>';
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Envoi en cours...';
+                feedback.innerHTML = '';
+                
+                try {
+                    const response = await fetch('/api/scholarship', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        feedback.innerHTML = '<span style="color: #10B981; font-weight: 600;">' + result.message + '</span>';
+                        form.reset();
+                    } else {
+                        feedback.innerHTML = '<span style="color: #EF4444;"> ' + (result.message || 'Une erreur est survenue. Veuillez réessayer.') + '</span>';
+                    }
+                } catch (error) {
+                    feedback.innerHTML = '<span style="color: #EF4444;"> Erreur de connexion. Veuillez réessayer.</span>';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Envoyer ma candidature';
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

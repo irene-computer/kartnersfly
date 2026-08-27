@@ -4,12 +4,13 @@
 <div class="container-fluid">
     <h2 class="mb-4">Tableau de bord</h2>
     
+    <!-- Statistiques -->
     <div class="row g-4">
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
-                    <h3>{{ messages_count }}</h3>
+                    <h3>{{ messages_non_lus or 0 }}</h3>
                     <p class="text-muted">Messages non lus</p>
                     <a href="/admin/messages" class="btn btn-sm btn-outline-primary">Voir</a>
                 </div>
@@ -20,7 +21,7 @@
             <div class="card text-center shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
-                    <h3>{{ bookings_count }}</h3>
+                    <h3>{{ bookings_en_attente or 0 }}</h3>
                     <p class="text-muted">Reservations en attente</p>
                     <a href="/admin/bookings" class="btn btn-sm btn-outline-success">Voir</a>
                 </div>
@@ -31,7 +32,7 @@
             <div class="card text-center shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-plane fa-3x text-info mb-3"></i>
-                    <h3>{{ destinations_count }}</h3>
+                    <h3>{{ destinations_count or 0 }}</h3>
                     <p class="text-muted">Destinations</p>
                     <a href="/admin/destinations" class="btn btn-sm btn-outline-info">Gerer</a>
                 </div>
@@ -42,12 +43,87 @@
             <div class="card text-center shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-concierge-bell fa-3x text-warning mb-3"></i>
-                    <h3>{{ services_count }}</h3>
+                    <h3>{{ services_count or 0 }}</h3>
                     <p class="text-muted">Services</p>
                     <a href="/admin/services" class="btn btn-sm btn-outline-warning">Gerer</a>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Derniers messages -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-envelope"></i> Derniers messages</h5>
+                </div>
+                <div class="card-body">
+                    {% if derniers_messages %}
+                        {% for msg in derniers_messages %}
+                        <div class="border-bottom py-2">
+                            <strong>{{ msg.name }}</strong>
+                            <span class="badge {% if msg.status == 'non lu' %}bg-danger{% else %}bg-success{% endif %} float-end">
+                                {{ msg.status }}
+                            </span>
+                            <br>
+                            <small class="text-muted">{{ msg.created_at[:16] if msg.created_at else '-' }}</small>
+                            <p class="mb-0 text-muted small">{{ msg.message[:80] }}{% if msg.message|length > 80 %}...{% endif %}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun message</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Demandes de bourse</h5>
+                </div>
+                <div class="card-body">
+                    {% if derniers_scholarships %}
+                        {% for s in derniers_scholarships %}
+                        <div class="border-bottom py-2">
+                            <strong>{{ s.full_name }}</strong>
+                            <span class="badge bg-warning float-end">{{ s.status }}</span>
+                            <br>
+                            <small class="text-muted">{{ s.country }} - {{ s.study_level }}</small>
+                            <p class="mb-0 text-muted small">{{ s.created_at[:16] if s.created_at else '-' }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucune demande de bourse</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+    }
+    .card-header {
+        border-radius: 16px 16px 0 0 !important;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .btn-sm {
+        border-radius: 30px;
+        padding: 5px 20px;
+    }
+    .badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+    }
+</style>
 {% endblock %}

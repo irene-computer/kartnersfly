@@ -8,818 +8,755 @@
 {% endblock %}
 
 {% block content %}
-<section class="contact-hero">
-    <div class="container">
-        <div class="contact-hero-content">
-            <h1>Contactez-<span>nous</span></h1>
-            <p>Notre équipe est à votre écoute du lundi au samedi</p>
-        </div>
-    </div>
-</section>
 
-<section class="contact-main">
-    <div class="container">
-        <div class="contact-grid">
-            <!-- Carte Informations -->
-            <div class="contact-card info-card">
-                <div class="card-badge">
-                    <i class="fas fa-map-pin"></i>
-                    <span>Nous trouver</span>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<div class="k-contact-page">
+
+    <!-- HERO SECTION CONTACT -->
+    <section class="k-hero">
+        <div class="k-container k-hero-inner">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <span class="k-badge"><i class="fas fa-headset"></i> Service client</span>
+                    <h1 class="k-hero-title">Contactez-<span class="k-gradient-text">nous</span></h1>
+                    <p class="k-hero-lead">Notre équipe est à votre écoute du lundi au samedi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENU PRINCIPAL -->
+    <section class="k-section">
+        <div class="k-container">
+            <div class="k-contact-grid">
+                
+                <!-- CARTE INFORMATIONS -->
+                <div class="k-contact-card k-info-card">
+                    <div class="k-card-badge">
+                        <i class="fas fa-map-pin"></i>
+                        <span>Nous trouver</span>
+                    </div>
+                    
+                    <div class="k-info-section">
+                        <div class="k-info-icon-wrapper">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="k-info-content">
+                            <h3>Adresse</h3>
+                            <p>Logpom, Douala - Cameroun</p>
+                            <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="k-map-link">
+                                <i class="fas fa-directions"></i> Voir l'itinéraire
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="k-info-divider"></div>
+                    
+                    <div class="k-info-section">
+                        <div class="k-info-icon-wrapper">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="k-info-content">
+                            <h3>Téléphone</h3>
+                            <a href="tel:+237676268350" class="k-contact-link">+237 676 268 350</a>
+                            <span class="k-contact-note">Disponible 24h/24</span>
+                        </div>
+                    </div>
+                    
+                    <div class="k-info-divider"></div>
+                    
+                    <div class="k-info-section">
+                        <div class="k-info-icon-wrapper">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="k-info-content">
+                            <h3>Email</h3>
+                            <a href="mailto:kta2k23@gmail.com" class="k-contact-link">kta2k23@gmail.com</a>
+                            <span class="k-contact-note">Réponse sous 24h</span>
+                        </div>
+                    </div>
+                    
+                    <div class="k-info-divider"></div>
+                    
+                    <div class="k-hours-section">
+                        <div class="k-hours-header">
+                            <i class="far fa-clock"></i>
+                            <h4>Horaires d'ouverture</h4>
+                        </div>
+                        <ul class="k-hours-list">
+                            <li>
+                                <span class="k-day">Lundi - Samedi</span>
+                                <span class="k-time">08:00 - 18:00</span>
+                            </li>
+                            <li>
+                                <span class="k-day">Dimanche & Jours fériés</span>
+                                <span class="k-time k-closed">Fermé</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="k-social-section">
+                        <div class="k-social-header">
+                            <i class="fas fa-share-alt"></i>
+                            <h4>Suivez-nous</h4>
+                        </div>
+                        <div class="k-social-grid">
+                            <a href="https://wa.me/237676268350" target="_blank" rel="noopener noreferrer" class="k-social-link k-whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            <a href="https://www.facebook.com/profile.php?id=61555991666119" class="k-social-link k-facebook">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="https://www.linkedin.com/in/kartners-agency-4746a2305?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="k-social-link k-linkedin">
+                                <i class="fab fa-linkedin-in"></i>
+                                <span>LinkedIn</span>
+                            </a>
+                            <a href="https://www.instagram.com/kartnerstravelagency?utm_source=qr&igsh=MWRxdXhubnhlZXgyaA==" class="k-social-link k-instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <div class="info-icon-wrapper">
-                        <i class="fas fa-map-marker-alt"></i>
+                <!-- CARTE FORMULAIRE -->
+                <div class="k-contact-card k-form-card">
+                    <div class="k-form-header">
+                        <div class="k-form-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <h2>Envoyez-nous un message</h2>
+                        <p>Remplissez le formulaire et nous vous répondrons dans les plus brefs délais</p>
                     </div>
-                    <div class="info-content">
-                        <h3>Adresse</h3>
-                        <p>Logpom, Douala - Cameroun</p>
-                        <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="map-link">
-                            <i class="fas fa-directions"></i> Voir l'itinéraire
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="info-divider"></div>
-                
-                <div class="info-section">
-                    <div class="info-icon-wrapper">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3>Téléphone</h3>
-                        <a href="tel:+237676268350" class="contact-link">+237 676 268 350</a>
-                        <span class="contact-note">Disponible 24h/24</span>
-                    </div>
-                </div>
-                
-                <div class="info-divider"></div>
-                
-                <div class="info-section">
-                    <div class="info-icon-wrapper">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3>Email</h3>
-                        <a href="mailto:kta2k23@gmail.com" class="contact-link">kta2k23@gmail.com</a>
-                        <span class="contact-note">Réponse sous 24h</span>
-                    </div>
-                </div>
-                
-                <div class="info-divider"></div>
-                
-                <div class="hours-section">
-                    <div class="hours-header">
-                        <i class="far fa-clock"></i>
-                        <h4>Horaires d'ouverture</h4>
-                    </div>
-                    <ul class="hours-list">
-                        <li>
-                            <span class="day">Lundi - Samedi</span>
-                            <span class="time">08:00 - 18:00</span>
-                        </li>
-                        <li>
-                            <span class="day">Dimanche & Jours fériés</span>
-                            <span class="time closed">Fermé</span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="social-section">
-                    <div class="social-header">
-                        <i class="fas fa-share-alt"></i>
-                        <h4>Suivez-nous</h4>
-                    </div>
-                    <div class="social-grid">
-                        <a href="https://wa.me/237676268350" target="_blank" rel="noopener noreferrer" class="social-link whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                            <span>WhatsApp</span>
-                        </a>
-                        <a href="https://www.facebook.com/profile.php?id=61555991666119" class="social-link facebook">
-                            <i class="fab fa-facebook-f"></i>
-                            <span>Facebook</span>
-                        </a>
-                        <a href="https://www.linkedin.com/in/kartners-agency-4746a2305?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="social-link linkedin">
-                            <i class="fab fa-linkedin-in"></i>
-                            <span>LinkedIn</span>
-                        </a>
-                        <a href="https://www.instagram.com/kartnerstravelagency?utm_source=qr&igsh=MWRxdXhubnhlZXgyaA==" class="social-link instagram">
-                            <i class="fab fa-instagram"></i>
-                            <span>Instagram</span>
-                        </a>
-                    </div>
+                    
+                    <form id="contactForm" class="k-contact-form" novalidate>
+                        <div class="k-form-group">
+                            <label for="name">
+                                <i class="fas fa-user"></i>
+                                <span>Nom complet</span>
+                                <span class="k-required">*</span>
+                            </label>
+                            <input type="text" id="name" name="name" class="k-form-input" placeholder="Jean Dupont" required>
+                            <div class="k-error-message" data-for="name"></div>
+                        </div>
+                        
+                        <div class="k-form-row">
+                            <div class="k-form-group">
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Email</span>
+                                    <span class="k-required">*</span>
+                                </label>
+                                <input type="email" id="email" name="email" class="k-form-input" placeholder="jean@exemple.com" required>
+                                <div class="k-error-message" data-for="email"></div>
+                            </div>
+                            
+                            <div class="k-form-group">
+                                <label for="phone">
+                                    <i class="fas fa-phone"></i>
+                                    <span>Téléphone</span>
+                                </label>
+                                <input type="tel" id="phone" name="phone" class="k-form-input" placeholder="+237 676 268 350">
+                                <div class="k-error-message" data-for="phone"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="k-form-group">
+                            <label for="service">
+                                <i class="fas fa-concierge-bell"></i>
+                                <span>Service concerné</span>
+                            </label>
+                            <select id="service" name="service" class="k-form-select">
+                                <option value="">Sélectionnez un service</option>
+                                <option value="passeport">Pré-enrôlement - Passeport/CNI</option>
+                                <option value="billetterie">Billeterie aérienne</option>
+                                <option value="hotel">Réservation hôtelière</option>
+                                <option value="visa">Assistance visa</option>
+                                <option value="voyage">Planification de voyage</option>
+                                <option value="autre">Autre demande</option>
+                            </select>
+                        </div>
+                        
+                        <div class="k-form-group">
+                            <label for="message">
+                                <i class="fas fa-comment"></i>
+                                <span>Message</span>
+                                <span class="k-required">*</span>
+                            </label>
+                            <textarea id="message" name="message" class="k-form-textarea" rows="5" placeholder="Décrivez votre demande..." required></textarea>
+                            <div class="k-char-count" id="charCount">0/500 caractères</div>
+                            <div class="k-error-message" data-for="message"></div>
+                        </div>
+                        
+                        <button type="submit" class="k-btn-submit" id="submitBtn">
+                            <span class="k-btn-text">
+                                <i class="fas fa-paper-plane"></i>
+                                Envoyer le message
+                            </span>
+                            <div class="k-btn-spinner"></div>
+                        </button>
+                        
+                        <p class="k-form-note">
+                            <i class="fas fa-lock"></i>
+                            Vos informations sont confidentielles
+                        </p>
+                        
+                        <div id="formMessage" class="k-form-message" style="display: none;"></div>
+                    </form>
                 </div>
             </div>
             
-            <!-- Carte Formulaire -->
-            <div class="contact-card form-card">
-                <div class="form-header">
-                    <div class="form-icon">
-                        <i class="fas fa-paper-plane"></i>
-                    </div>
-                    <h2>Envoyez-nous un message</h2>
-                    <p>Remplissez le formulaire et nous vous répondrons dans les plus brefs délais</p>
+            <!-- CARTE GOOGLE MAPS -->
+            <div class="k-map-card">
+                <div class="k-map-header">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Notre emplacement</h3>
+                    <p>Logpom, Douala - Cameroun</p>
                 </div>
-                
-                <form id="contactForm" class="contact-form" novalidate>
-                    <div class="form-group">
-                        <label for="name">
-                            <i class="fas fa-user"></i>
-                            <span>Nom complet</span>
-                            <span class="required">*</span>
-                        </label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="Jean Dupont" required>
-                        <div class="error-message" data-for="name"></div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">
-                                <i class="fas fa-envelope"></i>
-                                <span>Email</span>
-                                <span class="required">*</span>
-                            </label>
-                            <input type="email" id="email" name="email" class="form-input" placeholder="jean@exemple.com" required>
-                            <div class="error-message" data-for="email"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">
-                                <i class="fas fa-phone"></i>
-                                <span>Téléphone</span>
-                            </label>
-                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="+237 676 268 350">
-                            <div class="error-message" data-for="phone"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="service">
-                            <i class="fas fa-concierge-bell"></i>
-                            <span>Service concerné</span>
-                        </label>
-                        <select id="service" name="service" class="form-select">
-                            <option value="">Sélectionnez un service</option>
-                            <option value="passeport">Pré-enrôlement - Passeport/CNI</option>
-                            <option value="billetterie">Billeterie aérienne</option>
-                            <option value="hotel">Réservation hôtelière</option>
-                            <option value="visa">Assistance visa</option>
-                            <option value="voyage">Planification de voyage</option>
-                            <option value="autre">Autre demande</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="message">
-                            <i class="fas fa-comment"></i>
-                            <span>Message</span>
-                            <span class="required">*</span>
-                        </label>
-                        <textarea id="message" name="message" class="form-textarea" rows="5" placeholder="Décrivez votre demande..." required></textarea>
-                        <div class="char-count" id="charCount">0/500 caractères</div>
-                        <div class="error-message" data-for="message"></div>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn" id="submitBtn">
-                        <span class="btn-text">
-                            <i class="fas fa-paper-plane"></i>
-                            Envoyer le message
-                        </span>
-                        <div class="btn-spinner"></div>
-                    </button>
-                    
-                    <p class="form-note">
-                        <i class="fas fa-lock"></i>
-                        Vos informations sont confidentielles
-                    </p>
-                    
-                    <div id="formMessage" class="form-message" style="display: none;"></div>
-                </form>
+                <div class="k-map-wrapper">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15915.528703831552!2d9.703471!3d4.051197!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1061123b8f7b6f8d%3A0x8b5c6d3e2f1a0b7!2sLogpom%2C%20Douala%2C%20Cameroun!5e0!3m2!1sfr!2scm!4v1700000000000!5m2!1sfr!2scm" 
+                        width="100%" 
+                        height="400" 
+                        style="border:0; border-radius: 16px;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Kartners Travel Agency - Logpom Douala">
+                    </iframe>
+                </div>
+                <div class="k-map-footer">
+                    <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="k-map-button">
+                        <i class="fas fa-external-link-alt"></i>
+                        Ouvrir dans Google Maps
+                    </a>
+                </div>
             </div>
         </div>
-        
-        <!-- Carte Google Maps -->
-        <div class="map-card">
-            <div class="map-header">
-                <i class="fas fa-map-marked-alt"></i>
-                <h3>Notre emplacement</h3>
-                <p>Logpom, Douala - Cameroun</p>
-            </div>
-            <div class="map-wrapper">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15915.528703831552!2d9.703471!3d4.051197!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1061123b8f7b6f8d%3A0x8b5c6d3e2f1a0b7!2sLogpom%2C%20Douala%2C%20Cameroun!5e0!3m2!1sfr!2scm!4v1700000000000!5m2!1sfr!2scm" 
-                    width="100%" 
-                    height="400" 
-                    style="border:0; border-radius: 16px;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="Kartners Travel Agency - Logpom Douala">
-                </iframe>
-            </div>
-            <div class="map-footer">
-                <a href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener noreferrer" class="map-button">
-                    <i class="fas fa-external-link-alt"></i>
-                    Ouvrir dans Google Maps
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
+
+</div>
 
 <style>
-/* ===== CONTACT PAGE STYLES ===== */
-.contact-hero {
-    background: linear-gradient(135deg, var(--violet-primary) 0%, var(--blue-primary) 100%);
-    padding: 80px 0 60px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.contact-hero::before {
-    content: "✈️";
-    font-size: 200px;
-    position: absolute;
-    bottom: -50px;
-    right: -50px;
-    opacity: 0.08;
-    pointer-events: none;
-}
-
-.contact-hero::after {
-    content: "🌍";
-    font-size: 150px;
-    position: absolute;
-    top: -30px;
-    left: -30px;
-    opacity: 0.08;
-    pointer-events: none;
-}
-
-.contact-hero-content h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 16px;
-    animation: fadeInUp 0.8s ease;
-}
-
-.contact-hero-content h1 span {
-    background: linear-gradient(135deg, #FFE4B5, white);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.contact-hero-content p {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.9);
-    animation: fadeInUp 0.8s ease 0.2s both;
-}
-
-.contact-main {
-    background: var(--gray-light);
-    padding: 60px 0 80px;
-}
-
-.contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 40px;
-    margin-bottom: 50px;
-}
-
-.contact-card {
-    background: white;
-    border-radius: 28px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-}
-
-.contact-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
-}
-
-.info-card {
-    padding: 32px;
-}
-
-.card-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
-    padding: 6px 16px;
-    border-radius: 50px;
-    margin-bottom: 28px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--violet-dark);
-}
-
-.card-badge i {
-    font-size: 0.9rem;
-}
-
-.info-section {
-    display: flex;
-    gap: 18px;
-    align-items: flex-start;
-}
-
-.info-icon-wrapper {
-    width: 52px;
-    height: 52px;
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.info-icon-wrapper i {
-    font-size: 1.4rem;
-    color: white;
-}
-
-.info-content h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-gray);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.info-content p {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-dark);
-    margin: 0;
-}
-
-.contact-link {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--violet-dark);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.contact-link:hover {
-    color: var(--violet-primary);
-}
-
-.contact-note {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-gray);
-    margin-top: 4px;
-}
-
-.map-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    font-size: 0.85rem;
-    color: var(--blue-primary);
-    text-decoration: none;
-    font-weight: 500;
-    transition: gap 0.3s ease;
-}
-
-.map-link:hover {
-    gap: 10px;
-}
-
-.info-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gray-medium), transparent);
-    margin: 24px 0;
-}
-
-.hours-section {
-    margin-bottom: 28px;
-}
-
-.hours-header, .social-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.hours-header i, .social-header i {
-    font-size: 1.2rem;
-    color: var(--violet-primary);
-}
-
-.hours-header h4, .social-header h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-.hours-list {
-    list-style: none;
-    padding: 0;
-}
-
-.hours-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--gray-medium);
-}
-
-.hours-list li:last-child {
-    border-bottom: none;
-}
-
-.hours-list .day {
-    font-weight: 500;
-    color: var(--text-dark);
-}
-
-.hours-list .time {
-    color: var(--text-gray);
-}
-
-.hours-list .time.closed {
-    color: #EF4444;
-}
-
-.social-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 14px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    color: white;
-}
-
-.social-link.whatsapp { background: #25D366; }
-.social-link.facebook { background: #1877F2; }
-.social-link.linkedin { background: #0077B5; }
-.social-link.instagram { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCAF45); }
-
-.social-link:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.05);
-}
-
-/* Form Card */
-.form-card {
-    padding: 40px;
-}
-
-.form-header {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.form-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-}
-
-.form-icon i {
-    font-size: 1.8rem;
-    color: white;
-}
-
-.form-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-dark);
-}
-
-.form-header p {
-    color: var(--text-gray);
-    font-size: 0.9rem;
-}
-
-.form-group {
-    margin-bottom: 22px;
-}
-
-.form-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: var(--text-dark);
-}
-
-.form-group label i {
-    color: var(--violet-primary);
-}
-
-.required {
-    color: #EF4444;
-}
-
-.form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 14px 18px;
-    border: 2px solid var(--gray-medium);
-    border-radius: 16px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--violet-primary);
-    box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
-}
-
-.form-input.error, .form-textarea.error {
-    border-color: #EF4444;
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.char-count {
-    text-align: right;
-    font-size: 0.7rem;
-    color: var(--text-gray);
-    margin-top: 6px;
-}
-
-.error-message {
-    color: #EF4444;
-    font-size: 0.75rem;
-    margin-top: 5px;
-    display: none;
-}
-
-.submit-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139,92,246,0.3);
-}
-
-.submit-btn.loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.btn-spinner {
-    display: none;
-    width: 22px;
-    height: 22px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.submit-btn.loading .btn-text {
-    opacity: 0;
-}
-
-.submit-btn.loading .btn-spinner {
-    display: block;
-}
-
-.form-note {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-gray);
-    margin-top: 18px;
-}
-
-.form-message {
-    margin-top: 20px;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.form-message.success {
-    background: #10B981;
-    color: white;
-}
-
-.form-message.error {
-    background: #EF4444;
-    color: white;
-}
-
-.form-message.info {
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-    color: white;
-}
-
-/* Map Card */
-.map-card {
-    background: white;
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-}
-
-.map-header {
-    padding: 24px 28px 0;
-}
-
-.map-header i {
-    font-size: 1.4rem;
-    color: var(--violet-primary);
-    margin-right: 10px;
-}
-
-.map-header h3 {
-    display: inline-block;
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-.map-header p {
-    color: var(--text-gray);
-    margin: 8px 0 0;
-    font-size: 0.9rem;
-}
-
-.map-wrapper {
-    padding: 20px;
-}
-
-.map-footer {
-    padding: 0 28px 28px;
-    text-align: center;
-}
-
-.map-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
-    color: white;
-    padding: 12px 28px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.map-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(139,92,246,0.3);
-    color: white;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+    /* ===================================================
+       DESIGN SYSTEM KTA (VIOLET #5B2588 & CYAN #00A3E0)
+       AVEC TAILLES DE POLICE AGRANDIES POUR UNE MEILLEURE LISIBILITÉ
+       =================================================== */
+    :root {
+        --k-violet: #5B2588;
+        --k-violet-dark: #3F1762;
+        --k-cyan: #00A3E0;
+        --k-cyan-dark: #0084B7;
+        --k-dark: #0B0F19;
+        --k-body: #1E293B;
+        --k-muted: #64748B;
+        --k-bg: #F8FAFC;
+        --k-border: #E2E8F0;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+    .k-contact-page {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--k-body);
+        background: var(--k-bg);
+    }
 
-/* Responsive */
-@media (max-width: 992px) {
-    .contact-grid {
-        grid-template-columns: 1fr;
+    .k-container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 24px;
     }
-    
-    .contact-hero-content h1 {
-        font-size: 2.5rem;
-    }
-}
 
-@media (max-width: 768px) {
-    .contact-hero {
-        padding: 60px 0 40px;
-    }
-    
-    .contact-hero-content h1 {
-        font-size: 2rem;
-    }
-    
-    .contact-hero-content p {
-        font-size: 1rem;
-    }
-    
-    .contact-main {
-        padding: 40px 0 60px;
-    }
-    
-    .info-card, .form-card {
-        padding: 24px;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-    
-    .social-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .map-header {
-        padding: 20px 20px 0;
-    }
-    
-    .map-wrapper {
-        padding: 15px;
-    }
-    
-    .map-footer {
-        padding: 0 20px 20px;
-    }
-}
+    .k-section { padding: 70px 0; }
 
-@media (max-width: 576px) {
-    .info-section {
-        flex-direction: column;
+    /* BADGES */
+    .k-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #FFFFFF;
+        padding: 8px 20px; /* Badge plus gros */
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .k-gradient-text {
+        background: linear-gradient(135deg, var(--k-violet) 0%, var(--k-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* HERO */
+    .k-hero {
+        background: linear-gradient(135deg, var(--k-violet-dark) 0%, var(--k-violet) 50%, var(--k-cyan-dark) 100%);
+        padding: 100px 0 130px; /* Hero plus haut pour plus d'impact */
+        color: #FFFFFF;
+        position: relative;
+    }
+
+    .k-hero-title {
+        font-size: clamp(3.2rem, 5vw, 4.5rem);
+        font-weight: 900;
+        margin: 25px 0;
+        color: #FFFFFF;
+    }
+
+    .k-hero-title .k-gradient-text {
+        background: linear-gradient(135deg, #FFFFFF 0%, var(--k-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .k-hero-lead {
+        font-size: 1.4rem;
+        line-height: 1.9;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0 auto;
+    }
+
+    /* CONTACT GRID */
+    .k-contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 40px;
+        margin-bottom: 50px;
+    }
+
+    .k-contact-card {
+        background: #FFFFFF;
+        border-radius: 28px; /* Coins plus arrondis */
+        overflow: hidden;
+        transition: all 0.35s ease;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+
+    .k-contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    /* INFO CARD */
+    .k-info-card { padding: 40px; } /* Plus d'espace intérieur */
+
+    .k-card-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, rgba(91, 37, 136, 0.1), rgba(0, 163, 224, 0.1));
+        padding: 8px 20px;
+        border-radius: 50px;
+        margin-bottom: 32px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--k-violet-dark);
+    }
+
+    .k-card-badge i { font-size: 1rem; }
+
+    .k-info-section {
+        display: flex;
+        gap: 24px;
         align-items: flex-start;
     }
-    
-    .info-icon-wrapper {
-        width: 48px;
-        height: 48px;
+
+    .k-info-icon-wrapper {
+        width: 56px; /* Icône plus grande */
+        height: 56px;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark));
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
-    
-    .info-icon-wrapper i {
+
+    .k-info-icon-wrapper i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .k-info-content h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--k-muted);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .k-info-content p {
         font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--k-body);
+        margin: 0;
     }
-    
-    .contact-link {
+
+    .k-contact-link {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--k-violet-dark);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .k-contact-link:hover { color: var(--k-violet); }
+
+    .k-contact-note {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--k-muted);
+        margin-top: 6px;
+    }
+
+    .k-map-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        font-size: 0.95rem;
+        color: var(--k-cyan-dark);
+        text-decoration: none;
+        font-weight: 600;
+        transition: gap 0.3s ease;
+    }
+
+    .k-map-link:hover { gap: 12px; }
+
+    .k-info-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--k-border), transparent);
+        margin: 28px 0;
+    }
+
+    .k-hours-section { margin-bottom: 32px; }
+
+    .k-hours-header, .k-social-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .k-hours-header i, .k-social-header i {
+        font-size: 1.4rem;
+        color: var(--k-violet);
+    }
+
+    .k-hours-header h4, .k-social-header h4 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--k-body);
+    }
+
+    .k-hours-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .k-hours-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--k-border);
+        font-size: 1.05rem;
+    }
+
+    .k-hours-list li:last-child { border-bottom: none; }
+
+    .k-hours-list .k-day { font-weight: 600; color: var(--k-body); }
+    .k-hours-list .k-time { color: var(--k-muted); }
+    .k-hours-list .k-time.k-closed { color: #EF4444; }
+
+    /* SOCIAL GRID */
+    .k-social-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .k-social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 600;
         font-size: 1rem;
+        transition: all 0.3s ease;
+        color: white;
     }
-    
-    .map-header h3 {
-        font-size: 1.1rem;
+
+    .k-social-link.k-whatsapp { background: #25D366; }
+    .k-social-link.k-facebook { background: #1877F2; }
+    .k-social-link.k-linkedin { background: #0077B5; }
+    .k-social-link.k-instagram { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCAF45); }
+
+    .k-social-link:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.05);
     }
-}
+
+    /* FORM CARD */
+    .k-form-card { padding: 48px; } /* Plus d'espace intérieur */
+
+    .k-form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .k-form-icon {
+        width: 80px; /* Icône plus grande */
+        height: 80px;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+    }
+
+    .k-form-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .k-form-header h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: var(--k-body);
+    }
+
+    .k-form-header p {
+        color: var(--k-muted);
+        font-size: 1.05rem;
+    }
+
+    .k-form-group {
+        margin-bottom: 28px;
+    }
+
+    .k-form-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--k-body);
+    }
+
+    .k-form-group label i { color: var(--k-violet); font-size: 1.1rem; }
+
+    .k-required { color: #EF4444; }
+
+    .k-form-input, .k-form-select, .k-form-textarea {
+        width: 100%;
+        padding: 18px 20px;
+        border: 2px solid var(--k-border);
+        border-radius: 16px;
+        font-family: inherit;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .k-form-input:focus, .k-form-select:focus, .k-form-textarea:focus {
+        outline: none;
+        border-color: var(--k-violet);
+        box-shadow: 0 0 0 4px rgba(91, 37, 136, 0.15);
+    }
+
+    .k-form-input.error, .k-form-textarea.error { border-color: #EF4444; }
+
+    .k-form-textarea {
+        resize: vertical;
+        min-height: 140px;
+    }
+
+    .k-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .k-char-count {
+        text-align: right;
+        font-size: 0.85rem;
+        color: var(--k-muted);
+        margin-top: 8px;
+    }
+
+    .k-error-message {
+        color: #EF4444;
+        font-size: 0.85rem;
+        margin-top: 6px;
+        display: none;
+    }
+
+    .k-btn-submit {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark));
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.15rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .k-btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(91, 37, 136, 0.3);
+    }
+
+    .k-btn-submit.loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .k-btn-spinner {
+        display: none;
+        width: 22px;
+        height: 22px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: k-spin 0.6s linear infinite;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .k-btn-submit.loading .k-btn-text { opacity: 0; }
+    .k-btn-submit.loading .k-btn-spinner { display: block; }
+
+    @keyframes k-spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .k-form-note {
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--k-muted);
+        margin-top: 24px;
+    }
+
+    .k-form-message {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .k-form-message.success { background: #10B981; color: white; }
+    .k-form-message.error { background: #EF4444; color: white; }
+    .k-form-message.info { background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark)); color: white; }
+
+    /* MAP CARD */
+    .k-map-card {
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+
+    .k-map-header {
+        padding: 28px 32px 0;
+    }
+
+    .k-map-header i {
+        font-size: 1.6rem;
+        color: var(--k-violet);
+        margin-right: 12px;
+    }
+
+    .k-map-header h3 {
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--k-body);
+    }
+
+    .k-map-header p {
+        color: var(--k-muted);
+        margin: 10px 0 0;
+        font-size: 1.05rem;
+    }
+
+    .k-map-wrapper { padding: 24px; }
+
+    .k-map-footer {
+        padding: 0 32px 32px;
+        text-align: center;
+    }
+
+    .k-map-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan-dark));
+        color: white;
+        padding: 16px 32px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .k-map-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(91, 37, 136, 0.3);
+        color: white;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .k-contact-grid { grid-template-columns: 1fr; }
+        .k-hero-title { font-size: 2.8rem; }
+    }
+
+    @media (max-width: 768px) {
+        .k-hero { padding: 60px 0 40px; }
+        .k-hero-title { font-size: 2.4rem; }
+        .k-hero-lead { font-size: 1.2rem; }
+        .k-section { padding: 40px 0 60px; }
+        .k-info-card, .k-form-card { padding: 28px; }
+        .k-form-row { grid-template-columns: 1fr; gap: 0; }
+        .k-social-grid { grid-template-columns: 1fr; }
+        .k-map-header { padding: 20px 20px 0; }
+        .k-map-wrapper { padding: 16px; }
+        .k-map-footer { padding: 0 20px 20px; }
+    }
+
+    @media (max-width: 576px) {
+        .k-info-section { flex-direction: column; align-items: flex-start; }
+        .k-info-icon-wrapper { width: 48px; height: 48px; }
+        .k-info-icon-wrapper i { font-size: 1.2rem; }
+        .k-contact-link { font-size: 1rem; }
+        .k-map-header h3 { font-size: 1.2rem; }
+        .k-hero-title { font-size: 2rem; }
+    }
 </style>
 
 <script>
@@ -888,7 +825,7 @@ const validators = {
 };
 
 function showError(fieldName, message) {
-    const errorDiv = document.querySelector(`.error-message[data-for="${fieldName}"]`);
+    const errorDiv = document.querySelector(`.k-error-message[data-for="${fieldName}"]`);
     const input = document.getElementById(fieldName);
     if (errorDiv) {
         errorDiv.textContent = message;
@@ -935,7 +872,7 @@ function updateCharCount() {
 function setStatusMessage(message, isError = false, isSuccess = false) {
     if (elements.formMessage) {
         elements.formMessage.textContent = message;
-        elements.formMessage.className = 'form-message';
+        elements.formMessage.className = 'k-form-message';
         elements.formMessage.classList.add(isError ? 'error' : (isSuccess ? 'success' : 'info'));
         elements.formMessage.style.display = 'block';
         if (!isError) {
@@ -981,7 +918,7 @@ async function handleSubmit(e) {
     if (isSubmitting) return;
     if (!validateForm()) {
         setStatusMessage('Veuillez corriger les erreurs dans le formulaire', true);
-        const firstError = document.querySelector('.error-message:not(:empty)');
+        const firstError = document.querySelector('.k-error-message:not(:empty)');
         if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
@@ -1054,4 +991,5 @@ document.addEventListener('DOMContentLoaded', () => {
     addCSRFToken();
 });
 </script>
+
 {% endblock %}

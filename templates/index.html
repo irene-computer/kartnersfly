@@ -1,49 +1,551 @@
 {% extends "base.html" %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Accueil | Kartners Travel Agency{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="container">
-        <h1>Voyagez, <span class="highlight">comme vous l'imaginez.</span></h1>
-        <p class="lead mb-4">Kartners Travel Agency - Votre partenaire de confiance pour tous vos voyages</p>
-        <a href="/destinations" class="btn btn-primary-custom me-3">Découvrir nos voyages</a>
-        <a href="/contact" class="btn btn-outline-custom">Nous contacter</a>
-    </div>
-</section>
 
-<section class="section">
-    <div class="container">
-        <h2 class="section-title">Pourquoi <span>Kartners</span> ?</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-globe-africa"></i>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<div class="k-home-page">
+
+    <!-- ===== HERO AVEC SLIDESHOW (overlay neutre, sans couleur) ===== -->
+    <section class="k-hero">
+        <div class="k-hero-slideshow">
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/voyage.jpg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/voyages2.jpg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/voyageimagar.jpeg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/voyage+.jpeg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/viyay.jpeg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/voya.jpeg');"></div>
+            <div class="k-hero-slide" style="background-image: url('/static/images/backgrounds/vv.jpeg');"></div>
+        </div>
+
+        <!-- Overlay neutre : seulement pour la lisibilité, sans couleur dominante -->
+        <div class="k-hero-overlay"></div>
+
+        <div class="k-container k-hero-content">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+
+                    <!-- BADGE ANIMÉ -->
+                    <div class="k-hero-badge">
+                        <span class="k-badge-text">KARTNERS TRAVEL AGENCY</span>
+                        <span class="k-badge-dot"></span>
+                        <span class="k-badge-label">Expert voyage</span>
                     </div>
-                    <h3>Expertise locale</h3>
-                    <p>Plus de 15 ans d'expérience au Cameroun et à l'international</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-headset"></i>
+
+                    <h1 class="k-hero-title">
+                        Voyagez, <br>
+                        <span class="k-highlight">comme vous l'imaginez.</span>
+                    </h1>
+
+                    <p class="k-hero-lead">
+                        Kartners Travel Agency – Votre partenaire de confiance pour tous vos voyages.
+                    </p>
+
+                    <div class="k-hero-buttons">
+                        <a href="/destinations" class="k-btn k-btn-primary">
+                            <i class="fas fa-compass"></i> Découvrir nos voyages
+                        </a>
+                        <a href="/contact" class="k-btn k-btn-outline">
+                            <i class="fas fa-headset"></i> Nous contacter
+                        </a>
                     </div>
-                    <h3>Assistance 24/7</h3>
-                    <p>Une équipe dédiée pour tous vos déplacements</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <h3>Services complets</h3>
-                    <p>Billeterie, visas, hôtels, assurances, pré-enrôlement</p>
+
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="k-section">
+        <div class="k-container">
+            <div class="k-section-header">
+                <span class="k-section-tag">Nos services</span>
+                <h2>Pourquoi <span class="k-gradient-text">Kartners</span> ?</h2>
+                <p class="k-section-sub">Une expertise complète pour tous vos besoins de voyage.</p>
+            </div>
+
+            <div class="k-services-grid">
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-globe-africa"></i></div>
+                    <h3>Expertise locale</h3>
+                    <p>Plus de 15 ans d'expérience au Cameroun et à l'international.</p>
+                </div>
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-headset"></i></div>
+                    <h3>Assistance 24/7</h3>
+                    <p>Une équipe dédiée pour tous vos déplacements, jour et nuit.</p>
+                </div>
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Services complets</h3>
+                    <p>Billeterie, visas, hôtels, assurances, pré-enrôlement.</p>
+                </div>
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Bourse d'études</h3>
+                    <p>Accompagnement complet pour vos études à l'étranger et visa étudiant.</p>
+                </div>
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-file-signature"></i></div>
+                    <h3>Assistance Visa</h3>
+                    <p>Tourisme & Affaires, suivi rigoureux de votre dossier.</p>
+                </div>
+
+                <div class="k-service-card">
+                    <div class="k-service-icon"><i class="fas fa-map-marked-alt"></i></div>
+                    <h3>Planification sur mesure</h3>
+                    <p>Circuits personnalisés et voyages organisés selon vos envies.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<style>
+    /* ============================================================
+       KARTNERS TRAVEL AGENCY – ACCUEIL SANS COULEUR SUR LES IMAGES
+       Overlay neutre, uniquement pour la lisibilité
+       ============================================================ */
+    :root {
+        --k-violet: #6C2BD9;
+        --k-violet-dark: #4A1A8A;
+        --k-cyan: #00B4D8;
+        --k-cyan-dark: #0077B6;
+        --k-white: #FFFFFF;
+        --k-bg: #F0F4F8;
+        --k-gray: #E2E8F0;
+        --k-text: #1E293B;
+        --k-muted: #64748B;
+        --k-shadow: rgba(108, 43, 217, 0.06);
+    }
+
+    .k-home-page {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--k-bg);
+        color: var(--k-text);
+    }
+
+    .k-container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    /* ===== TYPOGRAPHIE ===== */
+    .k-gradient-text {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .k-section-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--k-violet);
+        background: rgba(108, 43, 217, 0.06);
+        padding: 4px 18px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+    }
+
+    .k-section-header {
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 56px;
+    }
+
+    .k-section-header h2 {
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 12px;
+    }
+
+    .k-section-sub {
+        font-size: 1.1rem;
+        color: var(--k-muted);
+        line-height: 1.8;
+    }
+
+    /* ===== HERO (sans overlay coloré) ===== */
+    .k-hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        background: #000; /* fallback si les images ne chargent pas */
+    }
+
+    /* Slideshow */
+    .k-hero-slideshow {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .k-hero-slide {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transform: scale(1.05);
+        animation: kHeroZoomFade 35s ease-in-out infinite;
+    }
+
+    .k-hero-slide:nth-child(1) { animation-delay: 0s; }
+    .k-hero-slide:nth-child(2) { animation-delay: 5s; }
+    .k-hero-slide:nth-child(3) { animation-delay: 10s; }
+    .k-hero-slide:nth-child(4) { animation-delay: 15s; }
+    .k-hero-slide:nth-child(5) { animation-delay: 20s; }
+    .k-hero-slide:nth-child(6) { animation-delay: 25s; }
+    .k-hero-slide:nth-child(7) { animation-delay: 30s; }
+
+    @keyframes kHeroZoomFade {
+        0%, 14% { opacity: 1; transform: scale(1); }
+        17%, 95% { opacity: 0; transform: scale(1.08); }
+        100% { opacity: 0; }
+    }
+
+    /* ===== OVERLAY NEUTRE (uniquement pour la lisibilité, sans couleur) ===== */
+    .k-hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: rgba(0, 0, 0, 0.20); /* très léger, pas de teinte colorée */
+        /* Dégradé optionnel : plus sombre en bas pour le texte */
+        background: linear-gradient(180deg, 
+            rgba(0, 0, 0, 0.05) 0%, 
+            rgba(0, 0, 0, 0.25) 50%,
+            rgba(0, 0, 0, 0.35) 100%
+        );
+    }
+
+    .k-hero-content {
+        position: relative;
+        z-index: 2;
+        color: var(--k-white);
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    /* ===== HERO BADGE ANIMÉ ===== */
+    .k-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 12px 32px 12px 28px;
+        border-radius: 60px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.20);
+    }
+
+    .k-badge-text {
+        color: #FFFFFF;
+        animation: kColorCycle 4s ease-in-out infinite;
+        font-weight: 900;
+    }
+
+    @keyframes kColorCycle {
+        0%, 100% { color: #FFFFFF; }
+        25% { color: #B3A0FF; }
+        50% { color: #6C2BD9; }
+        75% { color: #00B4D8; }
+    }
+
+    .k-badge-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--k-cyan);
+        border-radius: 50%;
+        animation: kPulseDot 2s ease-in-out infinite;
+    }
+
+    @keyframes kPulseDot {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.6); }
+    }
+
+    .k-badge-label {
+        font-weight: 400;
+        opacity: 0.7;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Shimmer effet */
+    .k-hero-badge::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.04),
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.04),
+            transparent
+        );
+        animation: kShimmer 4s ease-in-out infinite;
+        transform: rotate(25deg);
+    }
+
+    @keyframes kShimmer {
+        0% { transform: translateX(-100%) rotate(25deg); }
+        100% { transform: translateX(100%) rotate(25deg); }
+    }
+
+    /* ===== HERO TITRE ===== */
+    .k-hero-title {
+        font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+        font-weight: 900;
+        letter-spacing: -2px;
+        line-height: 1.05;
+        color: #FFFFFF;
+        margin-bottom: 20px;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.30);
+    }
+
+    .k-hero-title .k-highlight {
+        background: linear-gradient(135deg,
+            #FFFFFF 0%,
+            #B3A0FF 40%,
+            #6C2BD9 70%,
+            #00B4D8 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .k-hero-lead {
+        font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+        color: rgba(255, 255, 255, 0.95);
+        max-width: 600px;
+        margin: 0 auto 32px;
+        font-weight: 400;
+        line-height: 1.8;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.30);
+    }
+
+    /* ===== BOUTONS HERO ===== */
+    .k-hero-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .k-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 36px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid transparent;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.10);
+    }
+
+    .k-btn-primary {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 28px rgba(108, 43, 217, 0.25);
+    }
+
+    .k-btn-primary:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(108, 43, 217, 0.35);
+        color: #FFFFFF !important;
+    }
+
+    .k-btn-outline {
+        background: rgba(0, 0, 0, 0.20);
+        backdrop-filter: blur(4px);
+        color: #FFFFFF !important;
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .k-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.10);
+        border-color: rgba(255, 255, 255, 0.50);
+        transform: translateY(-4px);
+        color: #FFFFFF !important;
+    }
+
+    /* ===== SERVICES ===== */
+    .k-section {
+        padding: 80px 0;
+        background: var(--k-bg);
+    }
+
+    .k-services-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        margin-top: 20px;
+    }
+
+    .k-service-card {
+        background: var(--k-white);
+        padding: 36px 28px;
+        border-radius: 24px;
+        text-align: center;
+        border: 1px solid rgba(108, 43, 217, 0.04);
+        box-shadow: 0 4px 20px var(--k-shadow);
+        transition: all 0.35s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .k-service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.10);
+        border-color: rgba(0, 180, 216, 0.15);
+    }
+
+    .k-service-icon {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, rgba(108, 43, 217, 0.06), rgba(0, 180, 216, 0.06));
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: var(--k-violet);
+        transition: all 0.35s ease;
+    }
+
+    .k-service-card:hover .k-service-icon {
+        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
+        color: var(--k-white);
+        transform: scale(1.08) rotate(-3deg);
+        box-shadow: 0 8px 24px rgba(108, 43, 217, 0.15);
+    }
+
+    .k-service-card h3 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 10px;
+    }
+
+    .k-service-card p {
+        font-size: 0.95rem;
+        color: var(--k-muted);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .k-services-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .k-hero-title {
+            font-size: 2.8rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .k-hero {
+            min-height: 90vh;
+        }
+        .k-hero-title {
+            font-size: 2.4rem;
+        }
+        .k-hero-badge {
+            font-size: 0.85rem;
+            padding: 10px 20px;
+            gap: 8px;
+        }
+        .k-badge-label {
+            display: none;
+        }
+        .k-hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        .k-btn {
+            width: 100%;
+            max-width: 320px;
+            justify-content: center;
+        }
+        .k-services-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .k-section {
+            padding: 56px 0;
+        }
+        .k-service-card {
+            padding: 28px 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .k-hero-title {
+            font-size: 1.8rem;
+        }
+        .k-hero-lead {
+            font-size: 0.9rem;
+            padding: 0 10px;
+            line-height: 1.5;
+        }
+        .k-hero-badge {
+            font-size: 0.7rem;
+            padding: 8px 14px;
+        }
+        .k-service-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.6rem;
+        }
+        .k-service-card h3 {
+            font-size: 1.1rem;
+        }
+        .k-section-header h2 {
+            font-size: 1.7rem;
+        }
+    }
+</style>
+
 {% endblock %}
