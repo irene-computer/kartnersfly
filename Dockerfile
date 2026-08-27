@@ -1,7 +1,3 @@
-# ============================================
-# KARTNERSFLY - Dockerfile pour Railway
-# ============================================
-
 FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -21,11 +17,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Créer les dossiers nécessaires avec les bons droits
-RUN mkdir -p static/images/flags static/images/destinations static/images/services static/images/scholarships \
-    && chmod -R 755 /app
+# Créer les dossiers nécessaires (data pour la base, images pour les uploads)
+RUN mkdir -p /app/data \
+    static/images/flags \
+    static/images/destinations \
+    static/images/services \
+    static/images/scholarships \
+    && chmod -R 755 /app/data /app/static/images
 
-# Exécution en root (pas d'utilisateur non-root)
 EXPOSE 5000
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "3", "--threads", "2", "app:app"]

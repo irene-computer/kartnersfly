@@ -13,9 +13,9 @@ class Config:
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
 
-    # ===== DATABASE =====
+    # ===== DATABASE - Utilise la variable d'environnement ou un chemin par défaut =====
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    DATABASE = os.path.join(BASE_DIR, 'database.db')
+    DATABASE = os.getenv('DATABASE', os.path.join(BASE_DIR, 'database.db'))
 
     # ===== SESSION =====
     PERMANENT_SESSION_LIFETIME = int(os.getenv('PERMANENT_SESSION_LIFETIME', 86400))
