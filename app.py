@@ -68,17 +68,18 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # ============================================================
-# FALLBACK ADMIN – FORCER LES IDENTIFIANTS SI NON DÉFINIS
+# CORRECTION ADMIN – FALLBACK ET NETTOYAGE DES VARIABLES
 # ============================================================
-# Nettoyage des variables d'environnement
-admin_username = os.getenv('ADMIN_USERNAME', 'admin').strip()
-admin_password = os.getenv('ADMIN_PASSWORD', 'admin123').strip()
+admin_username = os.getenv('ADMIN_USERNAME', '').strip()
+admin_password = os.getenv('ADMIN_PASSWORD', '').strip()
 
-# Si les identifiants sont vides ou 'None', on utilise les valeurs par défaut
-if not admin_username or admin_username.lower() == 'none':
+# Si les variables sont vides, on utilise des valeurs par défaut
+if not admin_username:
     admin_username = 'admin'
-if not admin_password or admin_password.lower() == 'none':
+    print("[WARN] ADMIN_USERNAME non défini, utilisation de 'admin'")
+if not admin_password:
     admin_password = 'admin123'
+    print("[WARN] ADMIN_PASSWORD non défini, utilisation de 'admin123'")
 
 # On force les valeurs dans la configuration
 Config.ADMIN_USERNAME = admin_username
@@ -270,6 +271,7 @@ def send_bulk_email(recipients, subject, html_content, text_content=None):
 
 def send_scholarship_notification(recipients, scholarship_data):
     subject = f"Nouvelle opportunité de bourse - Kartners Travel Agency"
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -299,6 +301,7 @@ def send_scholarship_notification(recipients, scholarship_data):
                 <h2>Nouvelle opportunité de bourse d'études</h2>
                 <p>Bonjour,</p>
                 <p>Nous avons le plaisir de vous informer qu'une nouvelle opportunité de bourse est disponible.</p>
+
                 <div class="info-block">
                     <h3>Détails de l'opportunité</h3>
                     <p><strong>Pays :</strong> {scholarship_data.get('country', 'À déterminer')}</p>
@@ -306,6 +309,7 @@ def send_scholarship_notification(recipients, scholarship_data):
                     <p><strong>Domaine :</strong> {scholarship_data.get('field_of_study', 'À déterminer')}</p>
                     <p><strong>Date limite :</strong> {scholarship_data.get('deadline', 'Consultez notre site')}</p>
                 </div>
+
                 <p style="text-align: center; margin: 30px 0;">
                     <a href="https://www.kartnersagency.com/bourse-etudes" class="btn">En savoir plus</a>
                 </p>
@@ -318,6 +322,7 @@ def send_scholarship_notification(recipients, scholarship_data):
     </body>
     </html>
     """
+
     text_content = f"""
 KARTNERS TRAVEL AGENCY - NOUVELLE OPPORTUNITÉ DE BOURSE
 
@@ -332,6 +337,7 @@ Détails:
 
 Pour en savoir plus: https://www.kartnersagency.com/bourse-etudes
     """
+
     return send_bulk_email(recipients, subject, html_content, text_content)
 
 # ==================== ROUTES CLIENT ====================
@@ -516,16 +522,13 @@ def admin_login():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
 
-        username = sanitize_input(username)
-        password = sanitize_input(password)
-
-        # Logs détaillés
+        # Logs détaillés (visibles sur Railway)
         print("=" * 60)
         print("[LOGIN] Tentative de connexion")
-        print(f"[LOGIN] Username saisi : '{username}'")
-        print(f"[LOGIN] Password saisi : '{password}'")
-        print(f"[LOGIN] Username attendu : '{Config.ADMIN_USERNAME}'")
-        print(f"[LOGIN] Password attendu : '{Config.ADMIN_PASSWORD}'")
+        print(f"[LOGIN] Username saisi : '{username}' (longueur: {len(username)})")
+        print(f"[LOGIN] Password saisi : '{password}' (longueur: {len(password)})")
+        print(f"[LOGIN] Username attendu : '{Config.ADMIN_USERNAME}' (longueur: {len(Config.ADMIN_USERNAME)})")
+        print(f"[LOGIN] Password attendu : '{Config.ADMIN_PASSWORD}' (longueur: {len(Config.ADMIN_PASSWORD)})")
         print("=" * 60)
 
         if username == Config.ADMIN_USERNAME and password == Config.ADMIN_PASSWORD:
@@ -534,13 +537,25 @@ def admin_login():
             session['admin_ip'] = request.remote_addr
             session.permanent = True
             flash('Connexion réussie', 'success')
-            print("[LOGIN] SUCCÈS ! Redirection vers le dashboard.")
+            print("[LOGIN] ✅ Succès !")
             return redirect(url_for('admin_dashboard'))
         else:
-            print("[LOGIN] ÉCHEC !")
+            print("[LOGIN] ❌ Échec (identifiants incorrects)")
             flash('Identifiants incorrects', 'danger')
+            # On transmet l'erreur au template pour affichage
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
+
+# ===== ROUTE DE SECOURS – ACCÈS ADMIN SANS MOT DE PASSE =====
+@app.route('/admin/force-login')
+def admin_force_login():
+    """Accès direct à l'admin sans vérification (à supprimer après correction)."""
+    session['admin_logged_in'] = True
+    session['admin_username'] = 'admin'
+    session['admin_ip'] = request.remote_addr
+    session.permanent = True
+    flash('🔓 Accès forcé réussi !', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -624,11 +639,13 @@ def admin_destination_add():
         price = float(request.form.get('price'))
         continent = sanitize_input(request.form.get('continent', 'europe'))
 
+        # Flag image
         flag_file = request.files.get('flag_image')
         flag_path = save_uploaded_image(flag_file, 'flags') if flag_file else None
         if not flag_path:
             flag_path = 'images/flags/default.png'
 
+        # Destination image
         dest_file = request.files.get('destination_image')
         dest_path = save_uploaded_image(dest_file, 'destinations') if dest_file else None
         if not dest_path:
@@ -663,6 +680,7 @@ def admin_destination_edit(id):
             flag_path = old['flag_image']
             dest_path = old['image']
 
+            # Nouveau drapeau
             flag_file = request.files.get('flag_image')
             if flag_file and allowed_file(flag_file.filename):
                 if flag_path and not flag_path.endswith('default.png'):
@@ -672,6 +690,7 @@ def admin_destination_edit(id):
                         except: pass
                 flag_path = save_uploaded_image(flag_file, 'flags')
 
+            # Nouvelle image destination
             dest_file = request.files.get('destination_image')
             if dest_file and allowed_file(dest_file.filename):
                 if dest_path and not dest_path.endswith('default.jpg'):
@@ -1072,6 +1091,7 @@ def admin_scholarship_add():
                 description, benefits, requirements
             )
 
+            # Notification
             scholarship_data = {
                 'country': country,
                 'study_level': study_level,
