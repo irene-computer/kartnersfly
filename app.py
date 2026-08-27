@@ -68,23 +68,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # ============================================================
-# CORRECTION ADMIN – FALLBACK ET NETTOYAGE DES VARIABLES
+# LOGS DE DÉMARRAGE (affichage des identifiants admin)
 # ============================================================
-admin_username = os.getenv('ADMIN_USERNAME', '').strip()
-admin_password = os.getenv('ADMIN_PASSWORD', '').strip()
-
-# Si les variables sont vides, on utilise des valeurs par défaut
-if not admin_username:
-    admin_username = 'admin'
-    print("[WARN] ADMIN_USERNAME non défini, utilisation de 'admin'")
-if not admin_password:
-    admin_password = 'admin123'
-    print("[WARN] ADMIN_PASSWORD non défini, utilisation de 'admin123'")
-
-# On force les valeurs dans la configuration
-Config.ADMIN_USERNAME = admin_username
-Config.ADMIN_PASSWORD = admin_password
-
 print("=" * 70)
 print("[INFO] === CONFIGURATION ADMIN ===")
 print(f"[INFO] ADMIN_USERNAME = '{Config.ADMIN_USERNAME}'")
@@ -135,14 +120,19 @@ def before_request_security():
             return None
         return jsonify({'error': 'Unsupported Media Type'}), 415
 
+# ===== LOGIN REQUIRED (CORRECTION : IP VÉRIFICATION SUPPRIMÉE) =====
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not session.get('admin_logged_in'):
+            print("[AUTH] Session admin manquante, redirection vers login")
             return redirect(url_for('admin_login'))
-        if session.get('admin_ip') != request.remote_addr:
-            session.clear()
-            return redirect(url_for('admin_login'))
+        # La vérification d'IP est désactivée pour éviter les déconnexions sur Railway
+        # (l'IP peut changer à cause des proxies/load balancers)
+        # if session.get('admin_ip') != request.remote_addr:
+        #     print(f"[AUTH] IP changée : {session.get('admin_ip')} vs {request.remote_addr}")
+        #     session.clear()
+        #     return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return wrapper
 
@@ -542,14 +532,14 @@ def admin_login():
         else:
             print("[LOGIN] ❌ Échec (identifiants incorrects)")
             flash('Identifiants incorrects', 'danger')
-            # On transmet l'erreur au template pour affichage
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
 
 # ===== ROUTE DE SECOURS – ACCÈS ADMIN SANS MOT DE PASSE =====
+# ⚠️ À SUPPRIMER ABSOLUMENT EN PRODUCTION APRÈS CORRECTION !
 @app.route('/admin/force-login')
 def admin_force_login():
-    """Accès direct à l'admin sans vérification (à supprimer après correction)."""
+    """Accès direct à l'admin sans vérification (route de débogage temporaire)."""
     session['admin_logged_in'] = True
     session['admin_username'] = 'admin'
     session['admin_ip'] = request.remote_addr
@@ -620,7 +610,7 @@ def admin_message_delete(id):
     flash('Message supprimé', 'success')
     return redirect(url_for('admin_messages'))
 
-# ========== DESTINATIONS (avec images uniformisées) ==========
+# ========== DESTINATIONS ==========
 @app.route('/admin/destinations')
 @login_required
 def admin_destinations():
@@ -639,13 +629,11 @@ def admin_destination_add():
         price = float(request.form.get('price'))
         continent = sanitize_input(request.form.get('continent', 'europe'))
 
-        # Flag image
         flag_file = request.files.get('flag_image')
         flag_path = save_uploaded_image(flag_file, 'flags') if flag_file else None
         if not flag_path:
             flag_path = 'images/flags/default.png'
 
-        # Destination image
         dest_file = request.files.get('destination_image')
         dest_path = save_uploaded_image(dest_file, 'destinations') if dest_file else None
         if not dest_path:
@@ -680,7 +668,6 @@ def admin_destination_edit(id):
             flag_path = old['flag_image']
             dest_path = old['image']
 
-            # Nouveau drapeau
             flag_file = request.files.get('flag_image')
             if flag_file and allowed_file(flag_file.filename):
                 if flag_path and not flag_path.endswith('default.png'):
@@ -690,7 +677,6 @@ def admin_destination_edit(id):
                         except: pass
                 flag_path = save_uploaded_image(flag_file, 'flags')
 
-            # Nouvelle image destination
             dest_file = request.files.get('destination_image')
             if dest_file and allowed_file(dest_file.filename):
                 if dest_path and not dest_path.endswith('default.jpg'):
@@ -735,7 +721,7 @@ def admin_destination_delete(id):
     flash('Destination supprimée', 'success')
     return redirect(url_for('admin_destinations'))
 
-# ========== SERVICES (avec images uniformisées) ==========
+# ========== SERVICES ==========
 @app.route('/admin/services')
 @login_required
 def admin_services():
@@ -1052,7 +1038,7 @@ def api_delete_scholarship(scholarship_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ========== ADMIN SCHOLARSHIP OPPORTUNITIES (avec images) ==========
+# ========== ADMIN SCHOLARSHIP OPPORTUNITIES ==========
 @app.route('/admin/scholarship_opportunities')
 @login_required
 def admin_scholarship_opportunities():
@@ -1091,7 +1077,6 @@ def admin_scholarship_add():
                 description, benefits, requirements
             )
 
-            # Notification
             scholarship_data = {
                 'country': country,
                 'study_level': study_level,
