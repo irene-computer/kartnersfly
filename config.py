@@ -15,8 +15,10 @@ class Config:
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', '')
     
-    # ===== DATABASE =====
-    DATABASE = os.getenv('DATABASE', 'database.db')
+    # ===== DATABASE - Utilisation du dossier instance/ =====
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    DATABASE = os.getenv('DATABASE', os.path.join(BASE_DIR, 'instance', 'database.db'))
+    # Le dossier 'instance/' sera créé par le Dockerfile ou automatiquement
     
     # ===== SESSION =====
     PERMANENT_SESSION_LIFETIME = int(os.getenv('PERMANENT_SESSION_LIFETIME', 86400))
