@@ -73,6 +73,15 @@ from models import (
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# ===== LOGS DE DÉMARRAGE (affichage des variables d'environnement) =====
+print("=" * 70)
+print("[INFO] === CONFIGURATION CHARGÉE ===")
+print(f"[INFO] ADMIN_USERNAME = '{Config.ADMIN_USERNAME}'")
+print(f"[INFO] ADMIN_PASSWORD = {'*' * len(Config.ADMIN_PASSWORD) if Config.ADMIN_PASSWORD else 'VIDE'}")
+print(f"[INFO] DATABASE = {Config.DATABASE}")
+print(f"[INFO] SECRET_KEY = {Config.SECRET_KEY[:8]}... (tronqué)")
+print("=" * 70)
+
 # ==================== SECURITE ====================
 app.config['SESSION_COOKIE_SECURE'] = not Config.DEBUG
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -507,19 +516,31 @@ def api_newsletter():
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        # Sanitisation
         username = sanitize_input(username)
         password = sanitize_input(password)
+
+        # Logs détaillés (affichage en clair pour déboguer)
+        print("=" * 60)
+        print("[LOGIN] Tentative de connexion")
+        print(f"[LOGIN] Username saisi : '{username}'")
+        print(f"[LOGIN] Password saisi : '{password}'")
+        print(f"[LOGIN] Username attendu : '{Config.ADMIN_USERNAME}'")
+        print(f"[LOGIN] Password attendu : '{Config.ADMIN_PASSWORD}'")
+        print("=" * 60)
 
         if username == Config.ADMIN_USERNAME and password == Config.ADMIN_PASSWORD:
             session['admin_logged_in'] = True
             session['admin_username'] = username
             session['admin_ip'] = request.remote_addr
             session.permanent = True
+            print("[LOGIN] SUCCÈS ! Redirection vers le dashboard.")
             return redirect(url_for('admin_dashboard'))
         else:
-            print(f"[SECURITE] Tentative d'accès admin échouée depuis {request.remote_addr}")
+            print("[LOGIN] ÉCHEC !")
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
 
