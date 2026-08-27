@@ -19,28 +19,57 @@ from io import StringIO
 import secrets
 from functools import wraps
 
-# ==================== CORRECTION BASE DE DONNÉES ====================
-# Créer le dossier parent de la base de données si nécessaire,
-# et vérifier les droits d'écriture. En cas d'échec, fallback vers database.db
-db_dir = os.path.dirname(Config.DATABASE)
-if db_dir:
-    try:
-        os.makedirs(db_dir, exist_ok=True, mode=0o755)
+# ============================================================
+# CORRECTION ROBUSTE DE LA BASE DE DONNÉES
+# ============================================================
+import tempfile
+
+# S'assurer que le chemin de la base est absolu et résolu
+db_path_original = Config.DATABASE
+db_dir = os.path.dirname(db_path_original)
+
+# Si le dossier parent n'existe pas ou n'est pas accessible, on utilise un fallback
+try:
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True, mode=0o777)
         # Tester l'écriture
         test_file = os.path.join(db_dir, '.write_test')
         with open(test_file, 'w') as f:
             f.write('ok')
         os.remove(test_file)
-        print(f"[OK] Dossier {db_dir} accessible en écriture.")
-    except Exception as e:
-        print(f"[ERREUR] Impossible d'écrire dans {db_dir} : {e}")
-        # Fallback vers le répertoire courant
-        Config.DATABASE = 'database.db'
-        print(f"[INFO] Utilisation du fallback : {Config.DATABASE}")
-else:
-    print("[INFO] Base de données dans le répertoire courant.")
+        print(f"[OK] Dossier de la base accessible : {db_dir}")
+    else:
+        # Pas de dossier parent, on est dans le répertoire courant
+        print("[INFO] Base de données dans le répertoire courant.")
+except Exception as e:
+    print(f"[ERREUR] Impossible d'utiliser {db_dir} : {e}")
+    # Fallback vers /tmp (toujours accessible en écriture)
+    fallback_dir = tempfile.gettempdir()
+    fallback_path = os.path.join(fallback_dir, 'database.db')
+    Config.DATABASE = fallback_path
+    print(f"[INFO] Utilisation du fallback : {Config.DATABASE}")
+    # Créer le dossier /tmp si besoin (existe toujours)
+    os.makedirs(fallback_dir, exist_ok=True)
 
-# ==================== APP ====================
+# ============================================================
+# IMPORTS DES FONCTIONS MODELS
+# ============================================================
+from models import (
+    add_scholarship,
+    get_all_scholarships,
+    get_pending_scholarships_count,
+    update_scholarship_status,
+    delete_scholarship,
+    get_scholarship_by_id,
+    get_all_user_emails,
+    get_all_newsletter_emails,
+    add_scholarship_opportunity,
+    get_all_scholarship_opportunities,
+    delete_scholarship_opportunity,
+    get_scholarship_opportunity_by_id,
+    update_scholarship_opportunity
+)
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -126,6 +155,7 @@ def save_uploaded_image(file, subfolder='scholarships'):
     # Retourne le chemin relatif à utiliser avec url_for('static', filename=...)
     return f"images/{subfolder}/{unique_name}"
 
+# Initialiser la base de données
 init_db()
 
 # ==================== CONTEXTE GLOBAL ====================
@@ -1142,12 +1172,11 @@ if __name__ == '__main__':
     print("=" * 50)
     print(f"[INFO] Base de données initialisée : {Config.DATABASE}")
     print(f"[INFO] Admin : {Config.ADMIN_USERNAME} / {Config.ADMIN_PASSWORD}")
-    print(f"[INFO] Répertoire de travail : {os.getcwd()}")
-    print(f"[INFO] Base de données configurée : {Config.DATABASE}")
-    print(f"[INFO] Site client: http://0.0.0.0:{port}")
-    print(f"[INFO] Admin: http://0.0.0.0:{port}/admin/login")
-    print(f"[INFO] Bourse d'études: http://0.0.0.0:{port}/bourse-etudes")
-    print(f"[INFO] Mode debug: {debug_mode}")
-    print(f"[INFO] Email configuré: {Config.MAIL_USERNAME}")
+    print("Répertoire de travail :", os.getcwd())
+    print(f"Site client: http://0.0.0.0:{port}")
+    print(f"Admin: http://0.0.0.0:{port}/admin/login")
+    print(f"Bourse d'études: http://0.0.0.0:{port}/bourse-etudes")
+    print(f"Mode debug: {debug_mode}")
+    print(f"Email configuré: {Config.MAIL_USERNAME}")
     print("=" * 50)
     app.run(debug=debug_mode, host='0.0.0.0', port=port)
