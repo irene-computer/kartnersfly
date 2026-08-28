@@ -231,6 +231,8 @@ Voyageurs: {booking_data['travelers']}
 Kartners Travel Agency
 Tel: {Config.PHONE}
 Email: {Config.EMAIL}
+
+Pour plus d'informations, visitez notre site : https://www.kartnersagency.com
         """
         msg.set_content(text_content)
 
@@ -240,12 +242,12 @@ Email: {Config.EMAIL}
             server.login(sender_email, sender_password)
             server.send_message(msg)
 
-        print(f"[SUCCÈS] Email de confirmation envoyé à {to_email}")
+        print(f"[SUCCES] Email de confirmation envoyé à {to_email}")
         return True
 
     except smtplib.SMTPAuthenticationError as e:
         print(f"[ERREUR AUTH] Échec d'authentification SMTP : {e}")
-        print("  → Vérifiez votre mot de passe d'application Gmail ou les identifiants.")
+        print("  -> Vérifiez votre mot de passe d'application Gmail ou les identifiants.")
         return False
     except smtplib.SMTPException as e:
         print(f"[ERREUR SMTP] Problème d'envoi : {e}")
@@ -292,7 +294,7 @@ def send_bulk_email(recipients, subject, html_content, text_content=None):
                     msg.add_alternative(html_content, subtype='html')
                     server.send_message(msg)
                     success_count += 1
-                    print(f"[SUCCÈS] Email envoyé à {recipient}")
+                    print(f"[SUCCES] Email envoyé à {recipient}")
                 except Exception as e:
                     fail_count += 1
                     print(f"[ERREUR] Envoi à {recipient}: {str(e)}")
@@ -347,10 +349,14 @@ def send_scholarship_notification(recipients, scholarship_data):
                 <p style="text-align: center; margin: 30px 0;">
                     <a href="https://www.kartnersagency.com/bourse-etudes" class="btn">En savoir plus</a>
                 </p>
+                <p style="text-align: center; margin-top: 20px;">
+                    <a href="https://www.kartnersagency.com">Visitez notre site</a>
+                </p>
             </div>
             <div class="footer">
                 <p>&copy; 2026 Kartners Travel Agency</p>
                 <p>Tel: {Config.PHONE} | Email: {Config.EMAIL}</p>
+                <p><a href="https://www.kartnersagency.com">www.kartnersagency.com</a></p>
             </div>
         </div>
     </body>
@@ -370,6 +376,8 @@ Détails:
 - Domaine: {scholarship_data.get('field_of_study', 'À déterminer')}
 
 Pour en savoir plus: https://www.kartnersagency.com/bourse-etudes
+
+Visitez notre site : https://www.kartnersagency.com
     """
 
     return send_bulk_email(recipients, subject, html_content, text_content)
@@ -579,10 +587,10 @@ def admin_login():
             session['admin_ip'] = request.remote_addr
             session.permanent = True
             flash('Connexion réussie', 'success')
-            print("[LOGIN] ✅ Succès !")
+            print("[LOGIN] Succès !")
             return redirect(url_for('admin_dashboard'))
         else:
-            print("[LOGIN] ❌ Échec (identifiants incorrects)")
+            print("[LOGIN] Échec (identifiants incorrects)")
             flash('Identifiants incorrects', 'danger')
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
@@ -594,7 +602,7 @@ def admin_force_login():
     session['admin_username'] = 'admin'
     session['admin_ip'] = request.remote_addr
     session.permanent = True
-    flash('🔓 Accès forcé réussi !', 'success')
+    flash('Accès forcé réussi !', 'success')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/logout')
@@ -988,6 +996,8 @@ def admin_newsletter_send():
         if not recipients:
             flash('Aucun abonné à la newsletter', 'warning')
             return redirect(url_for('admin_newsletter'))
+
+        # Construction du HTML avec le lien vers le site
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -1011,26 +1021,31 @@ def admin_newsletter_send():
                     <p>Voyagez, comme vous l'imaginez</p>
                 </div>
                 <div class="content">
+                    <p><a href="https://www.kartnersagency.com" style="display:inline-block; padding:10px 20px; background:#8B5CF6; color:white; text-decoration:none; border-radius:50px;">Visitez notre site</a></p>
                     {content}
                 </div>
                 <div class="footer">
                     <p>&copy; 2026 Kartners Travel Agency</p>
                     <p>Tel: {Config.PHONE} | Email: {Config.EMAIL}</p>
+                    <p><a href="https://www.kartnersagency.com">www.kartnersagency.com</a></p>
                 </div>
             </div>
         </body>
         </html>
         """
+
         text_content = re.sub(r'<[^>]+>', '', content)
         success, fail = send_bulk_email(recipients, subject, html_content, text_content)
+
         if success > 0:
             flash(f'Newsletter envoyée. {success} emails envoyés, {fail} échecs.', 'success')
         else:
-            flash(f'Échec de l\'envoi de la newsletter. {fail} échecs. Vérifiez les logs.', 'danger')
+            flash(f'Échec total de l\'envoi. {fail} échecs. Vérifiez les logs.', 'danger')
+
         return redirect(url_for('admin_newsletter'))
     except Exception as e:
         traceback.print_exc()
-        flash(f'Erreur: {str(e)}', 'danger')
+        flash(f'Erreur : {str(e)}', 'danger')
         return redirect(url_for('admin_newsletter'))
 
 @app.route('/admin/newsletter/delete/<int:id>')
@@ -1257,9 +1272,9 @@ def admin_test_email():
     }
     success = send_confirmation_email(to_email, test_data)
     if success:
-        flash(f"✅ Email test envoyé avec succès à {to_email}", "success")
+        flash(f"Email test envoyé avec succès à {to_email}", "success")
     else:
-        flash("❌ Échec de l'envoi du test. Vérifiez les logs Railway.", "danger")
+        flash("Échec de l'envoi du test. Vérifiez les logs Railway.", "danger")
     return redirect(url_for('admin_dashboard'))
 
 # ==================== ROUTE DE CORRECTION DES IMAGES ====================
@@ -1269,7 +1284,7 @@ def admin_fix_images():
     try:
         from models import migrate_image_paths
         count = migrate_image_paths()
-        flash(f'✅ {count} chemins d\'images corrigés.', 'success')
+        flash(f'{count} chemins d\'images corrigés.', 'success')
     except Exception as e:
         traceback.print_exc()
         flash(f'Erreur lors de la correction : {str(e)}', 'danger')
