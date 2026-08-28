@@ -75,12 +75,6 @@ from models import (
 app = Flask(__name__)
 app.config.from_object(Config)
 
-<<<<<<< HEAD
-=======
-# ============================================================
-# LOGS DE DÉMARRAGE (affichage des identifiants admin)
-# ============================================================
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
 print("=" * 70)
 print("[INFO] === CONFIGURATION ADMIN ===")
 print(f"[INFO] ADMIN_USERNAME = '{Config.ADMIN_USERNAME}'")
@@ -130,22 +124,12 @@ def before_request_security():
             return None
         return jsonify({'error': 'Unsupported Media Type'}), 415
 
-# ===== LOGIN REQUIRED (CORRECTION : IP VÉRIFICATION SUPPRIMÉE) =====
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not session.get('admin_logged_in'):
             print("[AUTH] Session admin manquante, redirection vers login")
             return redirect(url_for('admin_login'))
-<<<<<<< HEAD
-=======
-        # La vérification d'IP est désactivée pour éviter les déconnexions sur Railway
-        # (l'IP peut changer à cause des proxies/load balancers)
-        # if session.get('admin_ip') != request.remote_addr:
-        #     print(f"[AUTH] IP changée : {session.get('admin_ip')} vs {request.remote_addr}")
-        #     session.clear()
-        #     return redirect(url_for('admin_login'))
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
         return f(*args, **kwargs)
     return wrapper
 
@@ -567,16 +551,9 @@ def admin_login():
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
 
-<<<<<<< HEAD
-@app.route('/admin/force-login')
-def admin_force_login():
-=======
-# ===== ROUTE DE SECOURS – ACCÈS ADMIN SANS MOT DE PASSE =====
-# ⚠️ À SUPPRIMER ABSOLUMENT EN PRODUCTION APRÈS CORRECTION !
 @app.route('/admin/force-login')
 def admin_force_login():
     """Accès direct à l'admin sans vérification (route de débogage temporaire)."""
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
     session['admin_logged_in'] = True
     session['admin_username'] = 'admin'
     session['admin_ip'] = request.remote_addr
@@ -647,10 +624,7 @@ def admin_message_delete(id):
     flash('Message supprimé', 'success')
     return redirect(url_for('admin_messages'))
 
-<<<<<<< HEAD
-=======
 # ========== DESTINATIONS ==========
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
 @app.route('/admin/destinations')
 @login_required
 def admin_destinations():
@@ -703,7 +677,6 @@ def admin_destination_edit(id):
             flag_path = old['flag_image']
             dest_path = old['image']
 
-<<<<<<< HEAD
             if request.form.get('remove_flag') == 'on':
                 if flag_path and not flag_path.endswith('default.png'):
                     old_flag = os.path.join(UPLOAD_FOLDER, flag_path.replace('images/', ''))
@@ -720,8 +693,6 @@ def admin_destination_edit(id):
                         except: pass
                 dest_path = 'images/destinations/default.jpg'
 
-=======
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
             flag_file = request.files.get('flag_image')
             if flag_file and allowed_file(flag_file.filename):
                 if flag_path and not flag_path.endswith('default.png'):
@@ -763,10 +734,7 @@ def admin_destination_delete(id):
         flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_destinations'))
 
-<<<<<<< HEAD
-=======
 # ========== SERVICES ==========
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
 @app.route('/admin/services')
 @login_required
 def admin_services():
@@ -855,6 +823,7 @@ def admin_service_delete(id):
         flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_services'))
 
+# ========== BOOKINGS ==========
 @app.route('/admin/bookings')
 @login_required
 def admin_bookings():
@@ -960,6 +929,7 @@ def admin_booking_export():
     response.headers['Content-Disposition'] = 'attachment; filename=reservations.csv'
     return response
 
+# ========== NEWSLETTER ==========
 @app.route('/admin/newsletter')
 @login_required
 def admin_newsletter():
@@ -1038,6 +1008,7 @@ def admin_newsletter_delete(id):
         flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_newsletter'))
 
+# ========== SCHOLARSHIPS (Demandes) ==========
 @app.route('/admin/scholarships')
 @login_required
 def admin_scholarships():
@@ -1077,10 +1048,7 @@ def api_delete_scholarship(scholarship_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-<<<<<<< HEAD
-=======
 # ========== ADMIN SCHOLARSHIP OPPORTUNITIES ==========
->>>>>>> 1bdb70511d028bb583a55e2d5a6be15e0a9443ed
 @app.route('/admin/scholarship_opportunities')
 @login_required
 def admin_scholarship_opportunities():
@@ -1220,6 +1188,7 @@ def admin_scholarship_opportunity_delete(id):
         flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_scholarship_opportunities'))
 
+# ==================== BOURSE PUBLIQUE ====================
 @app.route('/bourse-etudes')
 def bourse_etudes():
     opportunities = get_all_scholarship_opportunities()
@@ -1227,6 +1196,7 @@ def bourse_etudes():
     active_opportunities = [opp for opp in opportunities if opp['end_date'] is None or opp['end_date'] >= today]
     return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities, today=today)
 
+# ==================== ROUTE DE CORRECTION DES IMAGES ====================
 @app.route('/admin/fix-images')
 @login_required
 def admin_fix_images():
