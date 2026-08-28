@@ -15,7 +15,7 @@
 
 <div class="k-destinations-page">
 
-    <!-- HERO SECTION DESTINATIONS (dégradé violet → cyan, sans noir) -->
+    <!-- HERO SECTION DESTINATIONS (dégradé violet → cyan) -->
     <section class="k-hero">
         <div class="k-container k-hero-inner">
             <div class="row align-items-center">
@@ -98,7 +98,8 @@
                          data-price="{{ dest.price }}">
                         
                         <div class="k-card-img-wrapper">
-                            <div class="k-card-img" style="background-image: url('{{ url_for('static', filename='images/' + dest.image) if dest.image else '/static/images/destinations/default.jpg' }}')">
+                            <div class="k-card-img" 
+                                 style="background-image: url('{{ url_for('static', filename=dest.image) if dest.image else url_for('static', filename='images/destinations/default.jpg') }}')">
                                 <!-- Pas d'overlay sombre -->
                                 <div class="k-card-badges">
                                     <span class="badge-price"><i class="fas fa-tag"></i> {{ dest.price }} €</span>
@@ -111,9 +112,9 @@
                             <div class="k-card-meta">
                                 <div class="country-info">
                                     {% if dest.flag_image %}
-                                        <img src="{{ url_for('static', filename='images/' + dest.flag_image) }}" alt="{{ dest.country }}" class="flag-img">
+                                        <img src="{{ url_for('static', filename=dest.flag_image) }}" alt="{{ dest.country }}" class="flag-img">
                                     {% else %}
-                                        <img src="/static/images/flags/default.png" alt="{{ dest.country }}" class="flag-img">
+                                        <img src="{{ url_for('static', filename='images/flags/default.png') }}" alt="{{ dest.country }}" class="flag-img">
                                     {% endif %}
                                     <span class="country-name">{{ dest.country }}</span>
                                 </div>
@@ -172,7 +173,7 @@
         </div>
     </section>
 
-    <!-- VOYAGES POPULAIRES (sans overlays sombres) -->
+    <!-- VOYAGES POPULAIRES (avec images dynamiques si disponibles) -->
     <section class="k-section k-bg-white">
         <div class="k-container">
             <div class="text-center mb-5">
@@ -182,8 +183,9 @@
             </div>
 
             <div class="k-popular-grid">
+                <!-- Paris -->
                 <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('/static/images/destinations/paris.jpg')">
+                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/paris.jpg') if destinations|selectattr('name', 'equalto', 'Paris')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
                         <span class="k-popular-rank">1</span>
                     </div>
                     <div class="k-popular-body">
@@ -196,8 +198,9 @@
                     </div>
                 </div>
 
+                <!-- Dubai -->
                 <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('/static/images/destinations/dubai.jpg')">
+                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/dubai.jpg') if destinations|selectattr('name', 'equalto', 'Dubai')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
                         <span class="k-popular-rank">2</span>
                     </div>
                     <div class="k-popular-body">
@@ -210,8 +213,9 @@
                     </div>
                 </div>
 
+                <!-- Marrakech -->
                 <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('/static/images/destinations/marrakech.jpg')">
+                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/marrakech.jpg') if destinations|selectattr('name', 'equalto', 'Marrakech')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
                         <span class="k-popular-rank">3</span>
                     </div>
                     <div class="k-popular-body">
@@ -227,7 +231,7 @@
         </div>
     </section>
 
-    <!-- CTA SUR MESURE (dégradé clair sans noir) -->
+    <!-- CTA SUR MESURE -->
     <section class="k-section tight">
         <div class="k-container">
             <div class="k-cta-final">
@@ -351,7 +355,6 @@
         padding: 0 24px;
     }
 
-    /* BADGES & TYPO */
     .k-badge {
         display: inline-flex;
         align-items: center;
@@ -401,7 +404,6 @@
         -webkit-text-fill-color: transparent;
     }
 
-    /* HERO – dégradé violet → cyan (clair) */
     .k-hero {
         background: linear-gradient(135deg, #7C3AED 0%, #6C2BD9 50%, #00B4D8 100%);
         padding: 80px 0 110px;
@@ -429,7 +431,6 @@
         margin: 0 auto;
     }
 
-    /* STATS BAR (blanc pur) */
     .k-stats-bar {
         background: var(--k-white);
         border-radius: 24px;
@@ -448,7 +449,6 @@
     .k-stat-item .num span { color: var(--k-cyan); }
     .k-stat-item .lab { font-size: 0.95rem; color: var(--k-muted); margin-top: 8px; font-weight: 600; }
 
-    /* SECTIONS & FILTRES */
     .k-section { padding: 70px 0; }
     .k-section.tight { padding: 40px 0; }
     .k-bg-white { background: var(--k-white); }
@@ -505,7 +505,6 @@
         border-color: var(--k-violet);
     }
 
-    /* GRILLE DESTINATIONS */
     .k-destinations-count { font-size: 1rem; font-weight: 600; color: var(--k-muted); }
 
     .k-destinations-grid {
@@ -549,7 +548,6 @@
 
     .k-destination-card:hover .k-card-img { transform: scale(1.04); }
 
-    /* PAS D'OVERLAY SOMBRE */
     .k-card-badges {
         position: absolute;
         top: 15px;
@@ -658,7 +656,6 @@
         box-shadow: 0 8px 20px rgba(0, 180, 216, 0.35);
     }
 
-    /* POPULAIRE GRID */
     .k-popular-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
     .k-popular-card {
         background: var(--k-white);
@@ -679,7 +676,6 @@
         background-position: center;
         position: relative;
         padding: 15px;
-        /* pas d'overlay sombre */
     }
 
     .k-popular-rank {
@@ -699,7 +695,6 @@
     .k-popular-footer { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
     .k-popular-price { color: var(--k-violet); font-size: 1.1rem; }
 
-    /* CTA FINAL */
     .k-cta-final {
         background: linear-gradient(135deg, #7C3AED 0%, #6C2BD9 50%, #00B4D8 100%);
         border-radius: 28px;
@@ -737,7 +732,6 @@
         border: none;
     }
 
-    /* MODAL */
     .k-modal-content { border-radius: 24px; border: none; overflow: hidden; }
     .k-modal-header {
         background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
@@ -801,7 +795,6 @@
     .k-empty-state h4, .k-no-results h3 { font-size: 1.4rem; color: #0F172A; }
     .k-empty-state p, .k-no-results p { font-size: 1rem; color: var(--k-muted); }
 
-    /* RESPONSIVE */
     @media (max-width: 992px) {
         .k-stats-bar { grid-template-columns: repeat(2, 1fr); }
         .k-stat-item:nth-child(2) { border-left: 1px solid rgba(0,0,0,0.04); }
@@ -831,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const destinationsCount = document.getElementById('destinationsCount');
     const noResults = document.getElementById('noResults');
 
-    // FILTRAGE INTERACTIF
     function filterDestinations() {
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
         const priceRange = priceFilter ? priceFilter.value : 'all';
@@ -891,7 +883,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (priceFilter) priceFilter.addEventListener('change', filterDestinations);
     if (resetBtn) resetBtn.addEventListener('click', window.resetAllFilters);
 
-    // Initialiser le compteur
     filterDestinations();
 
     // Animation au scroll

@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_talisman import Talisman
 from config import Config
 from models import get_db, init_db
 import datetime
@@ -18,36 +17,16 @@ import csv
 from io import StringIO
 import secrets
 from functools import wraps
+import traceback
 
-# ============================================================
-# CORRECTION ROBUSTE DE LA BASE DE DONNÉES
-# ============================================================
-import tempfile
-
-db_path_original = Config.DATABASE
-db_dir = os.path.dirname(db_path_original)
-
-try:
-    if db_dir:
+db_dir = os.path.dirname(Config.DATABASE)
+if db_dir:
+    try:
         os.makedirs(db_dir, exist_ok=True, mode=0o777)
-        test_file = os.path.join(db_dir, '.write_test')
-        with open(test_file, 'w') as f:
-            f.write('ok')
-        os.remove(test_file)
-        print(f"[OK] Dossier de la base accessible : {db_dir}")
-    else:
-        print("[INFO] Base de données dans le répertoire courant.")
-except Exception as e:
-    print(f"[ERREUR] Impossible d'utiliser {db_dir} : {e}")
-    fallback_dir = tempfile.gettempdir()
-    fallback_path = os.path.join(fallback_dir, 'database.db')
-    Config.DATABASE = fallback_path
-    print(f"[INFO] Utilisation du fallback : {Config.DATABASE}")
-    os.makedirs(fallback_dir, exist_ok=True)
+        print(f"[OK] Dossier {db_dir} créé avec succès.")
+    except Exception as e:
+        print(f"[ERREUR] Impossible de créer {db_dir} : {e}")
 
-# ============================================================
-# IMPORTS DES FONCTIONS MODELS
-# ============================================================
 from models import (
     add_scholarship,
     get_all_scholarships,
@@ -61,29 +40,40 @@ from models import (
     get_all_scholarship_opportunities,
     delete_scholarship_opportunity,
     get_scholarship_opportunity_by_id,
-    update_scholarship_opportunity
+    update_scholarship_opportunity,
+    add_destination,
+    get_all_destinations,
+    get_destination_by_id,
+    update_destination,
+    delete_destination,
+    get_all_services,
+    add_service,
+    update_service,
+    update_service_image,
+    delete_service,
+    get_service_by_id,
+    get_services_count,
+    add_booking,
+    get_all_bookings,
+    update_booking_status,
+    delete_booking,
+    get_pending_bookings_count,
+    subscribe_newsletter,
+    get_newsletter_count,
+    get_all_newsletter_emails,
+    get_unread_messages_count,
+    get_all_messages,
+    add_message,
+    mark_message_as_read,
+    delete_message,
+    get_destinations_count,
+    get_scholarships_ending_soon,
+    migrate_image_paths,
+    create_upload_folders
 )
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
-# ============================================================
-# CORRECTION ADMIN – FALLBACK ET NETTOYAGE DES VARIABLES
-# ============================================================
-admin_username = os.getenv('ADMIN_USERNAME', '').strip()
-admin_password = os.getenv('ADMIN_PASSWORD', '').strip()
-
-# Si les variables sont vides, on utilise des valeurs par défaut
-if not admin_username:
-    admin_username = 'admin'
-    print("[WARN] ADMIN_USERNAME non défini, utilisation de 'admin'")
-if not admin_password:
-    admin_password = 'admin123'
-    print("[WARN] ADMIN_PASSWORD non défini, utilisation de 'admin123'")
-
-# On force les valeurs dans la configuration
-Config.ADMIN_USERNAME = admin_username
-Config.ADMIN_PASSWORD = admin_password
 
 print("=" * 70)
 print("[INFO] === CONFIGURATION ADMIN ===")
@@ -92,7 +82,6 @@ print(f"[INFO] ADMIN_PASSWORD = {'*' * len(Config.ADMIN_PASSWORD)}")
 print(f"[INFO] DATABASE = {Config.DATABASE}")
 print("=" * 70)
 
-# ==================== SECURITE ====================
 app.config['SESSION_COOKIE_SECURE'] = not Config.DEBUG
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -139,19 +128,43 @@ def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not session.get('admin_logged_in'):
-            return redirect(url_for('admin_login'))
-        if session.get('admin_ip') != request.remote_addr:
-            session.clear()
+            print("[AUTH] Session admin manquante, redirection vers login")
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return wrapper
 
-# ==================== UPLOADS ====================
 UPLOAD_FOLDER = 'static/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 
 for sub in ['flags', 'destinations', 'services', 'scholarships']:
-    os.makedirs(os.path.join(UPLOAD_FOLDER, sub), exist_ok=True)
+    folder = os.path.join(UPLOAD_FOLDER, sub)
+    try:
+        os.makedirs(folder, exist_ok=True)
+        os.chmod(folder, 0o777)
+    except:
+        pass
+
+def create_default_images():
+    import base64
+    flag_path = os.path.join(UPLOAD_FOLDER, 'flags', 'default.png')
+    if not os.path.exists(flag_path):
+        png_data = base64.b64decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+        )
+        with open(flag_path, 'wb') as f:
+            f.write(png_data)
+        print(f"[OK] Fichier {flag_path} créé.")
+
+    dest_path = os.path.join(UPLOAD_FOLDER, 'destinations', 'default.jpg')
+    if not os.path.exists(dest_path):
+        jpg_data = base64.b64decode(
+            '/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBkZWZhdWx0IHF1YWxpdHkK/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgAAQABAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/fyiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/2Q=='
+        )
+        with open(dest_path, 'wb') as f:
+            f.write(jpg_data)
+        print(f"[OK] Fichier {dest_path} créé.")
+
+create_default_images()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -167,10 +180,8 @@ def save_uploaded_image(file, subfolder='scholarships'):
     file.save(filepath)
     return f"images/{subfolder}/{unique_name}"
 
-# Initialiser la base de données
 init_db()
 
-# ==================== CONTEXTE GLOBAL ====================
 @app.context_processor
 def utility_processor():
     def now():
@@ -181,7 +192,6 @@ def utility_processor():
         scholarships_pending = 0
     return dict(now=now, scholarships_pending=scholarships_pending)
 
-# ==================== EMAILS ====================
 def send_confirmation_email(to_email, booking_data):
     try:
         smtp_server = Config.MAIL_SERVER
@@ -340,7 +350,6 @@ Pour en savoir plus: https://www.kartnersagency.com/bourse-etudes
 
     return send_bulk_email(recipients, subject, html_content, text_content)
 
-# ==================== ROUTES CLIENT ====================
 @app.route('/')
 def home():
     conn = get_db()
@@ -386,7 +395,6 @@ def cgv():
 def confidentialite():
     return render_template('legal/confidentialite.html')
 
-# ==================== API CLIENT ====================
 @app.route('/api/contact', methods=['POST'])
 @limiter.limit("5 per minute")
 def api_contact():
@@ -515,14 +523,12 @@ def api_newsletter():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ==================== ADMIN ====================
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
 
-        # Logs détaillés (visibles sur Railway)
         print("=" * 60)
         print("[LOGIN] Tentative de connexion")
         print(f"[LOGIN] Username saisi : '{username}' (longueur: {len(username)})")
@@ -542,14 +548,11 @@ def admin_login():
         else:
             print("[LOGIN] ❌ Échec (identifiants incorrects)")
             flash('Identifiants incorrects', 'danger')
-            # On transmet l'erreur au template pour affichage
             return render_template('admin/login.html', error='Identifiants incorrects')
     return render_template('admin/login.html')
 
-# ===== ROUTE DE SECOURS – ACCÈS ADMIN SANS MOT DE PASSE =====
 @app.route('/admin/force-login')
 def admin_force_login():
-    """Accès direct à l'admin sans vérification (à supprimer après correction)."""
     session['admin_logged_in'] = True
     session['admin_username'] = 'admin'
     session['admin_ip'] = request.remote_addr
@@ -620,7 +623,6 @@ def admin_message_delete(id):
     flash('Message supprimé', 'success')
     return redirect(url_for('admin_messages'))
 
-# ========== DESTINATIONS (avec images uniformisées) ==========
 @app.route('/admin/destinations')
 @login_required
 def admin_destinations():
@@ -639,29 +641,22 @@ def admin_destination_add():
         price = float(request.form.get('price'))
         continent = sanitize_input(request.form.get('continent', 'europe'))
 
-        # Flag image
         flag_file = request.files.get('flag_image')
         flag_path = save_uploaded_image(flag_file, 'flags') if flag_file else None
         if not flag_path:
             flag_path = 'images/flags/default.png'
 
-        # Destination image
         dest_file = request.files.get('destination_image')
         dest_path = save_uploaded_image(dest_file, 'destinations') if dest_file else None
         if not dest_path:
             dest_path = 'images/destinations/default.jpg'
 
-        conn = get_db()
-        conn.execute('''
-            INSERT INTO destinations (name, country, flag_image, description, price, image, continent)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (name, country, flag_path, description, price, dest_path, continent))
-        conn.commit()
-        conn.close()
+        add_destination(name, country, flag_path, description, price, dest_path, continent)
         flash('Destination ajoutée avec succès', 'success')
         return redirect(url_for('admin_destinations'))
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
         return redirect(url_for('admin_destinations'))
 
 @app.route('/admin/destination/edit/<int:id>', methods=['GET', 'POST'])
@@ -680,7 +675,22 @@ def admin_destination_edit(id):
             flag_path = old['flag_image']
             dest_path = old['image']
 
-            # Nouveau drapeau
+            if request.form.get('remove_flag') == 'on':
+                if flag_path and not flag_path.endswith('default.png'):
+                    old_flag = os.path.join(UPLOAD_FOLDER, flag_path.replace('images/', ''))
+                    if os.path.exists(old_flag):
+                        try: os.remove(old_flag)
+                        except: pass
+                flag_path = 'images/flags/default.png'
+
+            if request.form.get('remove_dest_image') == 'on':
+                if dest_path and not dest_path.endswith('default.jpg'):
+                    old_dest = os.path.join(UPLOAD_FOLDER, dest_path.replace('images/', ''))
+                    if os.path.exists(old_dest):
+                        try: os.remove(old_dest)
+                        except: pass
+                dest_path = 'images/destinations/default.jpg'
+
             flag_file = request.files.get('flag_image')
             if flag_file and allowed_file(flag_file.filename):
                 if flag_path and not flag_path.endswith('default.png'):
@@ -690,7 +700,6 @@ def admin_destination_edit(id):
                         except: pass
                 flag_path = save_uploaded_image(flag_file, 'flags')
 
-            # Nouvelle image destination
             dest_file = request.files.get('destination_image')
             if dest_file and allowed_file(dest_file.filename):
                 if dest_path and not dest_path.endswith('default.jpg'):
@@ -700,16 +709,12 @@ def admin_destination_edit(id):
                         except: pass
                 dest_path = save_uploaded_image(dest_file, 'destinations')
 
-            conn.execute('''
-                UPDATE destinations
-                SET name = ?, country = ?, flag_image = ?, description = ?, price = ?, image = ?, continent = ?
-                WHERE id = ?
-            ''', (name, country, flag_path, description, price, dest_path, continent, id))
-            conn.commit()
+            update_destination(id, name, country, flag_path, description, price, dest_path, continent)
             flash('Destination mise à jour avec succès', 'success')
             return redirect(url_for('admin_destinations'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            traceback.print_exc()
+            flash(f'Erreur : {str(e)}', 'danger')
             return redirect(url_for('admin_destinations'))
     else:
         destination = conn.execute('SELECT * FROM destinations WHERE id = ?', (id,)).fetchone()
@@ -719,23 +724,14 @@ def admin_destination_edit(id):
 @app.route('/admin/destination/delete/<int:id>')
 @login_required
 def admin_destination_delete(id):
-    conn = get_db()
-    dest = conn.execute('SELECT flag_image, image FROM destinations WHERE id = ?', (id,)).fetchone()
-    if dest:
-        for field in ['flag_image', 'image']:
-            val = dest[field]
-            if val and not val.endswith(('default.png', 'default.jpg')):
-                path = os.path.join(UPLOAD_FOLDER, val.replace('images/', ''))
-                if os.path.exists(path):
-                    try: os.remove(path)
-                    except: pass
-    conn.execute('DELETE FROM destinations WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('Destination supprimée', 'success')
+    try:
+        delete_destination(id)
+        flash('Destination supprimée', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_destinations'))
 
-# ========== SERVICES (avec images uniformisées) ==========
 @app.route('/admin/services')
 @login_required
 def admin_services():
@@ -755,18 +751,12 @@ def admin_service_add():
             features = sanitize_input(request.form.get('features', ''))
             image_file = request.files.get('image')
             image_path = save_uploaded_image(image_file, 'services') if image_file else 'images/services/default.jpg'
-
-            conn = get_db()
-            conn.execute('''
-                INSERT INTO services (name, description, icon, image, features)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (name, description, icon, image_path, features))
-            conn.commit()
-            conn.close()
+            add_service(name, description, icon, image_path, features)
             flash('Service ajouté avec succès', 'success')
             return redirect(url_for('admin_services'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            traceback.print_exc()
+            flash(f'Erreur : {str(e)}', 'danger')
             return redirect(url_for('admin_service_add'))
     return render_template('admin/service_edit.html', service=None)
 
@@ -804,36 +794,32 @@ def admin_service_edit(id):
                         except: pass
                 image_path = save_uploaded_image(image_file, 'services')
 
-            conn.execute('''
-                UPDATE services
-                SET name = ?, description = ?, icon = ?, image = ?, features = ?
-                WHERE id = ?
-            ''', (name, description, icon, image_path, features, id))
-            conn.commit()
+            update_service(id, name, description, icon, image_path, features)
             flash('Service mis à jour avec succès', 'success')
             return redirect(url_for('admin_services'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            traceback.print_exc()
+            flash(f'Erreur : {str(e)}', 'danger')
     conn.close()
     return render_template('admin/service_edit.html', service=service)
 
 @app.route('/admin/service/delete/<int:id>')
 @login_required
 def admin_service_delete(id):
-    conn = get_db()
-    service = conn.execute('SELECT image FROM services WHERE id = ?', (id,)).fetchone()
-    if service and service['image'] and not service['image'].endswith('default.jpg'):
-        old_path = os.path.join(UPLOAD_FOLDER, service['image'].replace('images/', ''))
-        if os.path.exists(old_path):
-            try: os.remove(old_path)
-            except: pass
-    conn.execute('DELETE FROM services WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('Service supprimé avec succès', 'success')
+    try:
+        service = get_service_by_id(id)
+        if service and service['image'] and not service['image'].endswith('default.jpg'):
+            old_path = os.path.join(UPLOAD_FOLDER, service['image'].replace('images/', ''))
+            if os.path.exists(old_path):
+                try: os.remove(old_path)
+                except: pass
+        delete_service(id)
+        flash('Service supprimé avec succès', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_services'))
 
-# ========== BOOKINGS ==========
 @app.route('/admin/bookings')
 @login_required
 def admin_bookings():
@@ -906,11 +892,12 @@ def admin_booking_update(id):
 @app.route('/admin/booking/delete/<int:id>')
 @login_required
 def admin_booking_delete(id):
-    conn = get_db()
-    conn.execute('DELETE FROM bookings WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('Réservation supprimée', 'success')
+    try:
+        delete_booking(id)
+        flash('Réservation supprimée', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_bookings'))
 
 @app.route('/admin/booking/export')
@@ -938,7 +925,6 @@ def admin_booking_export():
     response.headers['Content-Disposition'] = 'attachment; filename=reservations.csv'
     return response
 
-# ========== NEWSLETTER ==========
 @app.route('/admin/newsletter')
 @login_required
 def admin_newsletter():
@@ -999,20 +985,24 @@ def admin_newsletter_send():
         flash(f'Newsletter envoyée. {success} emails envoyés, {fail} échecs.', 'success')
         return redirect(url_for('admin_newsletter'))
     except Exception as e:
+        traceback.print_exc()
         flash(f'Erreur: {str(e)}', 'danger')
         return redirect(url_for('admin_newsletter'))
 
 @app.route('/admin/newsletter/delete/<int:id>')
 @login_required
 def admin_newsletter_delete(id):
-    conn = get_db()
-    conn.execute('DELETE FROM newsletter WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('Abonné supprimé', 'success')
+    try:
+        conn = get_db()
+        conn.execute('DELETE FROM newsletter WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        flash('Abonné supprimé', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_newsletter'))
 
-# ========== SCHOLARSHIPS (Demandes) ==========
 @app.route('/admin/scholarships')
 @login_required
 def admin_scholarships():
@@ -1052,7 +1042,6 @@ def api_delete_scholarship(scholarship_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ========== ADMIN SCHOLARSHIP OPPORTUNITIES (avec images) ==========
 @app.route('/admin/scholarship_opportunities')
 @login_required
 def admin_scholarship_opportunities():
@@ -1091,7 +1080,6 @@ def admin_scholarship_add():
                 description, benefits, requirements
             )
 
-            # Notification
             scholarship_data = {
                 'country': country,
                 'study_level': study_level,
@@ -1105,7 +1093,8 @@ def admin_scholarship_add():
             flash('Bourse ajoutée avec succès !', 'success')
             return redirect(url_for('admin_scholarship_opportunities'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            traceback.print_exc()
+            flash(f'Erreur : {str(e)}', 'danger')
             return redirect(url_for('admin_scholarship_add'))
     return render_template('admin/scholarship_add.html')
 
@@ -1166,7 +1155,8 @@ def admin_scholarship_edit(id):
             flash('Bourse modifiée avec succès !', 'success')
             return redirect(url_for('admin_scholarship_opportunities'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            traceback.print_exc()
+            flash(f'Erreur : {str(e)}', 'danger')
             return redirect(url_for('admin_scholarship_edit', id=id))
 
     return render_template('admin/scholarship_edit.html', opportunity=opportunity)
@@ -1187,10 +1177,10 @@ def admin_scholarship_opportunity_delete(id):
         delete_scholarship_opportunity(id)
         flash('Bourse supprimée avec succès.', 'success')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        traceback.print_exc()
+        flash(f'Erreur : {str(e)}', 'danger')
     return redirect(url_for('admin_scholarship_opportunities'))
 
-# ==================== BOURSE PUBLIQUE ====================
 @app.route('/bourse-etudes')
 def bourse_etudes():
     opportunities = get_all_scholarship_opportunities()
@@ -1198,20 +1188,28 @@ def bourse_etudes():
     active_opportunities = [opp for opp in opportunities if opp['end_date'] is None or opp['end_date'] >= today]
     return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities, today=today)
 
-# ==================== LANCEMENT ====================
+@app.route('/admin/fix-images')
+@login_required
+def admin_fix_images():
+    try:
+        from models import migrate_image_paths
+        count = migrate_image_paths()
+        flash(f'✅ {count} chemins d\'images corrigés.', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Erreur lors de la correction : {str(e)}', 'danger')
+    return redirect(url_for('admin_destinations'))
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug_mode = Config.DEBUG
     print("=" * 50)
     print("Kartners Travel Agency - Démarrage")
     print("=" * 50)
-    print(f"[INFO] Base de données initialisée : {Config.DATABASE}")
+    print(f"[INFO] Base de données : {Config.DATABASE}")
     print(f"[INFO] Admin : {Config.ADMIN_USERNAME} / {Config.ADMIN_PASSWORD}")
-    print("Répertoire de travail :", os.getcwd())
     print(f"Site client: http://0.0.0.0:{port}")
     print(f"Admin: http://0.0.0.0:{port}/admin/login")
     print(f"Bourse d'études: http://0.0.0.0:{port}/bourse-etudes")
-    print(f"Mode debug: {debug_mode}")
-    print(f"Email configuré: {Config.MAIL_USERNAME}")
     print("=" * 50)
     app.run(debug=debug_mode, host='0.0.0.0', port=port)

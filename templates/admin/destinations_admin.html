@@ -10,7 +10,7 @@
             <h5 class="mb-0">Ajouter une destination</h5>
         </div>
         <div class="card-body">
-            <form method="POST" action="/admin/destination/add" enctype="multipart/form-data">
+            <form method="POST" action="{{ url_for('admin_destination_add') }}" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <input type="text" name="name" class="form-control" placeholder="Nom" required>
@@ -22,17 +22,17 @@
                         <input type="text" name="description" class="form-control" placeholder="Description" required>
                     </div>
                     <div class="col-md-2">
-                        <input type="number" name="price" class="form-control" placeholder="Prix" required>
+                        <input type="number" name="price" class="form-control" placeholder="Prix" step="0.01" required>
                     </div>
                 </div>
                 <div class="row g-3 mt-2">
                     <div class="col-md-4">
                         <label class="form-label">Image du drapeau (PNG/JPG)</label>
-                        <input type="file" name="flag_image" class="form-control" accept="image/png,image/jpeg,image/jpg" required>
+                        <input type="file" name="flag_image" class="form-control" accept="image/png,image/jpeg,image/jpg">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Image de la destination</label>
-                        <input type="file" name="destination_image" class="form-control" accept="image/png,image/jpeg,image/jpg" required>
+                        <input type="file" name="destination_image" class="form-control" accept="image/png,image/jpeg,image/jpg">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">Ajouter</button>
@@ -64,20 +64,26 @@
                         <tr>
                             <td>{{ dest.id }}</td>
                             <td>
-                                <img src="/static/images/{{ dest.flag_image }}" alt="flag" style="width: 30px; height: 20px; object-fit: cover; border-radius: 4px;">
+                                <img src="{{ url_for('static', filename=dest.flag_image) }}" 
+                                     alt="flag" 
+                                     style="width: 30px; height: 20px; object-fit: cover; border-radius: 4px;"
+                                     onerror="this.src='{{ url_for('static', filename='images/flags/default.png') }}'">
                             </td>
                             <td>{{ dest.name }}</td>
                             <td>{{ dest.country }}</td>
                             <td>{{ dest.description[:40] }}...</td>
                             <td>{{ dest.price }} €</td>
                             <td>
-                                <img src="/static/images/{{ dest.image }}" alt="dest" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;">
+                                <img src="{{ url_for('static', filename=dest.image) }}" 
+                                     alt="dest" 
+                                     style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;"
+                                     onerror="this.src='{{ url_for('static', filename='images/destinations/default.jpg') }}'">
                             </td>
                             <td>
-                                <a href="/admin/destination/edit/{{ dest.id }}" class="btn btn-sm btn-warning">
+                                <a href="{{ url_for('admin_destination_edit', id=dest.id) }}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="/admin/destination/delete/{{ dest.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ?')">
+                                <a href="{{ url_for('admin_destination_delete', id=dest.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette destination ?')">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </td>

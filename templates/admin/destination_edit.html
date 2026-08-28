@@ -28,7 +28,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Continent</label>
-                        <select name="continent" class="form-control" required>
+                        <select name="continent" class="form-select" required>
                             <option value="europe" {% if destination.continent == 'europe' %}selected{% endif %}>Europe</option>
                             <option value="afrique" {% if destination.continent == 'afrique' %}selected{% endif %}>Afrique</option>
                             <option value="asie" {% if destination.continent == 'asie' %}selected{% endif %}>Asie</option>
@@ -38,27 +38,28 @@
                     </div>
                 </div>
                 
-                <!-- SECTION IMAGES - MODIFICATION DIRECTE -->
+                <!-- SECTION IMAGES -->
                 <div class="row mt-4">
                     <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-flag"></i> Drapeau
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <i class="fas fa-flag text-primary"></i> Drapeau
                             </div>
                             <div class="card-body text-center">
-                                {% if destination.flag_image %}
+                                {% if destination.flag_image and destination.flag_image != 'images/flags/default.png' %}
                                 <div class="current-image-wrapper">
                                     <img src="{{ url_for('static', filename=destination.flag_image) }}" 
                                          alt="Drapeau" 
                                          class="preview-flag"
-                                         id="flagPreview">
+                                         id="flagPreview"
+                                         onerror="this.style.display='none'; this.parentElement.querySelector('.no-image-placeholder').style.display='block';">
                                     <br>
                                     <small class="text-muted">Image actuelle</small>
                                 </div>
                                 {% else %}
                                 <div class="no-image-placeholder">
-                                    <i class="fas fa-flag"></i>
-                                    <p>Aucun drapeau</p>
+                                    <i class="fas fa-flag fa-3x text-muted"></i>
+                                    <p class="text-muted">Aucun drapeau</p>
                                 </div>
                                 {% endif %}
                                 
@@ -82,24 +83,25 @@
                     </div>
                     
                     <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-image"></i> Image de la destination
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <i class="fas fa-image text-primary"></i> Image de la destination
                             </div>
                             <div class="card-body text-center">
-                                {% if destination.image and destination.image != 'destinations/default.jpg' %}
+                                {% if destination.image and destination.image != 'images/destinations/default.jpg' %}
                                 <div class="current-image-wrapper">
                                     <img src="{{ url_for('static', filename=destination.image) }}" 
                                          alt="Destination" 
                                          class="preview-destination"
-                                         id="destPreview">
+                                         id="destPreview"
+                                         onerror="this.style.display='none'; this.parentElement.querySelector('.no-image-placeholder').style.display='block';">
                                     <br>
                                     <small class="text-muted">Image actuelle</small>
                                 </div>
                                 {% else %}
                                 <div class="no-image-placeholder">
-                                    <i class="fas fa-image"></i>
-                                    <p>Image par défaut</p>
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                    <p class="text-muted">Image par défaut</p>
                                 </div>
                                 {% endif %}
                                 
@@ -143,7 +145,7 @@
     height: 53px;
     object-fit: cover;
     border-radius: 8px;
-    border: 2px solid var(--gray-medium);
+    border: 2px solid #E2E8F0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -152,23 +154,23 @@
     height: 130px;
     object-fit: cover;
     border-radius: 8px;
-    border: 2px solid var(--gray-medium);
+    border: 2px solid #E2E8F0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .current-image-wrapper {
     padding: 15px;
-    background: var(--gray-light);
+    background: #F8FAFC;
     border-radius: 12px;
     margin-bottom: 10px;
 }
 
 .no-image-placeholder {
     padding: 30px;
-    background: var(--gray-light);
+    background: #F8FAFC;
     border-radius: 12px;
-    border: 2px dashed var(--gray-medium);
-    color: var(--text-gray);
+    border: 2px dashed #CBD5E1;
+    color: #94A3B8;
 }
 
 .no-image-placeholder i {
@@ -191,14 +193,14 @@
 }
 
 .card-header {
-    background: var(--gray-light);
-    border-bottom: 1px solid var(--gray-medium);
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
     padding: 12px 20px;
     font-weight: 600;
 }
 
 .card-header i {
-    color: var(--violet-primary);
+    color: #6C2BD9;
     margin-right: 8px;
 }
 
@@ -206,36 +208,39 @@
     padding: 20px;
 }
 
-.form-control:focus {
-    border-color: var(--violet-primary);
-    box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+.form-control:focus, .form-select:focus {
+    border-color: #6C2BD9;
+    box-shadow: 0 0 0 4px rgba(108,43,217,0.1);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--violet-primary), var(--blue-primary));
+    background: linear-gradient(135deg, #6C2BD9, #00B4D8);
     border: none;
     padding: 10px 30px;
     border-radius: 50px;
     font-weight: 600;
     transition: all 0.3s ease;
+    color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+    box-shadow: 0 5px 20px rgba(108,43,217,0.3);
+    color: white;
 }
 
 .btn-secondary {
-    background: var(--gray-medium);
+    background: #E2E8F0;
     border: none;
     padding: 10px 30px;
     border-radius: 50px;
     font-weight: 600;
-    color: var(--text-dark);
+    color: #1E293B;
 }
 
 .btn-secondary:hover {
-    background: #d0d5dd;
+    background: #CBD5E1;
+    color: #1E293B;
 }
 
 .form-check-label {
@@ -280,6 +285,10 @@ function previewImage(input, previewId) {
             if (wrapper) {
                 wrapper.style.display = 'block';
             }
+            const placeholder = preview.closest('.card-body').querySelector('.no-image-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -288,7 +297,9 @@ function previewImage(input, previewId) {
 // Désactiver les checkbox si un fichier est sélectionné
 document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function() {
-        const checkbox = this.closest('.card-body').querySelector('input[type="checkbox"]');
+        const cardBody = this.closest('.card-body');
+        if (!cardBody) return;
+        const checkbox = cardBody.querySelector('input[type="checkbox"]');
         if (checkbox && this.files.length > 0) {
             checkbox.checked = false;
             checkbox.disabled = true;
@@ -302,10 +313,13 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
 document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
         if (!this.checked) {
-            const fileInput = this.closest('.card-body').querySelector('input[type="file"]');
-            if (fileInput) {
-                fileInput.value = '';
-                fileInput.disabled = false;
+            const cardBody = this.closest('.card-body');
+            if (cardBody) {
+                const fileInput = cardBody.querySelector('input[type="file"]');
+                if (fileInput) {
+                    fileInput.value = '';
+                    fileInput.disabled = false;
+                }
             }
         }
     });

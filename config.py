@@ -10,14 +10,17 @@ class Config:
     DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
     # ===== ADMIN =====
-    # ⚠️ Les identifiants DOIVENT être définis dans les variables d'environnement ou .env
-    # Ils ne sont pas codés en dur ici pour des raisons de sécurité.
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', '').strip()
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', '').strip()
 
-    # ===== DATABASE =====
+    # ===== DATABASE (chemin absolu + création du dossier) =====
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     DATABASE = os.getenv('DATABASE', os.path.join(BASE_DIR, 'database.db'))
+
+    # Création du dossier parent (nécessaire pour Railway)
+    db_dir = os.path.dirname(DATABASE)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True, mode=0o777)
 
     # ===== SESSION =====
     PERMANENT_SESSION_LIFETIME = int(os.getenv('PERMANENT_SESSION_LIFETIME', 86400))
