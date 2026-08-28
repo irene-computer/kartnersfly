@@ -192,7 +192,15 @@ def utility_processor():
         scholarships_pending = 0
     return dict(now=now, scholarships_pending=scholarships_pending)
 
+# ============================================================
+# FONCTIONS EMAIL CORRIGÉES AVEC LOGS DÉTAILLÉS
+# ============================================================
+
 def send_confirmation_email(to_email, booking_data):
+    """
+    Envoie un email de confirmation de réservation.
+    Retourne True si l'envoi a réussi, False sinon.
+    """
     try:
         smtp_server = Config.MAIL_SERVER
         smtp_port = Config.MAIL_PORT
@@ -200,7 +208,7 @@ def send_confirmation_email(to_email, booking_data):
         sender_password = Config.MAIL_PASSWORD
 
         if not sender_email or not sender_password:
-            print("[ERREUR] Email non configuré")
+            print("[ERREUR] Email non configuré : MAIL_USERNAME ou MAIL_PASSWORD manquants.")
             return False
 
         msg = EmailMessage()
@@ -232,13 +240,26 @@ Email: {Config.EMAIL}
             server.login(sender_email, sender_password)
             server.send_message(msg)
 
-        print(f"[INFO] Email de confirmation envoyé à {to_email}")
+        print(f"[SUCCÈS] Email de confirmation envoyé à {to_email}")
         return True
+
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"[ERREUR AUTH] Échec d'authentification SMTP : {e}")
+        print("  → Vérifiez votre mot de passe d'application Gmail ou les identifiants.")
+        return False
+    except smtplib.SMTPException as e:
+        print(f"[ERREUR SMTP] Problème d'envoi : {e}")
+        return False
     except Exception as e:
-        print(f"[ERREUR] Envoi email: {str(e)}")
+        print(f"[ERREUR] Envoi email : {str(e)}")
+        traceback.print_exc()
         return False
 
 def send_bulk_email(recipients, subject, html_content, text_content=None):
+    """
+    Envoie un email en masse (newsletter).
+    Retourne (success_count, fail_count).
+    """
     if not recipients:
         return 0, 0
     try:
@@ -248,7 +269,7 @@ def send_bulk_email(recipients, subject, html_content, text_content=None):
         sender_password = Config.MAIL_PASSWORD
 
         if not sender_email or not sender_password:
-            print("[ERREUR] Email non configuré")
+            print("[ERREUR] Email non configuré pour l'envoi groupé.")
             return 0, len(recipients)
 
         if text_content is None:
@@ -271,12 +292,15 @@ def send_bulk_email(recipients, subject, html_content, text_content=None):
                     msg.add_alternative(html_content, subtype='html')
                     server.send_message(msg)
                     success_count += 1
+                    print(f"[SUCCÈS] Email envoyé à {recipient}")
                 except Exception as e:
                     fail_count += 1
                     print(f"[ERREUR] Envoi à {recipient}: {str(e)}")
+        print(f"[BILAN] {success_count} envoyés, {fail_count} échecs.")
         return success_count, fail_count
     except Exception as e:
         print(f"[ERREUR] Envoi de masse: {str(e)}")
+        traceback.print_exc()
         return 0, len(recipients)
 
 def send_scholarship_notification(recipients, scholarship_data):
@@ -350,6 +374,10 @@ Pour en savoir plus: https://www.kartnersagency.com/bourse-etudes
 
     return send_bulk_email(recipients, subject, html_content, text_content)
 
+# ============================================================
+# ROUTES CLIENT
+# ============================================================
+
 @app.route('/')
 def home():
     conn = get_db()
@@ -394,6 +422,10 @@ def cgv():
 @app.route('/politique-confidentialite')
 def confidentialite():
     return render_template('legal/confidentialite.html')
+
+# ============================================================
+# API CLIENT
+# ============================================================
 
 @app.route('/api/contact', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -522,6 +554,10 @@ def api_newsletter():
         return jsonify({'success': True, 'message': 'Inscription réussie.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================================
+# ADMIN
+# ============================================================
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -876,7 +912,7 @@ def admin_booking_confirm(id):
         if email_sent:
             flash('Réservation confirmée et email envoyé au client', 'success')
         else:
-            flash('Réservation confirmée mais email non envoyé (erreur technique)', 'warning')
+            flash('Réservation confirmée mais email non envoyé (erreur technique) – consultez les logs.', 'warning')
     else:
         flash('Réservation non trouvée', 'danger')
     conn.close()
@@ -987,7 +1023,10 @@ def admin_newsletter_send():
         """
         text_content = re.sub(r'<[^>]+>', '', content)
         success, fail = send_bulk_email(recipients, subject, html_content, text_content)
-        flash(f'Newsletter envoyée. {success} emails envoyés, {fail} échecs.', 'success')
+        if success > 0:
+            flash(f'Newsletter envoyée. {success} emails envoyés, {fail} échecs.', 'success')
+        else:
+            flash(f'Échec de l\'envoi de la newsletter. {fail} échecs. Vérifiez les logs.', 'danger')
         return redirect(url_for('admin_newsletter'))
     except Exception as e:
         traceback.print_exc()
@@ -1195,6 +1234,33 @@ def bourse_etudes():
     today = datetime.datetime.now().date().isoformat()
     active_opportunities = [opp for opp in opportunities if opp['end_date'] is None or opp['end_date'] >= today]
     return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities, today=today)
+
+# ==================== ROUTE DE TEST POUR LES EMAILS ====================
+@app.route('/admin/test-email')
+@login_required
+def admin_test_email():
+    """
+    Route de test pour vérifier la configuration SMTP.
+    Utilisation : /admin/test-email?email=destinataire@exemple.com
+    """
+    to_email = request.args.get('email') or Config.MAIL_USERNAME
+    if not to_email:
+        flash("Aucun email de test défini. Utilisez ?email=test@exemple.com", "warning")
+        return redirect(url_for('admin_dashboard'))
+
+    test_data = {
+        'id': 'TEST',
+        'fullname': 'Admin',
+        'destination_name': 'Test destination',
+        'departure_date': '2026-08-28',
+        'travelers': 1
+    }
+    success = send_confirmation_email(to_email, test_data)
+    if success:
+        flash(f"✅ Email test envoyé avec succès à {to_email}", "success")
+    else:
+        flash("❌ Échec de l'envoi du test. Vérifiez les logs Railway.", "danger")
+    return redirect(url_for('admin_dashboard'))
 
 # ==================== ROUTE DE CORRECTION DES IMAGES ====================
 @app.route('/admin/fix-images')
