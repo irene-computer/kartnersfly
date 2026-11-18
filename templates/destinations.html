@@ -1,980 +1,215 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m with context %}
 
-{% block title %}Destinations | Kartners Travel Agency{% endblock %}
-
+{% block title %}Destinations · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Découvrez nos destinations de rêve à travers le monde. Voyages organisés, circuits personnalisés et vols internationaux avec Kartners Travel Agency.">
-<meta name="keywords" content="destinations voyage, circuit touristique, voyage sur mesure, agence voyage cameroun">
+<meta name="description" content="Toutes nos destinations au départ de Douala : Europe, Afrique, Amériques, Asie. Prix indicatifs et réservation en ligne, confirmée par un conseiller sous 24 h.">
 {% endblock %}
 
 {% block content %}
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<div class="k-destinations-page">
-
-    <!-- HERO SECTION DESTINATIONS (dégradé violet → cyan) -->
-    <section class="k-hero">
-        <div class="k-container k-hero-inner">
-            <div class="row align-items-center">
-                <div class="col-lg-8 mx-auto text-center">
-                    <span class="k-badge"><i class="fas fa-globe-americas"></i> Explorer le monde</span>
-                    <h1 class="k-hero-title">Nos <span class="k-gradient-text">Destinations</span></h1>
-                    <p class="k-hero-lead">Explorez le monde avec Kartners Travel Agency.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- STATS BAR (fond blanc) -->
-    <div class="k-container">
-        <div class="k-stats-bar">
-            <div class="k-stat-item">
-                <div class="num">50<span>+</span></div>
-                <div class="lab">Destinations</div>
-            </div>
-            <div class="k-stat-item">
-                <div class="num">25<span>+</span></div>
-                <div class="lab">Pays visités</div>
-            </div>
-            <div class="k-stat-item">
-                <div class="num">5000<span>+</span></div>
-                <div class="lab">Voyageurs</div>
-            </div>
-            <div class="k-stat-item">
-                <div class="num">98<span>%</span></div>
-                <div class="lab">Satisfaction client</div>
-            </div>
+<section class="hero page-hero">
+    <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/voyages2.webp') }}')"></span></div>
+    <div class="wrap hero-grid">
+        <div>
+            <p class="hero-kicker"><b>DLA</b> Départs depuis Douala</p>
+            <h1>Nos destinations</h1>
+            <p class="hero-lead">Filtrez par continent ou par budget, puis envoyez votre demande. Un conseiller vous confirme le tarif exact et les disponibilités sous 24 h.</p>
         </div>
     </div>
+</section>
 
-    <!-- FILTRES DES DESTINATIONS -->
-    <section class="k-section tight">
-        <div class="k-container">
-            <div class="k-filters-card">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-5">
-                        <div class="k-input-group">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="searchInput" placeholder="Rechercher un pays..." class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="k-input-group">
-                            <i class="fas fa-tag"></i>
-                            <select id="priceFilter" class="form-select">
-                                <option value="all">Tous les prix</option>
-                                <option value="0-500">Moins de 500 €</option>
-                                <option value="500-1000">500 € - 1000 €</option>
-                                <option value="1000-2000">1000 € - 2000 €</option>
-                                <option value="2000+">Plus de 2000 €</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-3 text-md-end">
-                        <button id="resetFilters" class="k-btn-reset w-100">
-                            <i class="fas fa-redo-alt"></i> Réinitialiser
-                        </button>
-                    </div>
+<section class="section" style="padding-top:0">
+    <div class="wrap">
+        <form class="toolbar trust-overlap" id="filters" role="search" onsubmit="return false">
+            <div class="field">
+                <label for="f-q">Rechercher</label>
+                <div class="input-icon"><i class="fas fa-magnifying-glass"></i>
+                    <input class="input" id="f-q" type="search" placeholder="Ville ou pays" value="{{ query }}" autocomplete="off">
                 </div>
             </div>
+            <div class="field">
+                <label for="f-continent">Continent</label>
+                <select class="select" id="f-continent">
+                    <option value="">Tous</option>
+                    <option value="afrique">Afrique</option>
+                    <option value="europe">Europe</option>
+                    <option value="amerique">Amériques</option>
+                    <option value="asie">Asie & Moyen-Orient</option>
+                    <option value="oceanie">Océanie</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="f-price">Budget par personne</label>
+                <select class="select" id="f-price">
+                    <option value="">Tous les prix</option>
+                    <option value="0-1000">Moins de 1 000 €</option>
+                    <option value="1000-2000">1 000 € à 2 000 €</option>
+                    <option value="2000-999999">Plus de 2 000 €</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="f-sort">Trier</label>
+                <select class="select" id="f-sort">
+                    <option value="name">Nom (A → Z)</option>
+                    <option value="price-asc">Prix croissant</option>
+                    <option value="price-desc">Prix décroissant</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="result-line">
+            <span id="result-count" aria-live="polite">{{ destinations|length }} destination{{ 's' if destinations|length > 1 }}</span>
+            <button class="btn btn-ghost btn-sm" type="button" id="f-reset" hidden><i class="fas fa-rotate-left"></i> Réinitialiser les filtres</button>
         </div>
-    </section>
 
-    <!-- GRILLE DES DESTINATIONS -->
-    <section class="k-section pt-0">
-        <div class="k-container">
-            <div id="destinationsCount" class="k-destinations-count mb-3"></div>
-            
-            <div class="k-destinations-grid" id="destinationsGrid">
-                {% if destinations %}
-                    {% for dest in destinations %}
-                    <div class="k-destination-card" 
-                         data-id="{{ dest.id }}"
-                         data-name="{{ dest.name }}"
-                         data-country="{{ dest.country|lower }}"
-                         data-price="{{ dest.price }}">
-                        
-                        <div class="k-card-img-wrapper">
-                            <div class="k-card-img" 
-                                 style="background-image: url('{{ url_for('static', filename=dest.image) if dest.image else url_for('static', filename='images/destinations/default.jpg') }}')">
-                                <!-- Pas d'overlay sombre -->
-                                <div class="k-card-badges">
-                                    <span class="badge-price"><i class="fas fa-tag"></i> {{ dest.price }} €</span>
-                                    <span class="badge-country">{{ dest.country }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="k-card-body">
-                            <div class="k-card-meta">
-                                <div class="country-info">
-                                    {% if dest.flag_image %}
-                                        <img src="{{ url_for('static', filename=dest.flag_image) }}" alt="{{ dest.country }}" class="flag-img">
-                                    {% else %}
-                                        <img src="{{ url_for('static', filename='images/flags/default.png') }}" alt="{{ dest.country }}" class="flag-img">
-                                    {% endif %}
-                                    <span class="country-name">{{ dest.country }}</span>
-                                </div>
-                                <div class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    <span>4.5</span>
-                                </div>
-                            </div>
-
-                            <h3 class="k-card-title">{{ dest.name }}</h3>
-                            <p class="k-card-desc">{{ dest.description }}</p>
-
-                            <div class="k-card-features">
-                                <span><i class="fas fa-plane"></i> Vol inclus</span>
-                                <span><i class="fas fa-hotel"></i> Hôtel inclus</span>
-                                <span><i class="fas fa-utensils"></i> Demi-pension</span>
-                            </div>
-
-                            <div class="k-card-footer">
-                                <div class="price-info">
-                                    <span class="price-label">À partir de</span>
-                                    <span class="price-value">{{ dest.price }} €</span>
-                                    <span class="price-period">/personne</span>
-                                </div>
-                                <button class="k-btn-book" onclick="openBookingModal({{ dest.id }}, '{{ dest.name|escape }}')">
-                                    <i class="fas fa-calendar-check"></i> Réserver
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="w-100">
-                        <div class="k-empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h4>Aucune destination disponible</h4>
-                            <p>Nos offres sont en cours de mise à jour. Revenez très bientôt !</p>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <!-- Message aucun résultat -->
-            <div id="noResults" class="k-no-results" style="display: none;">
-                <i class="fas fa-map-marked-alt"></i>
-                <h3>Aucune destination trouvée</h3>
-                <p>Aucun résultat ne correspond à vos critères de recherche.</p>
-                <button onclick="resetAllFilters()" class="k-btn k-btn-secondary mt-2">
-                    <i class="fas fa-redo-alt me-2"></i> Voir toutes les destinations
-                </button>
-            </div>
+        {% if destinations %}
+        <div class="pass-grid" id="pass-grid">
+            {% for dest in destinations %}
+                {{ m.boarding_pass(dest, action='modal') }}
+            {% endfor %}
         </div>
-    </section>
-
-    <!-- VOYAGES POPULAIRES (avec images dynamiques si disponibles) -->
-    <section class="k-section k-bg-white">
-        <div class="k-container">
-            <div class="text-center mb-5">
-                <span class="k-section-tag"><i class="fas fa-fire"></i> Incontournables</span>
-                <h2 class="k-section-title">Voyages <span class="k-gradient-text">populaires</span></h2>
-                <p class="k-section-sub mx-auto">Nos destinations les plus demandées par nos voyageurs cette saison.</p>
-            </div>
-
-            <div class="k-popular-grid">
-                <!-- Paris -->
-                <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/paris.jpg') if destinations|selectattr('name', 'equalto', 'Paris')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
-                        <span class="k-popular-rank">1</span>
-                    </div>
-                    <div class="k-popular-body">
-                        <h4>Paris, France</h4>
-                        <p>La ville des lumières et de l'amour.</p>
-                        <div class="k-popular-footer">
-                            <span class="k-popular-price">À partir de 850 €</span>
-                            <i class="fas fa-heart text-danger"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dubai -->
-                <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/dubai.jpg') if destinations|selectattr('name', 'equalto', 'Dubai')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
-                        <span class="k-popular-rank">2</span>
-                    </div>
-                    <div class="k-popular-body">
-                        <h4>Dubaï, EAU</h4>
-                        <p>Luxe moderne et désert.</p>
-                        <div class="k-popular-footer">
-                            <span class="k-popular-price">À partir de 1200 €</span>
-                            <i class="fas fa-heart text-danger"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Marrakech -->
-                <div class="k-popular-card">
-                    <div class="k-popular-img" style="background-image: url('{{ url_for('static', filename='images/destinations/marrakech.jpg') if destinations|selectattr('name', 'equalto', 'Marrakech')|list else url_for('static', filename='images/destinations/default.jpg') }}')">
-                        <span class="k-popular-rank">3</span>
-                    </div>
-                    <div class="k-popular-body">
-                        <h4>Marrakech, Maroc</h4>
-                        <p>La perle du Sud.</p>
-                        <div class="k-popular-footer">
-                            <span class="k-popular-price">À partir de 650 €</span>
-                            <i class="fas fa-heart text-danger"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="empty" id="no-results" hidden>
+            <i class="fas fa-map-location-dot"></i>
+            <h3>Aucune destination ne correspond</h3>
+            <p>Nous organisons aussi des voyages vers des villes absentes de cette liste.</p>
+            <a class="btn btn-primary" href="/contact">Demander une autre destination</a>
         </div>
-    </section>
-
-    <!-- CTA SUR MESURE -->
-    <section class="k-section tight">
-        <div class="k-container">
-            <div class="k-cta-final">
-                <div class="d-flex align-items-center gap-4">
-                    <div class="k-cta-icon d-none d-md-block">
-                        <i class="fas fa-headset fa-3x text-cyan"></i>
-                    </div>
-                    <div>
-                        <h3>Vous ne trouvez pas votre destination ?</h3>
-                        <p>Nous organisons des voyages sur mesure vers toutes les destinations de votre choix.</p>
-                    </div>
-                </div>
-                <div>
-                    <a href="/contact" class="k-btn k-btn-white text-nowrap"><i class="fas fa-paper-plane me-2"></i> Contactez-nous</a>
-                </div>
-            </div>
+        {% else %}
+        <div class="empty">
+            <i class="fas fa-plane"></i>
+            <h3>Destinations en cours de mise à jour</h3>
+            <p>Contactez-nous directement pour un devis.</p>
+            <a class="btn btn-primary" href="/contact">Nous contacter</a>
         </div>
-    </section>
-
-</div>
-
-<!-- MODAL DE RÉSERVATION -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content k-modal-content">
-            <div class="modal-header k-modal-header">
-                <div>
-                    <div class="k-modal-icon"><i class="fas fa-ticket-alt"></i></div>
-                    <h3 class="modal-title">Réserver votre voyage</h3>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="k-dest-summary mb-4">
-                    <span>Destination sélectionnée :</span>
-                    <strong id="destination_name" class="d-block text-violet fs-5"></strong>
-                </div>
-
-                <form id="bookingForm">
-                    <input type="hidden" id="destination_id" name="destination_id">
-                    <input type="hidden" name="destination_name" id="destination_name_field">
-
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-user me-1 text-violet"></i> Nom complet *</label>
-                        <input type="text" class="form-control" name="fullname" required placeholder="ex: Jean Dupont">
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label"><i class="fas fa-envelope me-1 text-violet"></i> Email *</label>
-                            <input type="email" class="form-control" name="email" required placeholder="jean@exemple.com">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><i class="fas fa-phone me-1 text-violet"></i> Téléphone *</label>
-                            <input type="tel" class="form-control" name="phone" required placeholder="+237 6XX XXX XXX">
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label"><i class="fas fa-calendar me-1 text-violet"></i> Date de départ *</label>
-                            <input type="date" class="form-control" name="departure_date" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><i class="fas fa-users me-1 text-violet"></i> Nombre de personnes *</label>
-                            <input type="number" class="form-control" name="travelers" min="1" value="1" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-comment me-1 text-violet"></i> Précisions / Demandes particulières</label>
-                        <textarea class="form-control" name="message" rows="3" placeholder="Vol, type d'hôtel, besoins spécifiques..."></textarea>
-                    </div>
-
-                    <div class="text-center text-muted small mb-3">
-                        <i class="fas fa-lock text-success me-1"></i> Vos données sont protégées et confidentielles.
-                    </div>
-
-                    <button type="submit" class="k-btn-submit w-100">
-                        <span class="btn-text"><i class="fas fa-paper-plane me-2"></i> Envoyer ma demande</span>
-                        <div class="spinner-border spinner-border-sm text-light d-none" role="status"></div>
-                    </button>
-
-                    <div id="bookingMessage" class="mt-3 text-center p-2 rounded d-none"></div>
-                </form>
-            </div>
-        </div>
+        {% endif %}
     </div>
-</div>
-
-<style>
-    /* ===================================================
-       DESIGN SYSTEM KTA – Version Clair & Lumineux
-       (Aucun noir utilisé)
-       =================================================== */
-    :root {
-        --k-violet: #6C2BD9;
-        --k-violet-dark: #4A1A8A;
-        --k-cyan: #00B4D8;
-        --k-cyan-dark: #0077B6;
-        --k-white: #FFFFFF;
-        --k-bg: #F0F4F8;
-        --k-gray: #E8EDF2;
-        --k-text: #1E293B;
-        --k-muted: #64748B;
-        --k-shadow: rgba(108, 43, 217, 0.08);
-    }
-
-    .k-destinations-page {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: var(--k-text);
-        background: var(--k-bg);
-    }
-
-    .text-violet { color: var(--k-violet) !important; }
-    .text-cyan { color: var(--k-cyan) !important; }
-
-    .k-container {
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 0 24px;
-    }
-
-    .k-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255, 255, 255, 0.2);
-        color: #FFFFFF;
-        padding: 6px 20px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .k-section-tag {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 0.9rem;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .k-section-title {
-        font-size: clamp(2rem, 3vw, 2.8rem);
-        font-weight: 800;
-        color: #0F172A;
-        margin-bottom: 16px;
-        letter-spacing: -0.5px;
-    }
-
-    .k-section-sub {
-        font-size: 1.15rem;
-        color: var(--k-muted);
-        max-width: 640px;
-        line-height: 1.8;
-    }
-
-    .k-gradient-text {
-        background: linear-gradient(135deg, var(--k-violet) 0%, var(--k-cyan) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .k-hero {
-        background: linear-gradient(135deg, #7C3AED 0%, #6C2BD9 50%, #00B4D8 100%);
-        padding: 80px 0 110px;
-        color: #FFFFFF;
-        position: relative;
-    }
-
-    .k-hero-title {
-        font-size: clamp(2.8rem, 4.5vw, 4rem);
-        font-weight: 900;
-        margin: 20px 0;
-        color: #FFFFFF;
-    }
-
-    .k-hero-title .k-gradient-text {
-        background: linear-gradient(135deg, #FFFFFF 0%, #B3E5FC 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .k-hero-lead {
-        font-size: 1.3rem;
-        line-height: 1.8;
-        color: rgba(255, 255, 255, 0.95);
-        margin: 0 auto;
-    }
-
-    .k-stats-bar {
-        background: var(--k-white);
-        border-radius: 24px;
-        margin-top: -45px;
-        position: relative;
-        z-index: 3;
-        box-shadow: 0 12px 40px rgba(108, 43, 217, 0.10);
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        border: 1px solid rgba(108, 43, 217, 0.06);
-    }
-
-    .k-stat-item { text-align: center; padding: 28px 16px; }
-    .k-stat-item + .k-stat-item { border-left: 1px solid rgba(0,0,0,0.04); }
-    .k-stat-item .num { font-size: 2.5rem; font-weight: 900; color: var(--k-violet); line-height: 1.2; }
-    .k-stat-item .num span { color: var(--k-cyan); }
-    .k-stat-item .lab { font-size: 0.95rem; color: var(--k-muted); margin-top: 8px; font-weight: 600; }
-
-    .k-section { padding: 70px 0; }
-    .k-section.tight { padding: 40px 0; }
-    .k-bg-white { background: var(--k-white); }
-
-    .k-filters-card {
-        background: var(--k-white);
-        border-radius: 20px;
-        padding: 28px;
-        box-shadow: 0 4px 20px var(--k-shadow);
-        border: 1px solid rgba(108, 43, 217, 0.04);
-    }
-
-    .k-input-group { position: relative; }
-    .k-input-group i {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--k-violet);
-        z-index: 2;
-        font-size: 1.1rem;
-    }
-
-    .k-input-group .form-control,
-    .k-input-group .form-select {
-        padding-left: 48px;
-        height: 56px;
-        border-radius: 14px;
-        border: 1.5px solid var(--k-gray);
-        font-size: 1rem;
-        background: var(--k-white);
-    }
-
-    .k-input-group .form-control:focus,
-    .k-input-group .form-select:focus {
-        border-color: var(--k-cyan);
-        box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15);
-    }
-
-    .k-btn-reset {
-        height: 56px;
-        border-radius: 14px;
-        border: 1.5px solid var(--k-gray);
-        background: var(--k-white);
-        font-weight: 700;
-        font-size: 1rem;
-        color: var(--k-text);
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-
-    .k-btn-reset:hover {
-        background: var(--k-bg);
-        border-color: var(--k-violet);
-    }
-
-    .k-destinations-count { font-size: 1rem; font-weight: 600; color: var(--k-muted); }
-
-    .k-destinations-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 28px;
-    }
-
-    .k-destination-card {
-        background: var(--k-white);
-        border-radius: 24px;
-        overflow: hidden;
-        border: 1px solid rgba(108, 43, 217, 0.06);
-        box-shadow: 0 4px 20px var(--k-shadow);
-        transition: all 0.35s ease;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .k-destination-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.15);
-        border-color: rgba(0, 180, 216, 0.25);
-    }
-
-    .k-card-img-wrapper {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
-        background: var(--k-gray);
-    }
-
-    .k-card-img {
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        transition: transform 0.5s ease;
-        position: relative;
-    }
-
-    .k-destination-card:hover .k-card-img { transform: scale(1.04); }
-
-    .k-card-badges {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 6px;
-        z-index: 2;
-    }
-
-    .badge-price {
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        color: #FFFFFF;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 800;
-        box-shadow: 0 4px 12px rgba(108, 43, 217, 0.2);
-    }
-
-    .badge-country {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(4px);
-        color: var(--k-violet-dark);
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .k-card-body {
-        padding: 26px 24px 24px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-    }
-
-    .k-card-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .country-info { display: flex; align-items: center; gap: 10px; }
-    .flag-img { width: 32px; height: 22px; object-fit: cover; border-radius: 4px; border: 1px solid var(--k-gray); }
-    .country-name { font-size: 0.9rem; font-weight: 700; color: var(--k-muted); text-transform: uppercase; }
-
-    .rating { font-size: 0.9rem; font-weight: 700; color: #F59E0B; display: flex; align-items: center; gap: 6px; }
-
-    .k-card-title { font-size: 1.4rem; font-weight: 800; color: #0F172A; margin-bottom: 12px; line-height: 1.3; }
-    .k-card-desc { font-size: 1rem; color: var(--k-muted); line-height: 1.7; margin-bottom: 18px; }
-
-    .k-card-features {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 24px;
-    }
-
-    .k-card-features span {
-        font-size: 0.85rem;
-        background: var(--k-bg);
-        padding: 6px 14px;
-        border-radius: 20px;
-        color: var(--k-text);
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .k-card-features span i { color: var(--k-cyan-dark); }
-
-    .k-card-footer {
-        margin-top: auto;
-        padding-top: 18px;
-        border-top: 1px solid var(--k-gray);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .price-label { font-size: 0.8rem; color: var(--k-muted); display: block; }
-    .price-value { font-size: 1.5rem; font-weight: 900; color: var(--k-violet); }
-    .price-period { font-size: 0.8rem; color: var(--k-muted); }
-
-    .k-btn-book {
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        color: #FFFFFF;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 0.95rem;
-        transition: all 0.25s;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(108, 43, 217, 0.2);
-    }
-
-    .k-btn-book:hover {
-        background: linear-gradient(135deg, var(--k-cyan), var(--k-violet));
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 180, 216, 0.35);
-    }
-
-    .k-popular-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-    .k-popular-card {
-        background: var(--k-white);
-        border-radius: 24px;
-        overflow: hidden;
-        border: 1px solid rgba(108, 43, 217, 0.06);
-        box-shadow: 0 4px 20px var(--k-shadow);
-        transition: all 0.35s ease;
-    }
-    .k-popular-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.12);
-    }
-
-    .k-popular-img {
-        height: 200px;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        padding: 15px;
-    }
-
-    .k-popular-rank {
-        width: 40px; height: 40px;
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        color: #FFFFFF;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 900;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 12px rgba(108, 43, 217, 0.25);
-    }
-
-    .k-popular-body { padding: 24px; }
-    .k-popular-body h4 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: #0F172A; }
-    .k-popular-body p { font-size: 1rem; color: var(--k-muted); margin-bottom: 18px; line-height: 1.7; }
-    .k-popular-footer { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
-    .k-popular-price { color: var(--k-violet); font-size: 1.1rem; }
-
-    .k-cta-final {
-        background: linear-gradient(135deg, #7C3AED 0%, #6C2BD9 50%, #00B4D8 100%);
-        border-radius: 28px;
-        padding: 48px 50px;
-        color: #FFFFFF;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 30px;
-        box-shadow: 0 16px 40px rgba(108, 43, 217, 0.2);
-    }
-
-    .k-cta-final h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #FFFFFF; }
-    .k-cta-final p { color: rgba(255,255,255,0.9); margin: 0; font-size: 1.1rem; }
-
-    .k-btn {
-        display: inline-flex; align-items: center; justify-content: center;
-        padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem;
-        text-decoration: none; transition: all 0.3s;
-    }
-
-    .k-btn-white {
-        background: var(--k-white);
-        color: var(--k-violet-dark) !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-    .k-btn-white:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-
-    .k-btn-secondary {
-        background: var(--k-gray);
-        color: var(--k-text);
-        border: none;
-    }
-
-    .k-modal-content { border-radius: 24px; border: none; overflow: hidden; }
-    .k-modal-header {
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        color: #FFFFFF;
-        padding: 28px 30px;
-        border: none;
-    }
-
-    .k-modal-icon {
-        width: 48px; height: 48px;
-        background: rgba(255,255,255,0.15);
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 12px;
-        font-size: 1.4rem;
-    }
-
-    .k-modal-header h3 { font-size: 1.4rem; color: #FFFFFF; }
-
-    .k-dest-summary {
-        background: var(--k-bg);
-        padding: 16px;
-        border-radius: 14px;
-        border: 1px solid var(--k-gray);
-        font-size: 1rem;
-    }
-
-    .k-btn-submit {
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        color: #FFFFFF;
-        border: none;
-        padding: 16px;
-        border-radius: 50px;
-        font-weight: 800;
-        font-size: 1.1rem;
-        transition: all 0.3s;
-        box-shadow: 0 4px 16px rgba(108, 43, 217, 0.2);
-    }
-
-    .k-btn-submit:hover {
-        opacity: 0.95;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 28px rgba(108, 43, 217, 0.3);
-    }
-
-    .k-empty-state, .k-no-results {
-        text-align: center;
-        padding: 60px 20px;
-        background: var(--k-white);
-        border-radius: 24px;
-        border: 1px solid var(--k-gray);
-    }
-
-    .k-empty-state i, .k-no-results i {
-        font-size: 3.5rem;
-        color: #CBD5E1;
-        margin-bottom: 20px;
-        display: block;
-    }
-
-    .k-empty-state h4, .k-no-results h3 { font-size: 1.4rem; color: #0F172A; }
-    .k-empty-state p, .k-no-results p { font-size: 1rem; color: var(--k-muted); }
-
-    @media (max-width: 992px) {
-        .k-stats-bar { grid-template-columns: repeat(2, 1fr); }
-        .k-stat-item:nth-child(2) { border-left: 1px solid rgba(0,0,0,0.04); }
-        .k-stat-item:nth-child(3) { border-left: none; border-top: 1px solid rgba(0,0,0,0.04); }
-        .k-destinations-grid, .k-popular-grid { grid-template-columns: repeat(2, 1fr); }
-        .k-cta-final { flex-direction: column; text-align: center; padding: 30px 24px; }
-    }
-
-    @media (max-width: 768px) {
-        .k-stats-bar { grid-template-columns: 1fr; }
-        .k-stat-item + .k-stat-item { border-left: none; border-top: 1px solid rgba(0,0,0,0.04); }
-        .k-destinations-grid, .k-popular-grid { grid-template-columns: 1fr; }
-        .k-card-footer { flex-direction: column; gap: 15px; }
-        .k-btn-book { width: 100%; justify-content: center; }
-        .k-hero-title { font-size: 2.2rem; }
-        .k-hero-lead { font-size: 1.1rem; }
-        .k-card-title { font-size: 1.2rem; }
-        .k-popular-body h4 { font-size: 1.1rem; }
-    }
-</style>
-
+</section>
+
+<section class="section-tight">
+    <div class="wrap">
+        {{ m.cta_band("Votre ville n'est pas dans la liste ?", "Nous réservons des vols vers toutes les destinations desservies depuis Douala et Yaoundé, et nous montons des circuits sur mesure.", "Demander un devis") }}
+    </div>
+</section>
+
+<dialog class="modal" id="booking-dialog" aria-labelledby="booking-title">
+    <div class="modal-head">
+        <div>
+            <h2 id="booking-title">Demande de réservation</h2>
+            <p>Sans paiement en ligne : un conseiller vous rappelle pour confirmer.</p>
+        </div>
+        <button class="modal-close" type="button" data-close aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="ticket-head">
+            <div><small>Départ</small><span class="code">DLA</span></div>
+            <i class="fas fa-plane plane"></i>
+            <div style="text-align:right"><small id="booking-country">Destination</small><span class="code" id="booking-code">---</span></div>
+        </div>
+        <form id="booking-form" data-ajax="/api/booking" novalidate>
+            <input type="hidden" name="destination_id" id="booking-id">
+            <input type="hidden" name="destination_name" id="booking-name">
+            <div class="form-grid">
+                <div class="field full">
+                    <label for="b-fullname">Nom complet <span class="req">*</span></label>
+                    <input class="input" id="b-fullname" name="fullname" required autocomplete="name" placeholder="Comme sur le passeport">
+                </div>
+                <div class="field">
+                    <label for="b-email">Email <span class="req">*</span></label>
+                    <input class="input" id="b-email" name="email" type="email" required autocomplete="email" placeholder="vous@exemple.com">
+                </div>
+                <div class="field">
+                    <label for="b-phone">Téléphone / WhatsApp <span class="req">*</span></label>
+                    <input class="input" id="b-phone" name="phone" type="tel" required autocomplete="tel" placeholder="+237 6XX XXX XXX" pattern="[+0-9 ().-]{8,20}">
+                </div>
+                <div class="field">
+                    <label for="b-date">Date de départ <span class="req">*</span></label>
+                    <input class="input" id="b-date" name="departure_date" type="date" required min="{{ now().date().isoformat() }}">
+                </div>
+                <div class="field">
+                    <label for="b-travelers">Voyageurs <span class="req">*</span></label>
+                    <input class="input" id="b-travelers" name="travelers" type="number" min="1" max="50" value="1" required inputmode="numeric">
+                </div>
+                <div class="field full">
+                    <label for="b-message">Précisions</label>
+                    <textarea class="textarea" id="b-message" name="message" maxlength="2000" placeholder="Aller simple ou aller-retour, date de retour, hôtel souhaité, besoin de visa…"></textarea>
+                </div>
+                <div class="full" data-form-message hidden></div>
+                <div class="full" style="display:grid;gap:10px">
+                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> Envoyer ma demande</button>
+                    <p class="form-note"><i class="fas fa-lock"></i> Vos coordonnées servent uniquement à traiter cette demande.</p>
+                </div>
+            </div>
+        </form>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const priceFilter = document.getElementById('priceFilter');
-    const resetBtn = document.getElementById('resetFilters');
-    const destinationsCount = document.getElementById('destinationsCount');
-    const noResults = document.getElementById('noResults');
+(function () {
+    var grid = document.getElementById('pass-grid');
+    if (!grid) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.pass'));
+    var q = document.getElementById('f-q');
+    var continent = document.getElementById('f-continent');
+    var price = document.getElementById('f-price');
+    var sort = document.getElementById('f-sort');
+    var count = document.getElementById('result-count');
+    var reset = document.getElementById('f-reset');
+    var empty = document.getElementById('no-results');
 
-    function filterDestinations() {
-        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-        const priceRange = priceFilter ? priceFilter.value : 'all';
-        
-        const cards = document.querySelectorAll('.k-destination-card');
-        let visibleCount = 0;
-        
-        cards.forEach(card => {
-            const country = card.dataset.country || '';
-            const name = card.dataset.name ? card.dataset.name.toLowerCase() : '';
-            const price = parseInt(card.dataset.price) || 0;
-            
-            let matchesSearch = true;
-            let matchesPrice = true;
-            
-            if (searchTerm) {
-                matchesSearch = country.includes(searchTerm) || name.includes(searchTerm);
-            }
-            
-            if (priceRange !== 'all') {
-                if (priceRange === '2000+') {
-                    matchesPrice = price >= 2000;
-                } else {
-                    const parts = priceRange.split('-');
-                    if (parts.length === 2) {
-                        const min = parseInt(parts[0]);
-                        const max = parseInt(parts[1]);
-                        matchesPrice = price >= min && price <= max;
-                    }
-                }
-            }
-            
-            if (matchesSearch && matchesPrice) {
-                card.style.display = 'flex';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
+    function norm(s) { return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
+
+    function apply() {
+        var term = norm(q.value), cont = continent.value, range = price.value.split('-');
+        var visible = 0;
+        cards.forEach(function (c) {
+            var p = parseFloat(c.dataset.price) || 0;
+            var ok = (!term || norm(c.dataset.name).includes(term) || norm(c.dataset.country).includes(term))
+                && (!cont || c.dataset.continent === cont)
+                && (!price.value || (p >= +range[0] && p < +range[1]));
+            c.hidden = !ok;
+            if (ok) { visible++; c.classList.add('is-visible'); }
         });
-        
-        if (destinationsCount) {
-            destinationsCount.textContent = visibleCount + ' destination' + (visibleCount > 1 ? 's' : '') + ' trouvée' + (visibleCount > 1 ? 's' : '');
-        }
-        
-        if (noResults) {
-            noResults.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
-        }
+        var by = sort.value;
+        cards.slice().sort(function (a, b) {
+            if (by === 'price-asc') return a.dataset.price - b.dataset.price;
+            if (by === 'price-desc') return b.dataset.price - a.dataset.price;
+            return a.dataset.name.localeCompare(b.dataset.name, 'fr');
+        }).forEach(function (c) { grid.appendChild(c); });
+        count.textContent = visible + ' destination' + (visible > 1 ? 's' : '');
+        empty.hidden = visible > 0;
+        reset.hidden = !(q.value || cont || price.value);
     }
+    [q, continent, price, sort].forEach(function (el) { el.addEventListener('input', apply); });
+    reset.addEventListener('click', function () { q.value = ''; continent.value = ''; price.value = ''; apply(); q.focus(); });
+    apply();
 
-    window.resetAllFilters = function() {
-        if (searchInput) searchInput.value = '';
-        if (priceFilter) priceFilter.value = 'all';
-        filterDestinations();
-    };
-
-    if (searchInput) searchInput.addEventListener('input', filterDestinations);
-    if (priceFilter) priceFilter.addEventListener('change', filterDestinations);
-    if (resetBtn) resetBtn.addEventListener('click', window.resetAllFilters);
-
-    filterDestinations();
-
-    // Animation au scroll
-    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.k-destination-card, .k-popular-card').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.6s ease';
-        observer.observe(el);
+    /* Fenêtre de réservation */
+    var dlg = document.getElementById('booking-dialog');
+    var form = document.getElementById('booking-form');
+    function openBooking(btn) {
+        document.getElementById('booking-id').value = btn.dataset.book;
+        document.getElementById('booking-name').value = btn.dataset.bookName;
+        document.getElementById('booking-code').textContent = btn.dataset.bookCode;
+        document.getElementById('booking-country').textContent = btn.dataset.bookName + ', ' + btn.dataset.bookCountry;
+        document.getElementById('booking-title').textContent = 'Réserver : ' + btn.dataset.bookName;
+        var msg = form.querySelector('[data-form-message]'); if (msg) msg.hidden = true;
+        dlg.showModal();
+        setTimeout(function () { document.getElementById('b-fullname').focus(); }, 50);
+    }
+    grid.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-book]');
+        if (btn) openBooking(btn);
+    });
+    form.addEventListener('kta:success', function (e) {
+        setTimeout(function () { dlg.close(); window.ktaToast(e.detail.message, 'ok'); }, 1800);
     });
 
-    // OUVERTURE MODALE
-    window.openBookingModal = function(id, name) {
-        const destIdField = document.getElementById('destination_id');
-        const destNameSpan = document.getElementById('destination_name');
-        const destNameField = document.getElementById('destination_name_field');
-        
-        if (destIdField) destIdField.value = id;
-        if (destNameSpan) destNameSpan.textContent = name;
-        if (destNameField) destNameField.value = name;
-        
-        const modalElement = document.getElementById('bookingModal');
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        }
-    };
-
-    // SOUMISSION FORMULAIRE
-    const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = bookingForm.querySelector('.k-btn-submit');
-            const btnText = submitBtn.querySelector('.btn-text');
-            const spinner = submitBtn.querySelector('.spinner-border');
-            const messageDiv = document.getElementById('bookingMessage');
-            
-            submitBtn.disabled = true;
-            if (btnText) btnText.classList.add('d-none');
-            if (spinner) spinner.classList.remove('d-none');
-            
-            const formData = new FormData(bookingForm);
-            const data = Object.fromEntries(formData.entries());
-            
-            try {
-                const response = await fetch('/api/booking', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                messageDiv.classList.remove('d-none', 'alert-danger', 'alert-success', 'bg-danger', 'bg-success');
-                
-                if (response.ok && result.success) {
-                    messageDiv.classList.add('bg-success', 'text-white');
-                    messageDiv.textContent = result.message || 'Votre demande de réservation a été envoyée avec succès !';
-                    bookingForm.reset();
-                    setTimeout(() => {
-                        const modalElement = document.getElementById('bookingModal');
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) modal.hide();
-                        messageDiv.classList.add('d-none');
-                    }, 2500);
-                } else {
-                    messageDiv.classList.add('bg-danger', 'text-white');
-                    messageDiv.textContent = result.error || 'Une erreur est survenue. Veuillez réessayer.';
-                }
-            } catch (err) {
-                messageDiv.classList.remove('d-none');
-                messageDiv.classList.add('bg-danger', 'text-white');
-                messageDiv.textContent = 'Erreur de connexion au serveur.';
-            } finally {
-                submitBtn.disabled = false;
-                if (btnText) btnText.classList.remove('d-none');
-                if (spinner) spinner.classList.add('d-none');
-            }
-        });
-    }
-});
+    {% if selected_id %}
+    var pre = grid.querySelector('[data-book="{{ selected_id }}"]');
+    if (pre) { pre.closest('.pass').scrollIntoView({ block: 'center' }); openBooking(pre); }
+    {% endif %}
+})();
 </script>
-
 {% endblock %}

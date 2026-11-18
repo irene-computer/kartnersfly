@@ -1,753 +1,100 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m with context %}
 
-{% block title %}Services | Kartners Travel Agency{% endblock %}
-
+{% block title %}Services · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Kartners Travel Agency - Services de voyage sur mesure : billetterie aérienne, réservation hôtelière, assistance visa, pré-enrôlement administratif et planification de voyage.">
-<meta name="keywords" content="agence voyage cameroun, billetterie douala, assistance visa, réservation hôtel, passeport, cni">
+<meta name="description" content="Billetterie aérienne, assistance visa, réservation d'hôtels, pré-enrôlement passeport et CNI, planification de voyage et assurance : les services de Kartners Travel Agency à Douala.">
 {% endblock %}
 
+{% set regions = [
+    ('Europe', 'fas fa-landmark', [('fr','France'),('de','Allemagne'),('be','Belgique'),('it','Italie'),('es','Espagne'),('nl','Pays-Bas'),('ch','Suisse'),('gb','Royaume-Uni')]),
+    ('Amériques & Asie', 'fas fa-earth-americas', [('us','États-Unis'),('ca','Canada'),('cn','Chine'),('ae','Émirats arabes unis'),('tr','Turquie')]),
+    ('Afrique', 'fas fa-earth-africa', [('ma','Maroc'),('za','Afrique du Sud'),('sn','Sénégal'),('ci',"Côte d'Ivoire"),('ga','Gabon')]),
+] %}
+
 {% block content %}
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<div class="k-services-page">
-
-    <!-- HERO SECTION SERVICES -->
-    <section class="k-hero">
-        <div class="k-container">
-            <div class="row align-items-center">
-                <div class="col-lg-8 mx-auto text-center">
-                    <span class="k-badge">
-                        <i class="fas fa-check-circle"></i> Service de confiance - Plus de 5000 clients accompagnés
-                    </span>
-                    <h1 class="k-hero-title">Nos <span class="k-gradient-text">Services</span></h1>
-                    <p class="k-hero-lead">Des solutions clés en main et sur mesure pour concrétiser tous vos projets de mobilité, d'études et de voyages internationaux.</p>
-                </div>
-            </div>
+<section class="hero page-hero">
+    <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/voyage-plus.webp') }}')"></span></div>
+    <div class="wrap hero-grid">
+        <div>
+            <p class="hero-kicker"><b>{{ services|length }}</b> services sous un même toit</p>
+            <h1>Nos services</h1>
+            <p class="hero-lead">Des démarches administratives jusqu'à l'embarquement : nous prenons en charge chaque étape de votre projet de voyage, d'études ou d'affaires.</p>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- SERVICES GRID SECTION -->
-    <section class="k-section">
-        <div class="k-container">
-            <div class="k-services-grid">
-                {% for service in services %}
-                <div class="k-service-card">
-                    <!-- IMAGE DU SERVICE -->
-                    <div class="k-service-img-wrapper">
-                        {% if service.image and service.image != 'services/default.jpg' %}
-                            {% set img_path = service.image %}
-                            {% if not img_path.startswith('images/') %}
-                                {% set img_path = 'images/' + img_path %}
-                            {% endif %}
-                            <img src="{{ url_for('static', filename=img_path) }}" 
-                                 alt="{{ service.name }}" 
-                                 class="k-service-img" 
-                                 loading="lazy">
-                        {% else %}
-                            <div class="k-service-icon-fallback">
-                                <i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i>
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="k-card-body">
-                        <div class="k-service-tag">
-                            {% if service.features %}
-                                {% set features_list = service.features.split('|') %}
-                                {{ features_list[0] if features_list|length > 0 else 'Service premium' }}
-                            {% else %}
-                                Service premium
-                            {% endif %}
-                        </div>
-
-                        <h3 class="k-card-title">{{ service.name }}</h3>
-                        <p class="k-card-desc">{{ service.description }}</p>
-
-                        <ul class="k-service-features">
-                            {% if service.features %}
-                                {% for feature in service.features.split('|') %}
-                                <li><i class="fas fa-check-circle"></i> <span>{{ feature }}</span></li>
-                                {% endfor %}
-                            {% else %}
-                                <li><i class="fas fa-check-circle"></i> <span>Service de haute qualité</span></li>
-                                <li><i class="fas fa-check-circle"></i> <span>Accompagnement personnalisé</span></li>
-                                <li><i class="fas fa-check-circle"></i> <span>Tarifs compétitifs</span></li>
-                            {% endif %}
-                        </ul>
-
-                        <div class="k-card-footer">
-                            <a href="{{ url_for('contact') }}" class="k-service-link">
-                                Demander un devis <i class="fas fa-arrow-right me-1"></i>
-                            </a>
-                        </div>
-                    </div>
+<section class="section">
+    <div class="wrap">
+        <div class="grid-3">
+            {% for service in services %}
+            {% set photo = service.image|img %}
+            <article class="service-card reveal" id="service-{{ service.id }}">
+                <div class="service-media">
+                    {% if photo %}
+                    <img src="{{ photo }}" alt="" loading="lazy" decoding="async">
+                    {% else %}
+                    <div class="icon-fallback"><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i></div>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="w-100">
-                    <div class="k-empty-state">
-                        <i class="fas fa-info-circle"></i>
-                        <h4>Aucun service disponible pour le moment</h4>
-                        <p>Revenez bientôt ou contactez-nous directement pour toute demande spécifique.</p>
-                    </div>
+                <div class="service-body">
+                    <h3><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i> {{ service.name }}</h3>
+                    <p>{{ service.description }}</p>
+                    {% if service.features %}
+                    <ul class="checks">
+                        {% for feature in service.features.split('|') if feature.strip() %}<li>{{ feature.strip() }}</li>{% endfor %}
+                    </ul>
+                    {% endif %}
+                    <a class="link-arrow" href="/contact?service={{ service.name|urlencode }}">Demander un devis <i class="fas fa-arrow-right"></i></a>
                 </div>
-                {% endfor %}
-            </div>
+            </article>
+            {% else %}
+            <div class="empty"><i class="fas fa-concierge-bell"></i><h3>Services en cours de mise à jour</h3><p>Contactez-nous pour toute demande.</p></div>
+            {% endfor %}
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- SECTION PAYS DESSERVIS -->
-    <section class="k-section k-bg-dark text-white">
-        <div class="k-container">
-            <div class="text-center mb-5">
-                <span class="k-section-tag-light"><i class="fas fa-globe-americas me-1"></i> Réseau Mondial</span>
-                <h2 class="k-section-title text-white">Pays <span class="k-gradient-text-light">desservis</span></h2>
-                <p class="k-section-sub text-white-50 mx-auto">Assistance visa, admissions scolaires et voyages vers plus de 50 destinations à travers le monde.</p>
-            </div>
-            
-            <div class="row g-4 justify-content-center">
-                <div class="col-lg-4 col-md-6">
-                    <div class="k-country-card">
-                        <div class="k-country-header">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <h3>Europe</h3>
-                        </div>
-                        <ul class="k-country-list">
-                            <li><i class="fas fa-check"></i> France</li>
-                            <li><i class="fas fa-check"></i> Allemagne</li>
-                            <li><i class="fas fa-check"></i> Belgique</li>
-                            <li><i class="fas fa-check"></i> Italie</li>
-                            <li><i class="fas fa-check"></i> Espagne</li>
-                            <li><i class="fas fa-check"></i> Pays-Bas</li>
-                            <li><i class="fas fa-check"></i> Suisse</li>
-                            <li><i class="fas fa-check"></i> Royaume-Uni</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="k-country-card">
-                        <div class="k-country-header">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <h3>Amériques & Asie</h3>
-                        </div>
-                        <ul class="k-country-list">
-                            <li><i class="fas fa-check"></i> États-Unis</li>
-                            <li><i class="fas fa-check"></i> Canada</li>
-                            <li><i class="fas fa-check"></i> Chine</li>
-                            <li><i class="fas fa-check"></i> Émirats Arabes Unis</li>
-                            <li><i class="fas fa-check"></i> Turquie</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="k-country-card">
-                        <div class="k-country-header">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <h3>Afrique & Autres</h3>
-                        </div>
-                        <ul class="k-country-list">
-                            <li><i class="fas fa-check"></i> Maroc</li>
-                            <li><i class="fas fa-check"></i> Afrique du Sud</li>
-                            <li><i class="fas fa-check"></i> Sénégal</li>
-                            <li><i class="fas fa-check"></i> Côte d'Ivoire</li>
-                            <li><i class="fas fa-check"></i> Gabon</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="k-countries-footer mt-5">
-                <div class="k-motif-badge">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Motifs de voyage :</span>
-                    <div class="k-motif-list">
-                        <span class="k-motif">Études</span>
-                        <span class="k-motif">Tourisme</span>
-                        <span class="k-motif">Affaires</span>
-                    </div>
-                </div>
-                <div class="k-cta-message">
-                    <i class="fas fa-headset"></i>
-                    <span>Besoin d'un visa pour un pays non listé ? <a href="{{ url_for('contact') }}">Contactez-nous</a> pour un accompagnement personnalisé.</span>
-                </div>
-            </div>
+<section class="section section-ink">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Assistance visa</span>
+            <h2>Pays pour lesquels nous montons des dossiers</h2>
+            <p>Visas d'études, de tourisme et d'affaires. Votre pays n'apparaît pas ? Demandez-nous, la liste n'est pas limitative.</p>
         </div>
-    </section>
-
-    <!-- SECTION POURQUOI NOUS CHOISIR -->
-    <section class="k-section k-bg-white">
-        <div class="k-container">
-            <div class="text-center mb-5">
-                <span class="k-section-tag"><i class="fas fa-star me-1"></i> Nos Atouts</span>
-                <h2 class="k-section-title">Pourquoi nous <span class="k-gradient-text">choisir ?</span></h2>
-                <p class="k-section-sub mx-auto">Un savoir-faire éprouvé pour vous garantir un voyage et des démarches en toute sérénité.</p>
+        <div class="grid-3">
+            {% for title, icon, countries in regions %}
+            <div class="region reveal">
+                <h3><i class="{{ icon }}" style="color:var(--sun)"></i> {{ title }}</h3>
+                <ul>
+                    {% for code, name in countries %}
+                    <li><img src="https://flagcdn.com/w40/{{ code }}.png" alt="" loading="lazy" width="22" height="16">{{ name }}</li>
+                    {% endfor %}
+                </ul>
             </div>
-            
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
-                    <div class="k-why-card">
-                        <div class="k-why-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3>Rapidité & Rigueur</h3>
-                        <p>Prise en charge réactive de vos dossiers par des experts maîtrisant les exigences consulaires et administratives.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <div class="k-why-card">
-                        <div class="k-why-icon">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <h3>Suivi Personnalisé</h3>
-                        <p>Un conseiller dédié vous oriente à chaque phase, du montage de dossier jusqu'à votre installation.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <div class="k-why-card">
-                        <div class="k-why-icon">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <h3>Transparence totale</h3>
-                        <p>Des tarifs clairs sans aucun frais caché. Une éthique irréprochable sur l'ensemble de nos prestations.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <div class="k-why-card">
-                        <div class="k-why-icon">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <h3>Taux de Réussite</h3>
-                        <p>Plus de 5000 clients satisfaits et un réseau étendu d'universités et de partenaires internationaux.</p>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- BANNIÈRE CTA FINAL -->
-    <section class="k-section tight pt-0">
-        <div class="k-container">
-            <div class="k-cta-banner">
-                <div class="d-flex align-items-center gap-4">
-                    <div class="k-cta-icon d-none d-md-block">
-                        <i class="fas fa-paper-plane fa-3x text-cyan"></i>
-                    </div>
-                    <div>
-                        <h3>Prêt à concrétiser votre projet de voyage ?</h3>
-                        <p>Contactez notre équipe dès maintenant pour bénéficier d'une étude gratuite de votre profil.</p>
-                    </div>
-                </div>
-                <div>
-                    <a href="{{ url_for('contact') }}" class="k-btn k-btn-white text-nowrap">
-                        <i class="fas fa-envelope me-2"></i> Demander un devis gratuit
-                    </a>
-                </div>
-            </div>
+<section class="section section-white">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Notre méthode</span>
+            <h2>Pourquoi passer par Kartners</h2>
         </div>
-    </section>
-
-</div>
-
-<style>
-    /* ===================================================
-       CHARTE GRAPHIQUE KTA (VIOLET #5B2588 & CYAN #00A3E0)
-       =================================================== */
-    :root {
-        --k-violet: #5B2588;
-        --k-violet-dark: #3F1762;
-        --k-cyan: #00A3E0;
-        --k-cyan-dark: #0084B7;
-        --k-dark: #0B0F19;
-        --k-body: #1E293B;
-        --k-muted: #64748B;
-        --k-bg: #F8FAFC;
-        --k-border: #E2E8F0;
-    }
-
-    .k-services-page {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: var(--k-body);
-        background: var(--k-bg);
-    }
-
-    .text-cyan { color: var(--k-cyan) !important; }
-    .text-violet { color: var(--k-violet) !important; }
-
-    .k-container {
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 0 24px;
-    }
-
-    /* BADGES & TYPOGRAPHIE */
-    .k-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255, 255, 255, 0.15);
-        color: #FFFFFF;
-        padding: 8px 20px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .k-section-tag {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--k-violet), var(--k-cyan));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 0.82rem;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .k-section-tag-light {
-        display: inline-block;
-        color: var(--k-cyan);
-        font-size: 0.82rem;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .k-section-title {
-        font-size: clamp(1.8rem, 3vw, 2.5rem);
-        font-weight: 800;
-        color: #0F172A;
-        margin-bottom: 12px;
-        letter-spacing: -0.5px;
-    }
-
-    .k-section-sub {
-        font-size: 1.05rem;
-        color: var(--k-muted);
-        max-width: 640px;
-        line-height: 1.6;
-    }
-
-    .k-gradient-text {
-        background: linear-gradient(135deg, var(--k-violet) 0%, var(--k-cyan) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .k-gradient-text-light {
-        background: linear-gradient(135deg, #FFFFFF 0%, var(--k-cyan) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    /* HERO SECTION */
-    .k-hero {
-        background: linear-gradient(135deg, var(--k-violet-dark) 0%, var(--k-violet) 50%, var(--k-cyan-dark) 100%);
-        padding: 90px 0 80px;
-        color: #FFFFFF;
-        position: relative;
-    }
-
-    .k-hero-title {
-        font-size: clamp(2.2rem, 4.5vw, 3.5rem);
-        font-weight: 900;
-        margin: 20px 0 16px;
-        color: #FFFFFF;
-    }
-
-    .k-hero-title .k-gradient-text {
-        background: linear-gradient(135deg, #FFFFFF 0%, var(--k-cyan) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .k-hero-lead {
-        font-size: 1.15rem;
-        line-height: 1.75;
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0 auto;
-        max-width: 720px;
-    }
-
-    /* SECTIONS GENERALES */
-    .k-section { padding: 80px 0; }
-    .k-section.tight { padding: 40px 0; }
-    .k-bg-white { background: #FFFFFF; }
-    .k-bg-dark { background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); }
-
-    /* GRILLE DE SERVICES */
-    .k-services-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 30px;
-    }
-
-    .k-service-card {
-        background: #FFFFFF;
-        border-radius: 20px;
-        overflow: hidden;
-        border: 1px solid var(--k-border);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        transition: all 0.35s ease;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .k-service-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 35px rgba(91, 37, 136, 0.12);
-        border-color: rgba(0, 163, 224, 0.3);
-    }
-
-    .k-service-img-wrapper {
-        height: 200px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(135deg, rgba(91,37,136,0.05), rgba(0,163,224,0.05));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .k-service-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-
-    .k-service-card:hover .k-service-img {
-        transform: scale(1.06);
-    }
-
-    .k-service-icon-fallback {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(91,37,136,0.1), rgba(0,163,224,0.1));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .k-service-icon-fallback i {
-        font-size: 2.2rem;
-        color: var(--k-violet);
-    }
-
-    .k-card-body {
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-    }
-
-    .k-service-tag {
-        display: inline-block;
-        background: rgba(0, 163, 224, 0.1);
-        color: var(--k-cyan-dark);
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        padding: 4px 12px;
-        border-radius: 20px;
-        margin-bottom: 12px;
-        align-self: flex-start;
-    }
-
-    .k-card-title {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #0F172A;
-        margin-bottom: 10px;
-    }
-
-    .k-card-desc {
-        font-size: 0.9rem;
-        color: var(--k-muted);
-        line-height: 1.6;
-        margin-bottom: 20px;
-    }
-
-    .k-service-features {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 24px 0;
-    }
-
-    .k-service-features li {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        font-size: 0.85rem;
-        color: var(--k-body);
-        margin-bottom: 8px;
-        font-weight: 500;
-    }
-
-    .k-service-features li i {
-        color: #10B981;
-        margin-top: 3px;
-        font-size: 0.8rem;
-    }
-
-    .k-card-footer {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid var(--k-border);
-    }
-
-    .k-service-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--k-violet);
-        font-weight: 700;
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: all 0.25s ease;
-    }
-
-    .k-service-link:hover {
-        color: var(--k-cyan-dark);
-        transform: translateX(4px);
-    }
-
-    /* SECTION PAYS */
-    .k-country-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        padding: 24px;
-        height: 100%;
-        backdrop-filter: blur(10px);
-    }
-
-    .k-country-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .k-country-header i {
-        font-size: 1.4rem;
-        color: var(--k-cyan);
-    }
-
-    .k-country-header h3 {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #FFFFFF;
-        margin: 0;
-    }
-
-    .k-country-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    .k-country-list li {
-        font-size: 0.88rem;
-        color: rgba(255, 255, 255, 0.85);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .k-country-list li i {
-        color: #10B981;
-        font-size: 0.75rem;
-    }
-
-    .k-countries-footer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .k-motif-badge {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 10px 24px;
-        border-radius: 50px;
-        font-size: 0.88rem;
-        font-weight: 600;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .k-motif-badge i { color: var(--k-cyan); }
-
-    .k-motif-list { display: flex; gap: 8px; }
-    .k-motif {
-        background: rgba(0, 163, 224, 0.2);
-        color: #FFFFFF;
-        padding: 2px 12px;
-        border-radius: 20px;
-        font-size: 0.78rem;
-        font-weight: 700;
-    }
-
-    .k-cta-message {
-        background: rgba(91, 37, 136, 0.3);
-        border: 1px solid rgba(91, 37, 136, 0.5);
-        padding: 12px 24px;
-        border-radius: 16px;
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.9);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .k-cta-message i { color: var(--k-cyan); font-size: 1.1rem; }
-    .k-cta-message a { color: var(--k-cyan); font-weight: 700; text-decoration: underline; }
-
-    /* POURQUOI NOUS CHOISIR */
-    .k-why-card {
-        background: #FFFFFF;
-        border-radius: 20px;
-        padding: 28px 20px;
-        text-align: center;
-        border: 1px solid var(--k-border);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-
-    .k-why-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-        border-color: rgba(0, 163, 224, 0.3);
-    }
-
-    .k-why-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(91,37,136,0.1), rgba(0,163,224,0.1));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 18px;
-    }
-
-    .k-why-icon i {
-        font-size: 1.6rem;
-        color: var(--k-violet);
-    }
-
-    .k-why-card h3 {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #0F172A;
-        margin-bottom: 8px;
-    }
-
-    .k-why-card p {
-        font-size: 0.88rem;
-        color: var(--k-muted);
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    /* BANNIÈRE CTA FINAL */
-    .k-cta-banner {
-        background: linear-gradient(135deg, var(--k-violet-dark) 0%, var(--k-violet) 50%, var(--k-cyan-dark) 100%);
-        border-radius: 28px;
-        padding: 40px 50px;
-        color: #FFFFFF;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 30px;
-        box-shadow: 0 16px 40px rgba(91, 37, 136, 0.2);
-    }
-
-    .k-cta-banner h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; color: #FFFFFF; }
-    .k-cta-banner p { color: rgba(255,255,255,0.85); margin: 0; font-size: 0.95rem; }
-
-    .k-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 28px;
-        border-radius: 50px;
-        font-weight: 700;
-        text-decoration: none;
-        transition: all 0.3s;
-    }
-
-    .k-btn-white {
-        background: #FFFFFF;
-        color: var(--k-violet-dark) !important;
-    }
-
-    .k-btn-white:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .k-empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: #FFFFFF;
-        border-radius: 20px;
-        border: 1px solid var(--k-border);
-    }
-
-    .k-empty-state i {
-        font-size: 3rem;
-        color: #CBD5E1;
-        margin-bottom: 15px;
-        display: block;
-    }
-
-    /* RESPONSIVE DESIGN */
-    @media (max-width: 1024px) {
-        .k-services-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .k-services-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .k-cta-banner {
-            flex-direction: column;
-            text-align: center;
-            padding: 30px 20px;
-        }
-
-        .k-cta-message {
-            flex-direction: column;
-            text-align: center;
-        }
-    }
-</style>
-
+        <div class="grid-2">
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-bolt"></i></span><div><h3>Rapidité et rigueur</h3><p>Des conseillers qui connaissent les exigences des consulats et vérifient chaque pièce avant le dépôt.</p></div></div>
+            <div class="feature reveal"><span class="icon-tile sky"><i class="fas fa-user-check"></i></span><div><h3>Un conseiller dédié</h3><p>Une seule personne suit votre dossier, joignable par téléphone et WhatsApp.</p></div></div>
+            <div class="feature reveal"><span class="icon-tile sun"><i class="fas fa-receipt"></i></span><div><h3>Tarifs annoncés à l'avance</h3><p>Le prix de notre accompagnement est fixé avant le début des démarches, sans frais cachés.</p></div></div>
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-handshake"></i></span><div><h3>Un réseau de partenaires</h3><p>Compagnies aériennes, hôtels, assureurs et établissements d'enseignement à l'étranger.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="wrap">
+        {{ m.cta_band("Prêt à lancer votre projet ?", "Une première étude de votre dossier est gratuite. Dites-nous ce dont vous avez besoin.", "Demander un devis gratuit") }}
+    </div>
+</section>
 {% endblock %}

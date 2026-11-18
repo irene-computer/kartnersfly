@@ -6,7 +6,6 @@
 Flask==2.3.3
 Flask-Cors==4.0.1
 Flask-Limiter==3.7.0
-Flask-Talisman==1.1.0
 
 # ===== Serveur WSGI pour production =====
 gunicorn==25.3.0

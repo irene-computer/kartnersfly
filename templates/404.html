@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Erreur' if server_error else 'Page introuvable' }} · Kartners Travel Agency{% endblock %}
+{% block content %}
+<section class="wrap error-page">
+    <div style="display:grid;gap:16px;justify-items:center">
+        <span class="code">{{ '500' if server_error else '404' }}</span>
+        <h1 style="font-size:var(--step-3)">{{ "Une erreur est survenue de notre côté." if server_error else "Cette page n'a pas décollé." }}</h1>
+        <p style="color:var(--muted);max-width:40ch">{{ "Réessayez dans quelques instants ou contactez-nous directement." if server_error else "L'adresse est peut-être incorrecte, ou la page a été déplacée." }}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+            <a class="btn btn-primary" href="/">Retour à l'accueil</a>
+            <a class="btn btn-ghost" href="/destinations">Voir les destinations</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

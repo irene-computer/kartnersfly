@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, Response
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, Response, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -10,6 +10,7 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 import json
 import uuid
 import re
@@ -18,14 +19,10 @@ from io import StringIO
 import secrets
 from functools import wraps
 import traceback
-
-db_dir = os.path.dirname(Config.DATABASE)
-if db_dir:
-    try:
-        os.makedirs(db_dir, exist_ok=True, mode=0o777)
-        print(f"[OK] Dossier {db_dir} créé avec succès.")
-    except Exception as e:
-        print(f"[ERREUR] Impossible de créer {db_dir} : {e}")
+import hmac
+import shutil
+import threading
+from urllib.parse import urlparse
 
 from models import (
     add_scholarship,
@@ -69,34 +66,30 @@ from models import (
     get_destinations_count,
     get_scholarships_ending_soon,
     migrate_image_paths,
-    create_upload_folders
 )
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-print("=" * 70)
-print("[INFO] === CONFIGURATION ADMIN ===")
-print(f"[INFO] ADMIN_USERNAME = '{Config.ADMIN_USERNAME}'")
-print(f"[INFO] ADMIN_PASSWORD = {'*' * len(Config.ADMIN_PASSWORD)}")
-print(f"[INFO] DATABASE = {Config.DATABASE}")
-print("=" * 70)
+if not Config.ADMIN_USERNAME or not Config.ADMIN_PASSWORD:
+    print("[ATTENTION] ADMIN_USERNAME / ADMIN_PASSWORD non définis : la connexion admin est désactivée.")
 
-app.config['SESSION_COOKIE_SECURE'] = not Config.DEBUG
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# Derrière le proxy de Fly.io : vraie IP du visiteur (limitation de débit) et HTTPS.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
+app.config['TEMPLATES_AUTO_RELOAD'] = Config.DEBUG
 
 if Config.DEBUG:
     CORS(app)
 else:
-    CORS(app, resources={r"/api/*": {"origins": "https://www.kartnersagency.com"}})
+    CORS(app, resources={r"/api/*": {"origins": [
+        "https://www.kartnersagency.com", "https://kartnersagency.com", "https://kartnersfly.fly.dev"]}})
 
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
+    default_limits=[],
+    storage_uri=os.getenv('RATELIMIT_STORAGE_URI', 'memory://')
 )
 
 def sanitize_input(data):
@@ -105,69 +98,133 @@ def sanitize_input(data):
     elif isinstance(data, list):
         return [sanitize_input(item) for item in data]
     elif isinstance(data, str):
-        return re.sub(r'[<>"\']', '', data)
+        # Jinja échappe déjà le HTML à l'affichage : on garde les apostrophes
+        # (indispensables en français) et on retire seulement les balises et
+        # les caractères de contrôle.
+        data = re.sub(r'<[^>]*>', '', data)
+        data = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', data)
+        return data.strip()
     return data
+
+EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+
+
+def is_valid_email(value):
+    return bool(value) and len(value) <= 254 and bool(EMAIL_RE.match(value))
+
+
+def get_json_payload():
+    """Retourne le corps JSON (ou le formulaire) sous forme de dict, jamais None."""
+    data = request.get_json(silent=True)
+    if data is None:
+        data = request.form.to_dict() if request.form else {}
+    if not isinstance(data, dict):
+        data = {}
+    return sanitize_input(data)
+
+
+def api_error(message, status=400):
+    return jsonify({'success': False, 'message': message}), status
+
+# Routes d'administration qui modifient des données via un simple lien (GET).
+ADMIN_GET_ACTIONS = ('/delete/', '/confirm/', '/read/', '/admin/fix-images', '/admin/test-email')
+
+
+def _same_origin():
+    """Vérifie que la requête vient bien du site (protection CSRF)."""
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    if not source:
+        return False
+    return urlparse(source).netloc == request.host
+
 
 @app.before_request
 def before_request_security():
-    if request.content_length and request.content_length > 10 * 1024 * 1024:
-        return jsonify({'error': 'Request too large'}), 413
+    if request.content_length and request.content_length > Config.MAX_CONTENT_LENGTH:
+        return jsonify({'error': 'Fichier trop volumineux'}), 413
 
     if request.method in ['POST', 'PUT', 'PATCH']:
-        if request.content_type and 'multipart/form-data' in request.content_type:
-            return None
-        if request.content_type and 'application/x-www-form-urlencoded' in request.content_type:
-            return None
-        if request.content_type and 'application/json' in request.content_type:
-            return None
-        if not request.content_type:
-            return None
-        return jsonify({'error': 'Unsupported Media Type'}), 415
+        ctype = request.content_type or ''
+        allowed = ('multipart/form-data', 'application/x-www-form-urlencoded', 'application/json')
+        if ctype and not any(a in ctype for a in allowed):
+            return jsonify({'error': 'Unsupported Media Type'}), 415
+
+    # Protection CSRF de l'administration : toute action qui modifie des
+    # données doit provenir d'une page du site lui-même.
+    path = request.path
+    is_admin_area = path.startswith('/admin') or path.startswith('/api/scholarship/')
+    if is_admin_area and session.get('admin_logged_in'):
+        changes_data = request.method in ('POST', 'PUT', 'PATCH', 'DELETE') or any(a in path for a in ADMIN_GET_ACTIONS)
+        if changes_data and not _same_origin():
+            flash("Action refusée : la requête ne provient pas du site.", 'danger')
+            return redirect(url_for('admin_dashboard'))
+
+
+@app.after_request
+def security_headers(response):
+    response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.setdefault('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    if request.path.startswith('/admin'):
+        response.headers['Cache-Control'] = 'no-store'
+    return response
+
 
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not session.get('admin_logged_in'):
-            print("[AUTH] Session admin manquante, redirection vers login")
-            return redirect(url_for('admin_login'))
+            return redirect(url_for('admin_login', next=request.path))
         return f(*args, **kwargs)
     return wrapper
 
-UPLOAD_FOLDER = 'static/images'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'images')
+# SVG exclu : un SVG peut contenir du JavaScript exécuté sur le domaine du site.
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+UPLOAD_SUBFOLDERS = ['flags', 'destinations', 'services', 'scholarships']
 
-for sub in ['flags', 'destinations', 'services', 'scholarships']:
-    folder = os.path.join(UPLOAD_FOLDER, sub)
-    try:
-        os.makedirs(folder, exist_ok=True)
-        os.chmod(folder, 0o777)
-    except:
-        pass
 
-def create_default_images():
-    import base64
-    flag_path = os.path.join(UPLOAD_FOLDER, 'flags', 'default.png')
-    if not os.path.exists(flag_path):
-        png_data = base64.b64decode(
-            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
-        )
-        with open(flag_path, 'wb') as f:
-            f.write(png_data)
-        print(f"[OK] Fichier {flag_path} créé.")
+def setup_persistent_uploads():
+    """
+    Sur Fly.io, le disque du conteneur est effacé à chaque déploiement : les
+    images envoyées depuis l'admin disparaissaient. Si UPLOAD_ROOT est défini
+    (ex. /data/uploads, sur le volume persistant), chaque dossier
+    static/images/<sous-dossier> devient un lien vers ce volume. Les images
+    livrées avec le code y sont recopiées si elles n'y sont pas encore.
+    """
+    root = Config.UPLOAD_ROOT
+    for sub in UPLOAD_SUBFOLDERS:
+        local = os.path.join(UPLOAD_FOLDER, sub)
+        try:
+            if not root:
+                os.makedirs(local, exist_ok=True)
+                continue
+            target = os.path.join(root, sub)
+            os.makedirs(target, exist_ok=True)
+            if os.path.islink(local):
+                continue
+            if os.path.isdir(local):
+                for name in os.listdir(local):
+                    src, dst = os.path.join(local, name), os.path.join(target, name)
+                    if os.path.isfile(src) and not os.path.exists(dst):
+                        shutil.copy2(src, dst)
+                os.rename(local, f"{local}.bundled-{os.getpid()}")
+            os.symlink(target, local)
+            print(f"[OK] Uploads '{sub}' stockés sur {target}")
+        except FileExistsError:
+            pass  # un autre worker gunicorn a déjà créé le lien
+        except OSError as e:
+            print(f"[ATTENTION] Stockage persistant indisponible pour '{sub}' : {e}")
+            os.makedirs(local, exist_ok=True)
 
-    dest_path = os.path.join(UPLOAD_FOLDER, 'destinations', 'default.jpg')
-    if not os.path.exists(dest_path):
-        jpg_data = base64.b64decode(
-            '/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBkZWZhdWx0IHF1YWxpdHkK/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgAAQABAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/fyiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/2Q=='
-        )
-        with open(dest_path, 'wb') as f:
-            f.write(jpg_data)
-        print(f"[OK] Fichier {dest_path} créé.")
 
-create_default_images()
+setup_persistent_uploads()
+
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return bool(filename) and '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def save_uploaded_image(file, subfolder='scholarships'):
     if not file or not allowed_file(file.filename):
@@ -176,21 +233,122 @@ def save_uploaded_image(file, subfolder='scholarships'):
     unique_name = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}_{filename}"
     folder = os.path.join(UPLOAD_FOLDER, subfolder)
     os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, unique_name)
-    file.save(filepath)
+    file.save(os.path.join(folder, unique_name))
     return f"images/{subfolder}/{unique_name}"
 
+
+def remove_uploaded_image(rel_path):
+    """Supprime une image envoyée (jamais les images par défaut ni les URL externes)."""
+    if not rel_path or rel_path.startswith(('http://', 'https://')):
+        return
+    if os.path.basename(rel_path).startswith('default.'):
+        return
+    full = os.path.realpath(os.path.join(app.static_folder, rel_path))
+    if not full.startswith(os.path.realpath(UPLOAD_FOLDER)):
+        return
+    try:
+        if os.path.isfile(full):
+            os.remove(full)
+    except OSError:
+        pass
+
 init_db()
+
+# Codes pays ISO pour afficher un drapeau quand l'image locale manque.
+COUNTRY_CODES = {
+    'france': 'fr', 'emirats arabes unis': 'ae', 'émirats arabes unis': 'ae', 'eau': 'ae',
+    'maroc': 'ma', 'maldives': 'mv', 'italie': 'it', 'japon': 'jp', 'etats-unis': 'us',
+    'états-unis': 'us', 'usa': 'us', 'royaume-uni': 'gb', 'canada': 'ca', 'suisse': 'ch',
+    'turquie': 'tr', 'grece': 'gr', 'grèce': 'gr', 'senegal': 'sn', 'sénégal': 'sn',
+    'egypte': 'eg', 'égypte': 'eg', 'indonesie': 'id', 'indonésie': 'id', 'australie': 'au',
+    'belgique': 'be', 'allemagne': 'de', 'espagne': 'es', 'pays-bas': 'nl', 'chine': 'cn',
+    "cote d'ivoire": 'ci', "côte d'ivoire": 'ci', 'gabon': 'ga', 'afrique du sud': 'za',
+    'cameroun': 'cm', 'nigeria': 'ng', 'ghana': 'gh', 'portugal': 'pt', 'russie': 'ru',
+    'inde': 'in', 'thailande': 'th', 'thaïlande': 'th', 'bresil': 'br', 'brésil': 'br',
+    'tunisie': 'tn', 'algerie': 'dz', 'algérie': 'dz', 'kenya': 'ke', 'rwanda': 'rw',
+    'qatar': 'qa', 'arabie saoudite': 'sa', 'irlande': 'ie', 'autriche': 'at', 'pologne': 'pl',
+}
+
+# Code aéroport affiché sur les cartes (départ : Douala, DLA).
+CITY_AIRPORTS = {
+    'paris': 'CDG', 'dubai': 'DXB', 'dubaï': 'DXB', 'marrakech': 'RAK', 'maldives': 'MLE',
+    'rome': 'FCO', 'tokyo': 'HND', 'new york': 'JFK', 'londres': 'LHR', 'montreal': 'YUL',
+    'montréal': 'YUL', 'zurich': 'ZRH', 'istanbul': 'IST', 'athenes': 'ATH', 'athènes': 'ATH',
+    'dakar': 'DSS', 'le caire': 'CAI', 'bali': 'DPS', 'sydney': 'SYD', 'bruxelles': 'BRU',
+    'berlin': 'BER', 'madrid': 'MAD', 'abidjan': 'ABJ', 'libreville': 'LBV', 'casablanca': 'CMN',
+    'toronto': 'YYZ', 'genève': 'GVA', 'geneve': 'GVA', 'lisbonne': 'LIS', 'johannesburg': 'JNB',
+    'nairobi': 'NBO', 'lagos': 'LOS', 'accra': 'ACC', 'doha': 'DOH', 'pékin': 'PEK', 'pekin': 'PEK',
+}
+
+
+@app.template_filter('img')
+def img_filter(path):
+    """URL d'une image stockée en base, ou '' si le fichier n'existe pas."""
+    if not path:
+        return ''
+    path = str(path).strip()
+    if path.startswith(('http://', 'https://')):
+        return path
+    if path.startswith('/static/'):
+        path = path[len('/static/'):]
+    if not path.startswith('images/'):
+        path = 'images/' + path
+    full = os.path.join(app.static_folder, path)
+    if not os.path.isfile(full) or os.path.getsize(full) < 200:
+        return ''  # absent, ou image "par défaut" de 1 pixel
+    return url_for('static', filename=path)
+
+
+@app.template_filter('flag')
+def flag_filter(path, country=''):
+    """Drapeau : image locale si elle existe, sinon drapeau flagcdn d'après le pays."""
+    url = img_filter(path)
+    if url:
+        return url
+    code = COUNTRY_CODES.get((country or '').strip().lower())
+    return f"https://flagcdn.com/w80/{code}.png" if code else ''
+
+
+@app.template_filter('airport')
+def airport_filter(name):
+    key = (name or '').strip().lower()
+    if key in CITY_AIRPORTS:
+        return CITY_AIRPORTS[key]
+    letters = re.sub(r'[^A-Za-z]', '', name or '')
+    return (letters[:3] or '---').upper()
+
+
+@app.template_filter('money')
+def money_filter(value):
+    try:
+        return f"{float(value):,.0f}".replace(',', '\u202f')
+    except (TypeError, ValueError):
+        return '—'
+
+
+@app.template_filter('date_fr')
+def date_fr_filter(value):
+    mois = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+    try:
+        d = datetime.date.fromisoformat(str(value)[:10])
+        return f"{d.day} {mois[d.month - 1]} {d.year}"
+    except (TypeError, ValueError):
+        return value or ''
+
 
 @app.context_processor
 def utility_processor():
     def now():
         return datetime.datetime.now()
-    try:
-        scholarships_pending = get_pending_scholarships_count()
-    except:
-        scholarships_pending = 0
-    return dict(now=now, scholarships_pending=scholarships_pending)
+    scholarships_pending = 0
+    if request.path.startswith('/admin'):
+        try:
+            scholarships_pending = get_pending_scholarships_count()
+        except Exception:
+            scholarships_pending = 0
+    return dict(now=now, scholarships_pending=scholarships_pending,
+                contact_phone=Config.PHONE, contact_email=Config.EMAIL,
+                whatsapp_number=re.sub(r'\D', '', Config.PHONE))
 
 # ============================================================
 # FONCTIONS EMAIL CORRIGÉES AVEC LOGS DÉTAILLÉS
@@ -389,35 +547,41 @@ Visitez notre site : https://www.kartnersagency.com
 @app.route('/')
 def home():
     conn = get_db()
-    destinations_list = conn.execute('SELECT * FROM destinations LIMIT 6').fetchall()
-    services_list = conn.execute('SELECT * FROM services LIMIT 4').fetchall()
+    destinations_list = conn.execute('SELECT * FROM destinations ORDER BY price LIMIT 6').fetchall()
+    services_list = conn.execute('SELECT * FROM services ORDER BY id LIMIT 6').fetchall()
+    destinations_total = conn.execute('SELECT COUNT(*) FROM destinations').fetchone()[0]
     conn.close()
-    return render_template('index.html', destinations=destinations_list, services=services_list)
+    opportunities = [o for o in get_all_scholarship_opportunities()
+                     if not o['end_date'] or o['end_date'] >= datetime.date.today().isoformat()]
+    return render_template('index.html', destinations=destinations_list, services=services_list,
+                           destinations_total=destinations_total, opportunities=opportunities[:3])
 
 @app.route('/destinations')
 def destinations():
     conn = get_db()
     destinations_list = conn.execute('SELECT * FROM destinations ORDER BY name').fetchall()
     conn.close()
-    return render_template('destinations.html', destinations=destinations_list)
+    return render_template('destinations.html', destinations=destinations_list,
+                           query=request.args.get('q', '').strip(),
+                           selected_id=request.args.get('reserver', type=int))
 
 @app.route('/services')
 def services_page():
     conn = get_db()
-    services_list = conn.execute('SELECT * FROM services ORDER BY name').fetchall()
+    services_list = conn.execute('SELECT * FROM services ORDER BY id').fetchall()
     conn.close()
     return render_template('services.html', services=services_list)
 
 @app.route('/about')
 def about():
     conn = get_db()
-    services_list = conn.execute('SELECT * FROM services ORDER BY name').fetchall()
+    services_list = conn.execute('SELECT * FROM services ORDER BY id').fetchall()
     conn.close()
     return render_template('about.html', services=services_list)
 
 @app.route('/contact')
 def contact():
-    return render_template('contact.html')
+    return render_template('contact.html', selected_service=request.args.get('service', ''))
 
 @app.route('/mentions-legales')
 def mentions_legales():
@@ -431,6 +595,38 @@ def cgv():
 def confidentialite():
     return render_template('legal/confidentialite.html')
 
+# ----- PWA : le manifeste et le service worker doivent être servis à la racine -----
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory(app.root_path, 'manifest.json', mimetype='application/manifest+json')
+
+@app.route('/sw.js')
+def service_worker():
+    response = send_from_directory(app.static_folder, 'sw.js', mimetype='application/javascript')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
+
+@app.route('/robots.txt')
+def robots():
+    return Response("User-agent: *\nDisallow: /admin\n", mimetype='text/plain')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    if request.path.startswith('/api/'):
+        return api_error('Ressource introuvable', 404)
+    return render_template('404.html'), 404
+
+@app.errorhandler(429)
+def too_many_requests(e):
+    return api_error('Trop de tentatives. Patientez une minute puis réessayez.', 429)
+
+@app.errorhandler(500)
+def server_error(e):
+    if request.path.startswith('/api/'):
+        return api_error('Erreur interne. Réessayez dans un instant.', 500)
+    return render_template('404.html', server_error=True), 500
+
 # ============================================================
 # API CLIENT
 # ============================================================
@@ -438,172 +634,161 @@ def confidentialite():
 @app.route('/api/contact', methods=['POST'])
 @limiter.limit("5 per minute")
 def api_contact():
+    data = get_json_payload()
+    name, email, message = data.get('name', ''), data.get('email', ''), data.get('message', '')
+    if not name or not email or not message:
+        return api_error('Merci de renseigner votre nom, votre email et votre message.')
+    if not is_valid_email(email):
+        return api_error('Adresse email invalide.')
+    if len(message) > 2000 or len(name) > 120:
+        return api_error('Message trop long (2000 caractères maximum).')
     try:
-        data = request.json
-        data = sanitize_input(data)
-
-        if not data.get('name') or not data.get('email') or not data.get('message'):
-            return jsonify({'success': False, 'message': 'Champs requis'}), 400
-
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
-            return jsonify({'success': False, 'message': 'Email invalide'}), 400
-
-        conn = get_db()
-        conn.execute('''
-            INSERT INTO messages (name, email, phone, service, message, created_at, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'non lu')
-        ''', (data['name'], data['email'], data.get('phone', ''), data.get('service', ''), data['message'],
-              datetime.datetime.now().isoformat()))
-        conn.commit()
-        conn.close()
-
-        return jsonify({'success': True, 'message': 'Merci. Notre équipe vous répondra sous 24h.'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        add_message(name, email, data.get('phone', '')[:40], data.get('service', '')[:60], message)
+    except Exception:
+        traceback.print_exc()
+        return api_error("Votre message n'a pas pu être enregistré. Réessayez ou appelez-nous.", 500)
+    return jsonify({'success': True, 'message': 'Merci ! Notre équipe vous répond sous 24 h.'})
 
 @app.route('/api/scholarship', methods=['POST'])
 @limiter.limit("10 per minute")
 def api_scholarship():
+    data = get_json_payload()
+    labels = {'full_name': 'nom complet', 'email': 'email', 'country': 'pays souhaité',
+              'study_level': "niveau d'études", 'field_of_study': "domaine d'études"}
+    for field, label in labels.items():
+        if not data.get(field):
+            return api_error(f'Le champ « {label} » est obligatoire.')
+    if not is_valid_email(data['email']):
+        return api_error('Adresse email invalide.')
     try:
-        data = request.get_json()
-        data = sanitize_input(data)
-
-        required = ['full_name', 'email', 'country', 'study_level', 'field_of_study']
-        for field in required:
-            if not data.get(field):
-                return jsonify({'success': False, 'message': f'Le champ {field} est requis'}), 400
-
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
-            return jsonify({'success': False, 'message': 'Email invalide'}), 400
-
         scholarship_id = add_scholarship(
-            full_name=data.get('full_name'),
-            email=data.get('email'),
-            phone=data.get('phone', ''),
-            country=data.get('country'),
-            study_level=data.get('study_level'),
-            field_of_study=data.get('field_of_study'),
-            message=data.get('message', '')
+            full_name=data['full_name'][:120],
+            email=data['email'],
+            phone=data.get('phone', '')[:40],
+            country=data['country'][:80],
+            study_level=data['study_level'][:80],
+            field_of_study=data['field_of_study'][:80],
+            message=data.get('message', '')[:2000]
         )
-
-        if scholarship_id:
-            return jsonify({'success': True, 'message': 'Votre demande a été envoyée avec succès'})
-        else:
-            return jsonify({'success': False, 'message': 'Erreur lors de l\'enregistrement'}), 500
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+    except Exception:
+        traceback.print_exc()
+        scholarship_id = None
+    if not scholarship_id:
+        return api_error("Votre candidature n'a pas pu être enregistrée. Réessayez.", 500)
+    return jsonify({'success': True, 'message': 'Candidature reçue ! Un conseiller vous recontacte sous 24 h.'})
 
 @app.route('/api/booking', methods=['POST'])
 @limiter.limit("5 per minute")
 def api_booking():
+    data = get_json_payload()
+    labels = {'fullname': 'nom complet', 'email': 'email', 'phone': 'téléphone', 'departure_date': 'date de départ'}
+    for field, label in labels.items():
+        if not data.get(field):
+            return api_error(f'Le champ « {label} » est obligatoire.')
+    if not is_valid_email(data['email']):
+        return api_error('Adresse email invalide.')
+
     try:
-        data = request.json
-        data = sanitize_input(data)
+        departure = datetime.date.fromisoformat(str(data['departure_date'])[:10])
+    except ValueError:
+        return api_error('Date de départ invalide.')
+    if departure < datetime.date.today():
+        return api_error('La date de départ doit être aujourd\'hui ou plus tard.')
 
-        required_fields = ['fullname', 'email', 'phone', 'departure_date']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'success': False, 'message': f'Le champ {field} est requis'}), 400
+    try:
+        travelers = int(data.get('travelers') or 1)
+    except (TypeError, ValueError):
+        travelers = 0
+    if not 1 <= travelers <= 50:
+        return api_error('Le nombre de voyageurs doit être compris entre 1 et 50.')
 
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
-            return jsonify({'success': False, 'message': 'Email invalide'}), 400
+    try:
+        destination_id = int(data['destination_id']) if data.get('destination_id') else None
+    except (TypeError, ValueError):
+        destination_id = None
 
-        conn = get_db()
+    conn = get_db()
+    try:
         destination_name = data.get('destination_name', '')
-        if not destination_name and data.get('destination_id'):
-            dest = conn.execute('SELECT name FROM destinations WHERE id = ?', (data['destination_id'],)).fetchone()
+        if destination_id:
+            dest = conn.execute('SELECT name FROM destinations WHERE id = ?', (destination_id,)).fetchone()
             if dest:
                 destination_name = dest['name']
-
-        cursor = conn.cursor()
-        cursor.execute('''
+            else:
+                destination_id = None
+        cursor = conn.execute('''
             INSERT INTO bookings (
                 destination_id, destination_name, fullname, email, phone,
                 departure_date, travelers, message, created_at, status
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'en attente')
         ''', (
-            data.get('destination_id'),
-            destination_name,
-            data['fullname'],
-            data['email'],
-            data['phone'],
-            data['departure_date'],
-            data.get('travelers', 1),
-            data.get('message', ''),
+            destination_id, destination_name[:120], data['fullname'][:120], data['email'],
+            data['phone'][:40], departure.isoformat(), travelers, data.get('message', '')[:2000],
             datetime.datetime.now().isoformat()
         ))
-
         conn.commit()
         last_id = cursor.lastrowid
+    except Exception:
+        traceback.print_exc()
+        return api_error("La réservation n'a pas pu être enregistrée. Réessayez.", 500)
+    finally:
         conn.close()
 
-        return jsonify({'success': True, 'message': 'Réservation envoyée.', 'id': last_id})
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+    return jsonify({'success': True, 'id': last_id,
+                    'message': f'Demande KTA-{last_id} envoyée. Un conseiller vous contacte sous 24 h pour confirmer.'})
 
 @app.route('/api/newsletter', methods=['POST'])
 @limiter.limit("10 per minute")
 def api_newsletter():
+    data = get_json_payload()
+    email = (data.get('email') or '').lower()
+    if not is_valid_email(email):
+        return api_error('Adresse email invalide.')
     try:
-        data = request.json
-        email = data.get('email')
-
-        if not email or not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
-            return jsonify({'success': False, 'message': 'Email invalide'}), 400
-
         conn = get_db()
         conn.execute('INSERT OR IGNORE INTO newsletter (email, created_at) VALUES (?, ?)',
-                    (email, datetime.datetime.now().isoformat()))
+                     (email, datetime.datetime.now().isoformat()))
         conn.commit()
         conn.close()
-
-        return jsonify({'success': True, 'message': 'Inscription réussie.'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+    except Exception:
+        traceback.print_exc()
+        return api_error("Inscription impossible pour le moment. Réessayez plus tard.", 500)
+    return jsonify({'success': True, 'message': 'Inscription confirmée. À bientôt dans votre boîte mail !'})
 
 # ============================================================
 # ADMIN
 # ============================================================
 
+def _safe_next(target):
+    if target and target.startswith('/admin') and not target.startswith('//'):
+        return target
+    return url_for('admin_dashboard')
+
 @app.route('/admin/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute", methods=['POST'])
 def admin_login():
+    if session.get('admin_logged_in'):
+        return redirect(url_for('admin_dashboard'))
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
 
-        print("=" * 60)
-        print("[LOGIN] Tentative de connexion")
-        print(f"[LOGIN] Username saisi : '{username}' (longueur: {len(username)})")
-        print(f"[LOGIN] Password saisi : '{password}' (longueur: {len(password)})")
-        print(f"[LOGIN] Username attendu : '{Config.ADMIN_USERNAME}' (longueur: {len(Config.ADMIN_USERNAME)})")
-        print(f"[LOGIN] Password attendu : '{Config.ADMIN_PASSWORD}' (longueur: {len(Config.ADMIN_PASSWORD)})")
-        print("=" * 60)
+        if not Config.ADMIN_USERNAME or not Config.ADMIN_PASSWORD:
+            error = "Connexion désactivée : définissez ADMIN_USERNAME et ADMIN_PASSWORD sur le serveur."
+            return render_template('admin/login.html', error=error), 503
 
-        if username == Config.ADMIN_USERNAME and password == Config.ADMIN_PASSWORD:
+        valid = (hmac.compare_digest(username.encode(), Config.ADMIN_USERNAME.encode())
+                 and hmac.compare_digest(password.encode(), Config.ADMIN_PASSWORD.encode()))
+        if valid:
+            session.clear()
             session['admin_logged_in'] = True
             session['admin_username'] = username
-            session['admin_ip'] = request.remote_addr
             session.permanent = True
             flash('Connexion réussie', 'success')
-            print("[LOGIN] Succès !")
-            return redirect(url_for('admin_dashboard'))
-        else:
-            print("[LOGIN] Échec (identifiants incorrects)")
-            flash('Identifiants incorrects', 'danger')
-            return render_template('admin/login.html', error='Identifiants incorrects')
+            return redirect(_safe_next(request.args.get('next')))
+        print(f"[LOGIN] Échec de connexion depuis {request.remote_addr}")
+        return render_template('admin/login.html', error='Identifiants incorrects'), 401
     return render_template('admin/login.html')
-
-@app.route('/admin/force-login')
-def admin_force_login():
-    """Accès direct à l'admin sans vérification (route de débogage temporaire)."""
-    session['admin_logged_in'] = True
-    session['admin_username'] = 'admin'
-    session['admin_ip'] = request.remote_addr
-    session.permanent = True
-    flash('Accès forcé réussi !', 'success')
-    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -611,13 +796,17 @@ def admin_logout():
     flash('Déconnexion réussie', 'info')
     return redirect(url_for('admin_login'))
 
+@app.route('/admin')
+def admin_root():
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
     conn = get_db()
-    messages_non_lus = conn.execute('SELECT COUNT(*) FROM messages WHERE status = "non lu"').fetchone()[0]
+    messages_non_lus = conn.execute("SELECT COUNT(*) FROM messages WHERE status = 'non lu'").fetchone()[0]
     messages_total = conn.execute('SELECT COUNT(*) FROM messages').fetchone()[0]
-    bookings_en_attente = conn.execute('SELECT COUNT(*) FROM bookings WHERE status = "en attente"').fetchone()[0]
+    bookings_en_attente = conn.execute("SELECT COUNT(*) FROM bookings WHERE status = 'en attente'").fetchone()[0]
     bookings_total = conn.execute('SELECT COUNT(*) FROM bookings').fetchone()[0]
     destinations_count = conn.execute('SELECT COUNT(*) FROM destinations').fetchone()[0]
     services_count = conn.execute('SELECT COUNT(*) FROM services').fetchone()[0]
@@ -652,7 +841,7 @@ def admin_messages():
 @login_required
 def admin_message_read(id):
     conn = get_db()
-    conn.execute('UPDATE messages SET status = "lu" WHERE id = ?', (id,))
+    conn.execute("UPDATE messages SET status = 'lu' WHERE id = ?", (id,))
     conn.commit()
     conn.close()
     flash('Message marqué comme lu', 'success')
@@ -708,8 +897,12 @@ def admin_destination_add():
 @app.route('/admin/destination/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def admin_destination_edit(id):
-    conn = get_db()
+    destination = get_destination_by_id(id)
+    if not destination:
+        flash('Destination introuvable', 'danger')
+        return redirect(url_for('admin_destinations'))
     if request.method == 'POST':
+        conn = get_db()
         try:
             name = sanitize_input(request.form.get('name'))
             country = sanitize_input(request.form.get('country'))
@@ -762,10 +955,9 @@ def admin_destination_edit(id):
             traceback.print_exc()
             flash(f'Erreur : {str(e)}', 'danger')
             return redirect(url_for('admin_destinations'))
-    else:
-        destination = conn.execute('SELECT * FROM destinations WHERE id = ?', (id,)).fetchone()
-        conn.close()
-        return render_template('admin/destination_edit.html', destination=destination)
+        finally:
+            conn.close()
+    return render_template('admin/destination_edit.html', destination=destination)
 
 @app.route('/admin/destination/delete/<int:id>')
 @login_required
@@ -810,8 +1002,7 @@ def admin_service_add():
 @app.route('/admin/service/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def admin_service_edit(id):
-    conn = get_db()
-    service = conn.execute('SELECT * FROM services WHERE id = ?', (id,)).fetchone()
+    service = get_service_by_id(id)
     if not service:
         flash('Service non trouvé', 'danger')
         return redirect(url_for('admin_services'))
@@ -847,7 +1038,6 @@ def admin_service_edit(id):
         except Exception as e:
             traceback.print_exc()
             flash(f'Erreur : {str(e)}', 'danger')
-    conn.close()
     return render_template('admin/service_edit.html', service=service)
 
 @app.route('/admin/service/delete/<int:id>')
@@ -907,7 +1097,7 @@ def admin_booking_confirm(id):
     conn = get_db()
     booking = conn.execute('SELECT * FROM bookings WHERE id = ?', (id,)).fetchone()
     if booking:
-        conn.execute('UPDATE bookings SET status = "confirmee" WHERE id = ?', (id,))
+        conn.execute("UPDATE bookings SET status = 'confirmee' WHERE id = ?", (id,))
         conn.commit()
         booking_data = {
             'id': booking['id'],
@@ -930,6 +1120,9 @@ def admin_booking_confirm(id):
 @login_required
 def admin_booking_update(id):
     status = request.form.get('status')
+    if status not in ('en attente', 'confirmee', 'annulee'):
+        flash('Statut invalide', 'danger')
+        return redirect(url_for('admin_bookings'))
     conn = get_db()
     conn.execute('UPDATE bookings SET status = ? WHERE id = ?', (status, id))
     conn.commit()
@@ -962,14 +1155,17 @@ def admin_booking_export():
     output = StringIO()
     writer = csv.writer(output)
     writer.writerow(['ID', 'Nom', 'Email', 'Téléphone', 'Destination', 'Date départ', 'Voyageurs', 'Statut', 'Date réservation'])
+    def cell(value):
+        value = '' if value is None else str(value)
+        return "'" + value if value[:1] in ('=', '+', '-', '@') else value
     for b in bookings:
-        writer.writerow([
+        writer.writerow([cell(v) for v in (
             b['id'], b['fullname'], b['email'], b['phone'],
             b['destination_name'] or b['dest_name'],
             b['departure_date'], b['travelers'],
             b['status'], b['created_at']
-        ])
-    response = Response(output.getvalue(), mimetype='text/csv')
+        )])
+    response = Response('\ufeff' + output.getvalue(), mimetype='text/csv; charset=utf-8')
     response.headers['Content-Disposition'] = 'attachment; filename=reservations.csv'
     return response
 
@@ -1084,9 +1280,9 @@ def api_get_scholarship(scholarship_id):
 @login_required
 def api_update_scholarship(scholarship_id):
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         status = data.get('status')
-        if not status:
+        if status not in ('en attente', 'en cours', 'acceptee', 'refusee'):
             return jsonify({'success': False, 'message': 'Statut requis'}), 400
         update_scholarship_status(scholarship_id, status)
         return jsonify({'success': True, 'message': 'Statut mis à jour'})
@@ -1147,11 +1343,14 @@ def admin_scholarship_add():
                 'field_of_study': field_of_study,
                 'deadline': end_date or 'Consultez notre site'
             }
-            recipients = get_all_user_emails()
+            # Seuls les abonnés à la newsletter ont accepté de recevoir ces emails.
+            recipients = get_all_newsletter_emails()
             if recipients:
-                send_scholarship_notification(recipients, scholarship_data)
-
-            flash('Bourse ajoutée avec succès !', 'success')
+                threading.Thread(target=send_scholarship_notification,
+                                 args=(recipients, scholarship_data), daemon=True).start()
+                flash(f'Bourse ajoutée. Notification en cours d\'envoi à {len(recipients)} abonné(s).', 'success')
+            else:
+                flash('Bourse ajoutée avec succès !', 'success')
             return redirect(url_for('admin_scholarship_opportunities'))
         except Exception as e:
             traceback.print_exc()
@@ -1247,7 +1446,7 @@ def admin_scholarship_opportunity_delete(id):
 def bourse_etudes():
     opportunities = get_all_scholarship_opportunities()
     today = datetime.datetime.now().date().isoformat()
-    active_opportunities = [opp for opp in opportunities if opp['end_date'] is None or opp['end_date'] >= today]
+    active_opportunities = [dict(opp) for opp in opportunities if not opp['end_date'] or opp['end_date'] >= today]
     return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities, today=today)
 
 # ==================== ROUTE DE TEST POUR LES EMAILS ====================
@@ -1274,7 +1473,7 @@ def admin_test_email():
     if success:
         flash(f"Email test envoyé avec succès à {to_email}", "success")
     else:
-        flash("Échec de l'envoi du test. Vérifiez les logs Railway.", "danger")
+        flash("Échec de l'envoi du test. Vérifiez les logs du serveur.", "danger")
     return redirect(url_for('admin_dashboard'))
 
 # ==================== ROUTE DE CORRECTION DES IMAGES ====================
@@ -1297,7 +1496,6 @@ if __name__ == '__main__':
     print("Kartners Travel Agency - Démarrage")
     print("=" * 50)
     print(f"[INFO] Base de données : {Config.DATABASE}")
-    print(f"[INFO] Admin : {Config.ADMIN_USERNAME} / {Config.ADMIN_PASSWORD}")
     print(f"Site client: http://0.0.0.0:{port}")
     print(f"Admin: http://0.0.0.0:{port}/admin/login")
     print(f"Bourse d'études: http://0.0.0.0:{port}/bourse-etudes")

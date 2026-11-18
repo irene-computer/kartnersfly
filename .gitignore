@@ -5,3 +5,7 @@ __pycache__/
 venv/
 .DS_Store
 *.log
+
+.secret_key
+.ipynb_checkpoints/
+static/images/*.bundled-*/

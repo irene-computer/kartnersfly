@@ -80,7 +80,7 @@
                             </td>
                             <td style="max-width: 250px;">
                                 <div class="message-preview" data-full-message="{{ msg.message }}" 
-                                     onclick="viewMessage({{ msg.id }}, '{{ msg.name }}', '{{ msg.email }}', '{{ msg.phone or '' }}', '{{ msg.service or '' }}', '{{ msg.message|replace("'", "\\'") }}')">
+                                     onclick='viewMessage({{ msg.id }}, {{ msg.name|tojson }}, {{ msg.email|tojson }}, {{ (msg.phone or "")|tojson }}, {{ (msg.service or "")|tojson }}, {{ msg.message|tojson }})'>
                                     {{ msg.message[:80] }}{% if msg.message|length > 80 %}...{% endif %}
                                 </div>
                             </td>
@@ -188,7 +188,10 @@
 <script>
 function viewMessage(id, name, email, phone, service, message) {
     document.getElementById('modalName').textContent = name;
-    document.getElementById('modalEmail').innerHTML = '<a href="mailto:' + email + '">' + email + '</a>';
+    const emailLink = document.createElement('a');
+    emailLink.href = 'mailto:' + email;
+    emailLink.textContent = email;
+    document.getElementById('modalEmail').replaceChildren(emailLink);
     document.getElementById('modalPhone').textContent = phone || 'Non renseigne';
     
     // Afficher le service avec libelle lisible
@@ -215,7 +218,10 @@ function viewMessage(id, name, email, phone, service, message) {
         default:
             serviceText = service || 'Non specifie';
     }
-    document.getElementById('modalService').innerHTML = '<span class="badge bg-info text-white">' + serviceText + '</span>';
+    const badge = document.createElement('span');
+    badge.className = 'badge bg-info text-white';
+    badge.textContent = serviceText;
+    document.getElementById('modalService').replaceChildren(badge);
     document.getElementById('modalMessage').textContent = message;
     
     const markAsReadBtn = document.getElementById('markAsReadBtn');

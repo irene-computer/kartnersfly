@@ -116,7 +116,10 @@
                 }
                 return response.json();
             })
-            .then(data => {
+            .then(raw => {
+                // Échappement : ces données viennent du formulaire public.
+                const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+                const data = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, v == null ? v : esc(v)]));
                 const details = document.getElementById('scholarshipDetails');
                 const statusColors = {
                     'en attente': 'badge-pending',

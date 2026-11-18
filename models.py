@@ -7,38 +7,30 @@ from werkzeug.utils import secure_filename
 
 DB_PATH = Config.DATABASE
 
-def get_db():
+
+def _resolve_db_path():
+    """Vérifie une seule fois que le dossier de la base est accessible en écriture."""
     global DB_PATH
     db_dir = os.path.dirname(DB_PATH)
-    if db_dir:
-        try:
-            os.makedirs(db_dir, exist_ok=True, mode=0o777)
-            test_file = os.path.join(db_dir, '.write_test')
-            with open(test_file, 'w') as f:
-                f.write('ok')
-            os.remove(test_file)
-            print(f"[INFO] Dossier {db_dir} accessible en écriture.")
-        except Exception as e:
-            print(f"[ERREUR] Dossier {db_dir} non accessible : {e}")
-            fallback_dir = '/tmp'
-            DB_PATH = os.path.join(fallback_dir, 'database.db')
-            os.makedirs(fallback_dir, exist_ok=True)
-            print(f"[INFO] Fallback vers {DB_PATH}")
-
+    if not db_dir:
+        return
     try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        print(f"[INFO] Connexion réussie à {DB_PATH}")
-        return conn
-    except sqlite3.OperationalError as e:
-        print(f"[ERREUR] Connexion échouée à {DB_PATH} : {e}")
-        fallback_path = 'database.db'
-        print(f"[INFO] Fallback vers {fallback_path}")
-        conn = sqlite3.connect(fallback_path)
-        conn.row_factory = sqlite3.Row
-        DB_PATH = fallback_path
-        print(f"[INFO] Connexion réussie à {fallback_path}")
-        return conn
+        os.makedirs(db_dir, exist_ok=True)
+        if not os.access(db_dir, os.W_OK):
+            raise PermissionError(db_dir)
+    except OSError as e:
+        DB_PATH = os.path.join('/tmp', 'database.db')
+        print(f"[ATTENTION] {db_dir} non accessible ({e}). Base temporaire : {DB_PATH}")
+
+
+_resolve_db_path()
+
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.row_factory = sqlite3.Row
+    return conn
+
 
 def normalize_image_path(path):
     if not path:
@@ -53,6 +45,10 @@ def normalize_image_path(path):
 def init_db():
     print("[INFO] Initialisation de la base de données...")
     conn = get_db()
+    try:
+        conn.execute('PRAGMA journal_mode = WAL')  # lectures et écritures simultanées (plusieurs workers)
+    except sqlite3.OperationalError:
+        pass
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -154,23 +150,26 @@ def init_db():
 
     cursor.execute("SELECT COUNT(*) FROM destinations")
     if cursor.fetchone()[0] == 0:
+        # Images : seules Paris, Dubai et Marrakech ont une photo livrée avec le
+        # site. Les autres s'affichent avec un visuel généré (ajoutez une photo
+        # depuis l'admin). Les drapeaux manquants sont chargés depuis flagcdn.
         default_destinations = [
-            ('Paris', 'France', 'images/flags/france.png', 'La ville des lumieres et de l\'amour', 850, 'images/destinations/paris.jpg', 'europe'),
-            ('Dubai', 'Emirats Arabes Unis', 'images/flags/uae.png', 'Luxe moderne et desert', 1200, 'images/destinations/dubai.jpg', 'asie'),
-            ('Marrakech', 'Maroc', 'images/flags/morocco.png', 'La perle du Sud', 650, 'images/destinations/marrakech.jpg', 'afrique'),
-            ('Maldives', 'Maldives', 'images/flags/maldives.png', 'Lagons turquoise et villas sur l\'eau', 2890, 'images/destinations/maldives.jpg', 'asie'),
-            ('Rome', 'Italie', 'images/flags/italy.png', 'La ville eternelle', 1590, 'images/destinations/italy.jpg', 'europe'),
-            ('Tokyo', 'Japon', 'images/flags/japan.png', 'Entre tradition et modernite', 3250, 'images/destinations/japan.jpg', 'asie'),
-            ('New York', 'Etats-Unis', 'images/flags/usa.png', 'La ville qui ne dort jamais', 1990, 'images/destinations/newyork.jpg', 'amerique'),
-            ('Londres', 'Royaume-Uni', 'images/flags/uk.png', 'La capitale britannique', 1450, 'images/destinations/london.jpg', 'europe'),
-            ('Montreal', 'Canada', 'images/flags/canada.png', 'Grands espaces et nature sauvage', 2450, 'images/destinations/canada.jpg', 'amerique'),
-            ('Zurich', 'Suisse', 'images/flags/switzerland.png', 'Alpes, chocolat et precision', 2200, 'images/destinations/switzerland.jpg', 'europe'),
-            ('Istanbul', 'Turquie', 'images/flags/turkey.png', 'Ou l\'Orient rencontre l\'Occident', 1490, 'images/destinations/turkey.jpg', 'asie'),
-            ('Athenes', 'Grece', 'images/flags/greece.png', 'Iles paradisiaques et histoire', 1690, 'images/destinations/greece.jpg', 'europe'),
-            ('Dakar', 'Senegal', 'images/flags/senegal.png', 'La perle de l\'Afrique de l\'Ouest', 890, 'images/destinations/dakar.jpg', 'afrique'),
-            ('Le Caire', 'Egypte', 'images/flags/egypt.png', 'Les pyramides et la civilisation antique', 1350, 'images/destinations/egypt.jpg', 'afrique'),
-            ('Bali', 'Indonesie', 'images/flags/indonesia.png', 'Ile des dieux et paradis tropical', 1850, 'images/destinations/bali.jpg', 'asie'),
-            ('Sydney', 'Australie', 'images/flags/australia.png', 'Opera, plages et kangourous', 3200, 'images/destinations/australia.jpg', 'oceanie'),
+            ('Paris', 'France', 'images/flags/france.png', "La ville des lumières et de l'amour", 850, 'images/destinations/paris.jpg', 'europe'),
+            ('Dubai', 'Émirats Arabes Unis', '', 'Luxe moderne et désert', 1200, 'images/destinations/dubai.jpg', 'asie'),
+            ('Marrakech', 'Maroc', '', 'La perle du Sud', 650, 'images/destinations/marrakech.jpg', 'afrique'),
+            ('Maldives', 'Maldives', '', "Lagons turquoise et villas sur l'eau", 2890, '', 'asie'),
+            ('Rome', 'Italie', '', 'La ville éternelle', 1590, '', 'europe'),
+            ('Tokyo', 'Japon', '', 'Entre tradition et modernité', 3250, '', 'asie'),
+            ('New York', 'États-Unis', '', 'La ville qui ne dort jamais', 1990, '', 'amerique'),
+            ('Londres', 'Royaume-Uni', '', 'La capitale britannique', 1450, '', 'europe'),
+            ('Montréal', 'Canada', '', 'Grands espaces et nature sauvage', 2450, '', 'amerique'),
+            ('Zurich', 'Suisse', 'images/flags/flag_zurich_drapeausuisse.jpeg', 'Alpes, chocolat et précision', 2200, 'images/destinations/dest_zurich_suisse.jpg', 'europe'),
+            ('Istanbul', 'Turquie', '', "Où l'Orient rencontre l'Occident", 1490, '', 'asie'),
+            ('Athènes', 'Grèce', '', 'Îles paradisiaques et histoire', 1690, '', 'europe'),
+            ('Dakar', 'Sénégal', '', "La perle de l'Afrique de l'Ouest", 890, '', 'afrique'),
+            ('Le Caire', 'Égypte', '', 'Les pyramides et la civilisation antique', 1350, '', 'afrique'),
+            ('Bali', 'Indonésie', '', 'Île des dieux et paradis tropical', 1850, '', 'asie'),
+            ('Sydney', 'Australie', '', 'Opéra, plages et kangourous', 3200, '', 'oceanie'),
         ]
         cursor.executemany('''
             INSERT INTO destinations (name, country, flag_image, description, price, image, continent) 
@@ -180,12 +179,12 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM services")
     if cursor.fetchone()[0] == 0:
         default_services = [
-            ('Billeterie aerienne', 'Vols nationaux et internationaux aux meilleurs prix', 'fas fa-plane-departure', 'images/services/airline.jpg', 'Vols nationaux|Tarifs competitis|Reservation rapide'),
-            ('Reservation hotels', 'Sejours nationaux et internationaux', 'fas fa-hotel', 'images/services/hotel.jpg', 'Hotels standards|Confort superieur|Luxe et prestige'),
-            ('Assistance visa', 'Tous types de visas pour le monde entier', 'fas fa-passport', 'images/services/visa.jpg', 'Etudes|Tourisme|Affaires|Suivi complet'),
-            ('Pre-enrolement', 'Passeport - Carte Nationale d\'Identite (CNI)', 'fas fa-id-card', 'images/services/passport.jpg', 'Passeport|CNI|Demarches simplifiees'),
-            ('Planification de voyage', 'Voyages organises - Circuits personnalises', 'fas fa-map-marked-alt', 'images/services/planning.jpg', 'Voyages organises|Circuits personnalises|Sejours thematiques'),
-            ('Assurance voyage', 'Couverture complete et securisee', 'fas fa-shield-alt', 'images/services/insurance.jpg', 'Annulation|Rapatriement|Sante a l\'etranger|Bagages'),
+            ('Billetterie aérienne', 'Vols nationaux et internationaux aux meilleurs prix', 'fas fa-plane-departure', 'images/services/airline.jpg', 'Vols nationaux et internationaux|Tarifs compétitifs|Réservation rapide'),
+            ('Réservation hôtelière', 'Séjours nationaux et internationaux', 'fas fa-hotel', 'images/services/hotel.jpg', 'Hôtels standards|Confort supérieur|Luxe et prestige'),
+            ('Assistance visa', 'Tous types de visas pour le monde entier', 'fas fa-passport', 'images/services/visa.jpg', 'Études|Tourisme|Affaires|Suivi complet'),
+            ('Pré-enrôlement', "Passeport - Carte nationale d'identité (CNI)", 'fas fa-id-card', 'images/services/passport.jpg', 'Passeport|CNI|Démarches simplifiées'),
+            ('Planification de voyage', 'Voyages organisés - Circuits personnalisés', 'fas fa-map-marked-alt', 'images/services/planning.jpg', 'Voyages organisés|Circuits personnalisés|Séjours thématiques'),
+            ('Assurance voyage', 'Couverture complète et sécurisée', 'fas fa-shield-alt', 'images/services/insurance.jpg', "Annulation|Rapatriement|Santé à l'étranger|Bagages"),
         ]
         cursor.executemany('''
             INSERT INTO services (name, description, icon, image, features) 
@@ -217,13 +216,13 @@ def get_all_messages():
 
 def get_unread_messages_count():
     conn = get_db()
-    count = conn.execute('SELECT COUNT(*) FROM messages WHERE status = "non lu"').fetchone()[0]
+    count = conn.execute("SELECT COUNT(*) FROM messages WHERE status = 'non lu'").fetchone()[0]
     conn.close()
     return count
 
 def mark_message_as_read(message_id):
     conn = get_db()
-    conn.execute('UPDATE messages SET status = "lu" WHERE id = ?', (message_id,))
+    conn.execute("UPDATE messages SET status = 'lu' WHERE id = ?", (message_id,))
     conn.commit()
     conn.close()
 
@@ -383,7 +382,7 @@ def delete_booking(booking_id):
 
 def get_pending_bookings_count():
     conn = get_db()
-    count = conn.execute('SELECT COUNT(*) FROM bookings WHERE status = "en attente"').fetchone()[0]
+    count = conn.execute("SELECT COUNT(*) FROM bookings WHERE status = 'en attente'").fetchone()[0]
     conn.close()
     return count
 
@@ -443,7 +442,7 @@ def get_all_scholarships():
 
 def get_pending_scholarships_count():
     conn = get_db()
-    count = conn.execute('SELECT COUNT(*) FROM scholarships WHERE status = "en attente"').fetchone()[0]
+    count = conn.execute("SELECT COUNT(*) FROM scholarships WHERE status = 'en attente'").fetchone()[0]
     conn.close()
     return count
 
@@ -473,7 +472,7 @@ def get_scholarships_ending_soon(days=5):
     scholarships = conn.execute('''
         SELECT * FROM scholarships 
         WHERE created_at BETWEEN ? AND ?
-        AND status = "en attente"
+        AND status = 'en attente'
     ''', (start_date, end_date)).fetchall()
     conn.close()
     return scholarships

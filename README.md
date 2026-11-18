@@ -148,3 +148,26 @@ kartnersfly/
 ```bash
 git clone https://github.com/votre-compte/kartnersfly.git
 cd kartnersfly
+
+---
+
+## 🔐 Variables d'environnement
+
+| Variable | Obligatoire | Rôle |
+|----------|-------------|------|
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Oui | Identifiants du panneau `/admin`. Sans eux, la connexion admin est désactivée. |
+| `SECRET_KEY` | Recommandé | Clé de session. Si absente, une clé est générée une fois et conservée dans `.secret_key` à côté de la base. |
+| `DATABASE` | Non | Chemin de la base SQLite (`/data/database.db` sur Fly.io). |
+| `UPLOAD_ROOT` | Non | Dossier persistant des images envoyées depuis l'admin (`/data/uploads` sur Fly.io), pour qu'elles survivent aux déploiements. |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | Pour les emails | Compte SMTP (mot de passe d'application Gmail). |
+| `SESSION_COOKIE_SECURE` | Non | `True` par défaut sur Fly.io, `False` en local (http). |
+| `DEBUG` | Non | `True` uniquement en développement. |
+
+Sur Fly.io : `fly secrets set ADMIN_USERNAME=... ADMIN_PASSWORD=... SECRET_KEY=...`
+
+### Lancer en local
+
+```bash
+pip install -r requirements.txt
+ADMIN_USERNAME=admin ADMIN_PASSWORD=motdepasse DEBUG=True python app.py
+```

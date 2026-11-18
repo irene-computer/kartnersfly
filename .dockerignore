@@ -31,4 +31,6 @@ Dockerfile
 .dockerignore
 docker-compose.yml
 .DS_Store
-Thumbs.db
+Thumbs.db*.db
+data/
+.secret_key

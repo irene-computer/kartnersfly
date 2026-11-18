@@ -1,0 +1,56 @@
+{# Carte d'embarquement d'une destination. `action` = 'modal' (page destinations) ou 'link'. #}
+{% macro boarding_pass(dest, action='link') -%}
+{% set photo = dest.image|img %}
+{% set flag = dest.flag_image|flag(dest.country) %}
+{% set code = dest.name|airport %}
+{% set continents = {'europe': 'Europe', 'afrique': 'Afrique', 'asie': 'Asie & Moyen-Orient', 'amerique': 'Amériques', 'oceanie': 'Océanie'} %}
+<article class="pass reveal"
+         data-name="{{ dest.name|lower }}" data-country="{{ dest.country|lower }}"
+         data-price="{{ dest.price or 0 }}" data-continent="{{ dest.continent or '' }}">
+    <div class="pass-media">
+        {% if photo %}
+        <img src="{{ photo }}" alt="{{ dest.name }}, {{ dest.country }}" loading="lazy" decoding="async" data-fallback>
+        <div class="placeholder" aria-hidden="true" hidden>{{ code }}</div>
+        {% else %}
+        <div class="placeholder" aria-hidden="true">{{ code }}</div>
+        {% endif %}
+        {% if dest.continent in continents %}<span class="badge badge-continent">{{ continents[dest.continent] }}</span>{% endif %}
+        {% if flag %}<img class="pass-flag" src="{{ flag }}" alt="Drapeau : {{ dest.country }}" loading="lazy">{% endif %}
+    </div>
+    <div class="pass-body">
+        <h3>{{ dest.name }}</h3>
+        <span class="country">{{ dest.country }}</span>
+        {% if dest.description %}<p class="desc">{{ dest.description }}</p>{% endif %}
+        <div class="pass-route" aria-label="Vol Douala vers {{ dest.name }}">
+            <span>DLA</span><span class="dash"><i class="fas fa-plane"></i></span><span>{{ code }}</span>
+        </div>
+    </div>
+    <div class="pass-stub">
+        <div class="fare">
+            <small>À partir de</small>
+            <strong>{{ dest.price|money }} <span>€</span></strong>
+        </div>
+        {% if action == 'modal' %}
+        <button class="btn btn-dark btn-sm" type="button"
+                data-book="{{ dest.id }}" data-book-name="{{ dest.name }}" data-book-code="{{ code }}" data-book-country="{{ dest.country }}">
+            Réserver <i class="fas fa-arrow-right"></i>
+        </button>
+        {% else %}
+        <a class="btn btn-dark btn-sm" href="/destinations?reserver={{ dest.id }}">Réserver <i class="fas fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+</article>
+{%- endmacro %}
+
+{% macro cta_band(title, text, primary_label='Nous contacter', primary_href='/contact') -%}
+<div class="cta-band reveal">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>{{ text }}</p>
+    </div>
+    <div class="actions">
+        <a class="btn btn-sun" href="{{ primary_href }}">{{ primary_label }}</a>
+        <a class="btn btn-glass" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
+</div>
+{%- endmacro %}
