@@ -160,7 +160,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
     (function () {
         var input = document.getElementById('hero-q');
         var out = document.getElementById('route-to');

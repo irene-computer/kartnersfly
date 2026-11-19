@@ -481,7 +481,7 @@
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                 <i class="fas fa-bars"></i>
             </button>
-            <img src="/static/images/kta.png" alt="Logo" onerror="this.src='https://placehold.co/42x42/8B5CF6/white?text=K'">
+            <img src="/static/images/icon-192.png" alt="Logo">
             <div>
                 <span>Kartners Admin</span>
                 <small>Panel de gestion</small>
@@ -553,6 +553,12 @@
                 {% if newsletter_count is defined and newsletter_count > 0 %}
                     <span class="badge-nav">{{ newsletter_count }}</span>
                 {% endif %}
+            </a>
+        </li>
+        <li class="nav-section mt-3">Système</li>
+        <li>
+            <a href="/admin/securite" class="{% if request.path.startswith('/admin/securite') %}active{% endif %}">
+                <i class="fas fa-shield-alt"></i> Sécurité & sauvegardes
             </a>
         </li>
     </ul>

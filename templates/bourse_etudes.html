@@ -168,6 +168,7 @@
             <p>Notre équipe étudie votre éligibilité et vous recontacte sous 24 h.</p>
         </div>
         <form class="card card-shadow" id="scholarship-form" data-ajax="/api/scholarship" novalidate>
+                    {{ m_honeypot() }}
             <div class="form-grid">
                 <div class="field">
                     <label for="s-name">Nom complet <span class="req">*</span></label>
@@ -274,12 +275,12 @@
         </div>
     </div>
 </dialog>
-<script type="application/json" id="opp-data">{{ scholarship_opportunities|tojson }}</script>
+<script type="application/json" id="opp-data" nonce="{{ csp_nonce }}">{{ scholarship_opportunities|tojson }}</script>
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
     var dataEl = document.getElementById('opp-data');
     if (!dataEl) return;

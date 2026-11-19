@@ -17,4 +17,4 @@ RUN mkdir -p /app/data static/images/flags static/images/destinations \
 EXPOSE 8080
 
 # Le port vient de la variable PORT (8080 sur Fly.io, voir fly.toml).
-CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 2 --threads 4 --timeout 60 --access-logfile - app:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 8 --timeout 60 --access-logfile - app:app"]

@@ -1,0 +1,156 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Sécurité{% endblock %}
+{% block page_title %}Sécurité & sauvegardes{% endblock %}
+{% block page_subtitle %}État des protections, contenus suspects, journal et sauvegardes{% endblock %}
+
+{% block admin_content %}
+{% set checks = [
+    ('Double authentification', totp_enabled, 'Activée' if totp_enabled else 'Désactivée : configurez-la ci-dessous'),
+    ('Mot de passe stocké sous forme d\'empreinte', password_hashed, 'Oui' if password_hashed else 'Non : mot de passe en clair dans les secrets'),
+    ('Clé de session définie (SECRET_KEY)', secret_from_env, 'Oui' if secret_from_env else 'Clé générée automatiquement'),
+    ('Connexion chiffrée (HTTPS)', https, 'Oui' if https else 'Non (normal en local)'),
+    ('Sauvegardes disponibles', backups|length > 0, (backups|length) ~ ' sauvegarde(s)'),
+] %}
+
+<div class="row g-3 mb-4">
+    {% for label, ok, detail in checks %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex gap-3 align-items-start">
+                <i class="fas {{ 'fa-check-circle text-success' if ok else 'fa-exclamation-triangle text-warning' }} fa-lg mt-1"></i>
+                <div><strong>{{ label }}</strong><div class="text-muted small">{{ detail }}</div></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header {{ 'bg-danger text-white' if suspicious else 'bg-success text-white' }}">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Contenus suspects en base ({{ suspicious|length }})</h5>
+    </div>
+    <div class="card-body">
+        {% if suspicious %}
+        <p class="text-muted small">Ces entrées contiennent du code (balises, scripts, fragments SQL). Elles ne s'exécutent plus sur le site, mais vous pouvez les supprimer depuis la page concernée.</p>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead><tr><th>Table</th><th>N°</th><th>Champ</th><th>Contenu (texte brut)</th></tr></thead>
+                <tbody>
+                {% for item in suspicious %}
+                <tr><td>{{ item.table }}</td><td>{{ item.id }}</td><td>{{ item.field }}</td><td><code style="white-space:pre-wrap;word-break:break-all">{{ item.value }}</code></td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="mb-0">Aucun contenu suspect trouvé dans les messages, réservations, candidatures, destinations, services et bourses.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6" id="double-authentification">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-mobile-alt"></i> Double authentification</h5></div>
+            <div class="card-body">
+                {% if new_totp %}
+                <ol class="small">
+                    <li>Scannez ce QR code avec Google Authenticator, Microsoft Authenticator ou Authy.</li>
+                    <li>Enregistrez le secret sur le serveur :<br><code>fly secrets set ADMIN_TOTP_SECRET={{ new_totp.secret }}</code></li>
+                    <li>Après le redémarrage, la connexion demandera le code à 6 chiffres.</li>
+                </ol>
+                <div id="qrcode" class="my-3" data-uri="{{ new_totp.uri }}"></div>
+                <p class="small text-muted mb-0">Secret à saisir à la main si besoin : <code>{{ new_totp.secret }}</code>. Il n'est affiché qu'une fois.</p>
+                {% else %}
+                <p>{{ "La double authentification est active. Générez un nouveau secret seulement si vous changez de téléphone." if totp_enabled else "Sans double authentification, un mot de passe volé suffit pour entrer dans l'admin." }}</p>
+                <form method="POST" action="{{ url_for('admin_totp_generate') }}">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-key"></i> Générer un secret</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6" id="mot-de-passe">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-lock"></i> Nouveau mot de passe</h5></div>
+            <div class="card-body">
+                {% if new_hash %}
+                <p class="small">Enregistrez cette empreinte sur le serveur, puis supprimez l'ancien mot de passe en clair :</p>
+                <pre class="small bg-light p-2 rounded" style="white-space:pre-wrap;word-break:break-all">fly secrets set ADMIN_PASSWORD_HASH='{{ new_hash }}'
+fly secrets unset ADMIN_PASSWORD</pre>
+                <p class="small text-muted mb-0">Toutes les sessions ouvertes seront déconnectées au redémarrage.</p>
+                {% else %}
+                <p class="small">Le mot de passe n'est jamais enregistré : seule son empreinte est affichée, à copier dans les secrets Fly.io.</p>
+                <form method="POST" action="{{ url_for('admin_password_hash') }}" class="d-flex gap-2 flex-wrap">
+                    <input class="form-control" style="max-width:280px" type="password" name="new_password" minlength="12" required autocomplete="new-password" placeholder="12 caractères minimum">
+                    <button class="btn btn-primary" type="submit">Calculer l'empreinte</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-database"></i> Sauvegardes</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Une sauvegarde automatique par jour ; les 14 plus récentes sont conservées sur le volume du serveur.</p>
+                <form method="POST" action="{{ url_for('admin_backup_create') }}" class="mb-3">
+                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fas fa-plus"></i> Sauvegarder maintenant</button>
+                </form>
+                <ul class="list-group list-group-flush">
+                    {% for b in backups %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="small">{{ b.date.strftime('%d/%m/%Y %H:%M') }} · {{ (b.size / 1024)|round(0)|int }} Ko</span>
+                        <a class="btn btn-sm btn-light" href="{{ url_for('admin_backup_download', name=b.name) }}"><i class="fas fa-download"></i></a>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item px-0 text-muted small">Aucune sauvegarde pour l'instant.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-list"></i> Journal de sécurité</h5></div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height:420px">
+                    <table class="table table-sm">
+                        <thead><tr><th>Date</th><th>Événement</th><th>IP</th><th>Détail</th></tr></thead>
+                        <tbody>
+                        {% for e in events %}
+                        <tr class="{{ 'table-warning' if 'échec' in e.event or 'bloqu' in e.event }}">
+                            <td class="small text-nowrap">{{ e.created_at.replace('T', ' ') }}</td>
+                            <td class="small">{{ e.event }}</td>
+                            <td class="small">{{ e.ip or '' }}</td>
+                            <td class="small">{{ e.detail }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-muted small">Aucun événement enregistré.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if new_totp %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    (function () {
+        var el = document.getElementById('qrcode');
+        if (el && window.QRCode) new QRCode(el, { text: el.dataset.uri, width: 180, height: 180 });
+    })();
+</script>
+{% endif %}
+{% endblock %}

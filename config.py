@@ -42,6 +42,11 @@ class Config:
     # ===== ADMIN =====
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', '').strip()
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', '').strip()
+    # Optionnel : empreinte du mot de passe (générée par `python manage_security.py hash`)
+    # à la place du mot de passe en clair.
+    ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '').strip()
+    # Double authentification : secret TOTP (généré par `python manage_security.py totp`).
+    ADMIN_TOTP_SECRET = os.getenv('ADMIN_TOTP_SECRET', '').strip().replace(' ', '')
 
     # ===== DATABASE (chemin absolu + création du dossier) =====
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -75,6 +80,11 @@ class Config:
     # sur le volume Fly.io). Vide = images stockées dans static/images.
     UPLOAD_ROOT = os.getenv('UPLOAD_ROOT', '').strip()
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    # ===== SAUVEGARDES =====
+    # Une copie de la base par jour, 14 conservées (dossier backups/ à côté de la base).
+    AUTO_BACKUP = _env_bool('AUTO_BACKUP', True)
+    BACKUP_DIR = os.getenv('BACKUP_DIR', '').strip()
 
     # ===== CONTACT =====
     PHONE = os.getenv('PHONE', '+237 676 268 350')

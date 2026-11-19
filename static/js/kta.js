@@ -95,6 +95,8 @@
                 var button = form.querySelector('[type="submit"]');
                 setBusy(button, true);
                 var data = Object.fromEntries(new FormData(form).entries());
+                var tokenMeta = document.querySelector('meta[name="kta-form-token"]');
+                data.form_token = tokenMeta ? tokenMeta.content : '';
                 var result = await postJSON(form.dataset.ajax, data);
                 setBusy(button, false);
 
@@ -187,6 +189,9 @@
             if (img.complete && img.naturalWidth === 0) hide();
             img.addEventListener('error', hide);
         });
+
+        var filters = document.getElementById('filters');
+        if (filters) filters.addEventListener('submit', function (e) { e.preventDefault(); });
 
         bindAjaxForms(document);
     });

@@ -111,17 +111,23 @@
             <form method="POST" action="{{ url_for('admin_login') }}">
                 <div class="mb-3">
                     <label class="form-label">Nom d'utilisateur</label>
-                    <input type="text" name="username" class="form-control" placeholder="admin" required>
+                    <input type="text" name="username" class="form-control" autocomplete="username" required autofocus>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Mot de passe</label>
                     <div class="input-group">
-                        <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+                        <input type="password" name="password" id="password" class="form-control" autocomplete="current-password" required>
                         <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                             <i class="fas fa-eye" id="eyeIcon"></i>
                         </button>
                     </div>
                 </div>
+                {% if needs_totp %}
+                <div class="mb-3">
+                    <label class="form-label" for="totp">Code de vérification (application d'authentification)</label>
+                    <input type="text" name="totp" id="totp" class="form-control" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code" placeholder="123 456" required>
+                </div>
+                {% endif %}
                 <button type="submit" class="btn-login">
                     <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>

@@ -156,6 +156,9 @@ cd kartnersfly
 | Variable | Obligatoire | Rôle |
 |----------|-------------|------|
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Oui | Identifiants du panneau `/admin`. Sans eux, la connexion admin est désactivée. |
+| `ADMIN_PASSWORD_HASH` | Recommandé | Empreinte du mot de passe, à la place de `ADMIN_PASSWORD` (`python manage_security.py hash` ou page Admin › Sécurité). |
+| `ADMIN_TOTP_SECRET` | Recommandé | Active la double authentification (`python manage_security.py totp` ou page Admin › Sécurité). |
+| `AUTO_BACKUP` / `BACKUP_DIR` | Non | Sauvegarde quotidienne de la base (activée par défaut, 14 copies dans `backups/` à côté de la base). |
 | `SECRET_KEY` | Recommandé | Clé de session. Si absente, une clé est générée une fois et conservée dans `.secret_key` à côté de la base. |
 | `DATABASE` | Non | Chemin de la base SQLite (`/data/database.db` sur Fly.io). |
 | `UPLOAD_ROOT` | Non | Dossier persistant des images envoyées depuis l'admin (`/data/uploads` sur Fly.io), pour qu'elles survivent aux déploiements. |
@@ -171,3 +174,11 @@ Sur Fly.io : `fly secrets set ADMIN_USERNAME=... ADMIN_PASSWORD=... SECRET_KEY=.
 pip install -r requirements.txt
 ADMIN_USERNAME=admin ADMIN_PASSWORD=motdepasse DEBUG=True python app.py
 ```
+
+## 🛡️ Sécurité
+
+- Requêtes SQL paramétrées partout (pas d'injection SQL).
+- En-têtes `Content-Security-Policy` (scripts limités au site et aux blocs signés par un nonce), HSTS, `X-Frame-Options`, `nosniff`.
+- Connexion admin : blocage après 5 échecs en 15 min par adresse IP (et 30 par heure au total), conservé en base ; double authentification TOTP en option ; sessions révoquées quand le mot de passe change.
+- Formulaires publics : champ piège anti-robots, jeton signé, délai minimum de saisie, 10 envois par heure et par adresse IP.
+- Page **Admin › Sécurité & sauvegardes** : journal des connexions, recherche de contenus suspects en base, sauvegardes téléchargeables.

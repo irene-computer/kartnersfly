@@ -3,6 +3,10 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import Config
+import security
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask import g
+from markupsafe import Markup
 from models import get_db, init_db
 import datetime
 import os
@@ -22,6 +26,7 @@ import traceback
 import hmac
 import shutil
 import threading
+import time
 from urllib.parse import urlparse
 
 from models import (
@@ -76,7 +81,7 @@ if not Config.ADMIN_USERNAME or not Config.ADMIN_PASSWORD:
 
 # Derrière le proxy de Fly.io : vraie IP du visiteur (limitation de débit) et HTTPS.
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(hours=8)
 app.config['TEMPLATES_AUTO_RELOAD'] = Config.DEBUG
 
 if Config.DEBUG:
@@ -126,6 +131,26 @@ def get_json_payload():
 def api_error(message, status=400):
     return jsonify({'success': False, 'message': message}), status
 
+def guard_public_form(kind, data, per_hour, success_message):
+    """
+    Contrôles anti-robots et anti-spam communs aux formulaires publics.
+    Retourne une réponse à renvoyer immédiatement, ou None si tout va bien.
+    """
+    ip = request.remote_addr or 'inconnue'
+    ok, reason = security.check_form(data)
+    if not ok and reason == 'bot':
+        security.log_security_event('robot bloqué', ip, kind)
+        # On répond "succès" pour ne pas aider le robot à s'adapter.
+        return jsonify({'success': True, 'message': success_message})
+    if not ok:
+        return api_error("La page a expiré. Rechargez-la puis renvoyez le formulaire.", 400)
+    if security.over_limit(f'form-{kind}', ip, per_hour, 3600):
+        security.log_security_event('envois bloqués', ip, kind)
+        return api_error("Vous avez envoyé beaucoup de demandes. Réessayez dans une heure ou appelez-nous.", 429)
+    security.record_event(f'form-{kind}', ip)
+    return None
+
+
 # Routes d'administration qui modifient des données via un simple lien (GET).
 ADMIN_GET_ACTIONS = ('/delete/', '/confirm/', '/read/', '/admin/fix-images', '/admin/test-email')
 
@@ -140,6 +165,7 @@ def _same_origin():
 
 @app.before_request
 def before_request_security():
+    g.csp_nonce = secrets.token_urlsafe(16)
     if request.content_length and request.content_length > Config.MAX_CONTENT_LENGTH:
         return jsonify({'error': 'Fichier trop volumineux'}), 413
 
@@ -166,9 +192,51 @@ def security_headers(response):
     response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
     response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
     response.headers.setdefault('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    response.headers.setdefault('Cross-Origin-Opener-Policy', 'same-origin')
+    if request.is_secure:
+        # HSTS : le navigateur n'utilisera plus jamais http:// pour ce site (1 an).
+        response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    if response.mimetype == 'text/html':
+        response.headers['Content-Security-Policy'] = _content_security_policy()
     if request.path.startswith('/admin'):
         response.headers['Cache-Control'] = 'no-store'
     return response
+
+
+def _content_security_policy():
+    """
+    Liste blanche des sources autorisées. Sur le site public, seuls les scripts
+    du site et les blocs portant le "nonce" de la page s'exécutent : un script
+    injecté par un attaquant est bloqué par le navigateur. L'admin (ancien
+    code avec attributs onclick) garde les scripts en ligne, mais rien d'autre.
+    """
+    nonce = getattr(g, 'csp_nonce', '')
+    common = [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+        "frame-ancestors 'self'",
+        "form-action 'self'",
+        "img-src 'self' data: https:",
+        "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+        "connect-src 'self'",
+        "frame-src https://www.google.com https://maps.google.com",
+        "manifest-src 'self'",
+        "worker-src 'self'",
+    ]
+    if request.path.startswith('/admin'):
+        common.append("script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com")
+    else:
+        common.append(f"script-src 'self' 'nonce-{nonce}'")
+    if request.is_secure:
+        common.append('upgrade-insecure-requests')
+    return '; '.join(common)
+
+
+def _credentials_fingerprint():
+    raw = f"{Config.ADMIN_USERNAME}|{Config.ADMIN_PASSWORD}|{Config.ADMIN_PASSWORD_HASH}|{Config.ADMIN_TOTP_SECRET}"
+    return hmac.new(Config.SECRET_KEY.encode(), raw.encode(), 'sha256').hexdigest()[:24]
 
 
 def login_required(f):
@@ -176,6 +244,11 @@ def login_required(f):
     def wrapper(*args, **kwargs):
         if not session.get('admin_logged_in'):
             return redirect(url_for('admin_login', next=request.path))
+        if session.get('admin_fp') != _credentials_fingerprint():
+            # Mot de passe ou 2FA changés depuis la connexion : session révoquée.
+            session.clear()
+            flash('Session expirée, reconnectez-vous.', 'info')
+            return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return wrapper
 
@@ -253,6 +326,8 @@ def remove_uploaded_image(rel_path):
         pass
 
 init_db()
+security.init_security_tables()
+security.start_backup_thread()
 
 # Codes pays ISO pour afficher un drapeau quand l'image locale manque.
 COUNTRY_CODES = {
@@ -336,6 +411,12 @@ def date_fr_filter(value):
         return value or ''
 
 
+def _honeypot():
+    # Champ invisible pour les humains : un robot qui le remplit est ignoré.
+    return Markup('<div class="hp" aria-hidden="true"><label>Ne pas remplir '
+                  '<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>')
+
+
 @app.context_processor
 def utility_processor():
     def now():
@@ -347,6 +428,8 @@ def utility_processor():
         except Exception:
             scholarships_pending = 0
     return dict(now=now, scholarships_pending=scholarships_pending,
+                csp_nonce=getattr(g, 'csp_nonce', ''), form_token=security.issue_form_token,
+                m_honeypot=_honeypot,
                 contact_phone=Config.PHONE, contact_email=Config.EMAIL,
                 whatsapp_number=re.sub(r'\D', '', Config.PHONE))
 
@@ -635,6 +718,9 @@ def server_error(e):
 @limiter.limit("5 per minute")
 def api_contact():
     data = get_json_payload()
+    blocked = guard_public_form('contact', data, 10, 'Merci ! Notre équipe vous répond sous 24 h.')
+    if blocked:
+        return blocked
     name, email, message = data.get('name', ''), data.get('email', ''), data.get('message', '')
     if not name or not email or not message:
         return api_error('Merci de renseigner votre nom, votre email et votre message.')
@@ -653,6 +739,9 @@ def api_contact():
 @limiter.limit("10 per minute")
 def api_scholarship():
     data = get_json_payload()
+    blocked = guard_public_form('bourse', data, 10, 'Candidature reçue ! Un conseiller vous recontacte sous 24 h.')
+    if blocked:
+        return blocked
     labels = {'full_name': 'nom complet', 'email': 'email', 'country': 'pays souhaité',
               'study_level': "niveau d'études", 'field_of_study': "domaine d'études"}
     for field, label in labels.items():
@@ -681,6 +770,9 @@ def api_scholarship():
 @limiter.limit("5 per minute")
 def api_booking():
     data = get_json_payload()
+    blocked = guard_public_form('reservation', data, 10, 'Demande envoyée. Un conseiller vous contacte sous 24 h pour confirmer.')
+    if blocked:
+        return blocked
     labels = {'fullname': 'nom complet', 'email': 'email', 'phone': 'téléphone', 'departure_date': 'date de départ'}
     for field, label in labels.items():
         if not data.get(field):
@@ -741,6 +833,9 @@ def api_booking():
 @limiter.limit("10 per minute")
 def api_newsletter():
     data = get_json_payload()
+    blocked = guard_public_form('newsletter', data, 5, 'Inscription confirmée. À bientôt dans votre boîte mail !')
+    if blocked:
+        return blocked
     email = (data.get('email') or '').lower()
     if not is_valid_email(email):
         return api_error('Adresse email invalide.')
@@ -764,31 +859,67 @@ def _safe_next(target):
         return target
     return url_for('admin_dashboard')
 
+LOGIN_MAX_PER_IP = 5          # échecs autorisés par adresse IP…
+LOGIN_IP_WINDOW = 15 * 60     # …sur 15 minutes
+LOGIN_MAX_GLOBAL = 30         # échecs tous visiteurs confondus…
+LOGIN_GLOBAL_WINDOW = 60 * 60 # …sur 1 heure (attaque distribuée)
+
+
+def _password_ok(password):
+    if Config.ADMIN_PASSWORD_HASH:
+        try:
+            return check_password_hash(Config.ADMIN_PASSWORD_HASH, password)
+        except ValueError:
+            return False
+    return hmac.compare_digest(password.encode(), Config.ADMIN_PASSWORD.encode())
+
+
 @app.route('/admin/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute", methods=['POST'])
 def admin_login():
-    if session.get('admin_logged_in'):
+    if session.get('admin_logged_in') and session.get('admin_fp') == _credentials_fingerprint():
         return redirect(url_for('admin_dashboard'))
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
+    needs_totp = bool(Config.ADMIN_TOTP_SECRET)
+    if request.method == 'GET':
+        return render_template('admin/login.html', needs_totp=needs_totp)
 
-        if not Config.ADMIN_USERNAME or not Config.ADMIN_PASSWORD:
-            error = "Connexion désactivée : définissez ADMIN_USERNAME et ADMIN_PASSWORD sur le serveur."
-            return render_template('admin/login.html', error=error), 503
+    ip = request.remote_addr or 'inconnue'
+    if not Config.ADMIN_USERNAME or not (Config.ADMIN_PASSWORD or Config.ADMIN_PASSWORD_HASH):
+        error = "Connexion désactivée : définissez ADMIN_USERNAME et ADMIN_PASSWORD sur le serveur."
+        return render_template('admin/login.html', error=error, needs_totp=needs_totp), 503
 
-        valid = (hmac.compare_digest(username.encode(), Config.ADMIN_USERNAME.encode())
-                 and hmac.compare_digest(password.encode(), Config.ADMIN_PASSWORD.encode()))
-        if valid:
-            session.clear()
-            session['admin_logged_in'] = True
-            session['admin_username'] = username
-            session.permanent = True
-            flash('Connexion réussie', 'success')
-            return redirect(_safe_next(request.args.get('next')))
-        print(f"[LOGIN] Échec de connexion depuis {request.remote_addr}")
-        return render_template('admin/login.html', error='Identifiants incorrects'), 401
-    return render_template('admin/login.html')
+    if (security.over_limit('login-ip', ip, LOGIN_MAX_PER_IP, LOGIN_IP_WINDOW)
+            or security.over_limit('login-all', 'all', LOGIN_MAX_GLOBAL, LOGIN_GLOBAL_WINDOW)):
+        security.log_security_event('connexion bloquée', ip, 'trop de tentatives')
+        error = "Trop de tentatives échouées. Réessayez dans 15 minutes."
+        return render_template('admin/login.html', error=error, needs_totp=needs_totp), 429
+
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '')
+    code = request.form.get('totp', '').strip()
+
+    valid = hmac.compare_digest(username.encode(), Config.ADMIN_USERNAME.encode())
+    valid = _password_ok(password) and valid
+    if valid and needs_totp:
+        valid = security.verify_totp(Config.ADMIN_TOTP_SECRET, code)
+
+    if not valid:
+        security.record_event('login-ip', ip)
+        security.record_event('login-all', 'all')
+        security.log_security_event('échec de connexion admin', ip, f"identifiant saisi : {username[:40]}")
+        time.sleep(0.5)  # ralentit les essais automatisés
+        error = 'Identifiants ou code de vérification incorrects' if needs_totp else 'Identifiants incorrects'
+        return render_template('admin/login.html', error=error, needs_totp=needs_totp), 401
+
+    security.clear_events('login-ip', ip)
+    security.log_security_event('connexion admin réussie', ip)
+    session.clear()
+    session['admin_logged_in'] = True
+    session['admin_username'] = username
+    session['admin_fp'] = _credentials_fingerprint()
+    session.permanent = True
+    flash('Connexion réussie', 'success')
+    return redirect(_safe_next(request.args.get('next')))
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -1488,6 +1619,99 @@ def admin_fix_images():
         traceback.print_exc()
         flash(f'Erreur lors de la correction : {str(e)}', 'danger')
     return redirect(url_for('admin_destinations'))
+
+# ==================== SÉCURITÉ ====================
+SUSPICIOUS_RE = re.compile(r'<\s*(script|iframe|object|embed|svg|img|a)\b|javascript:|on[a-z]+\s*=|data:text/html|union\s+select|drop\s+table|--\s*$|<\?php', re.I)
+SCAN_TARGETS = {
+    'messages': ['name', 'email', 'phone', 'service', 'message'],
+    'bookings': ['fullname', 'email', 'phone', 'destination_name', 'message'],
+    'scholarships': ['full_name', 'email', 'phone', 'country', 'study_level', 'field_of_study', 'message'],
+    'newsletter': ['email'],
+    'destinations': ['name', 'country', 'description', 'image', 'flag_image'],
+    'services': ['name', 'description', 'icon', 'image', 'features'],
+    'scholarship_opportunities': ['title', 'country', 'description', 'benefits', 'requirements', 'image_url', 'flag_url'],
+}
+
+
+def scan_suspicious_content(limit=200):
+    """Repère en base les contenus qui ressemblent à une tentative d'injection."""
+    found = []
+    conn = get_db()
+    try:
+        for table, fields in SCAN_TARGETS.items():
+            rows = conn.execute(f"SELECT id, {', '.join(fields)} FROM {table}").fetchall()
+            for row in rows:
+                for field in fields:
+                    value = row[field]
+                    if isinstance(value, str) and SUSPICIOUS_RE.search(value):
+                        found.append({'table': table, 'id': row['id'], 'field': field, 'value': value[:160]})
+                        if len(found) >= limit:
+                            return found
+    finally:
+        conn.close()
+    return found
+
+
+@app.route('/admin/securite')
+@login_required
+def admin_security():
+    try:
+        backups = security.list_backups()
+    except OSError:
+        backups = []
+    return render_template(
+        'admin/securite.html',
+        events=security.recent_security_events(100),
+        backups=backups,
+        suspicious=scan_suspicious_content(),
+        totp_enabled=bool(Config.ADMIN_TOTP_SECRET),
+        password_hashed=bool(Config.ADMIN_PASSWORD_HASH),
+        secret_from_env=bool(os.getenv('SECRET_KEY')),
+        https=request.is_secure,
+        new_totp=session.pop('new_totp', None),
+        new_hash=session.pop('new_hash', None),
+    )
+
+
+@app.route('/admin/securite/sauvegarde', methods=['POST'])
+@login_required
+def admin_backup_create():
+    try:
+        path = security.make_backup()
+        flash(f'Sauvegarde créée : {os.path.basename(path)}', 'success')
+    except Exception as e:
+        traceback.print_exc()
+        flash(f'Sauvegarde impossible : {e}', 'danger')
+    return redirect(url_for('admin_security'))
+
+
+@app.route('/admin/securite/sauvegarde/<name>')
+@login_required
+def admin_backup_download(name):
+    if not re.fullmatch(r'database-[0-9A-Za-z_-]+\.db', name):
+        return redirect(url_for('admin_security'))
+    security.log_security_event('sauvegarde téléchargée', request.remote_addr, name)
+    return send_from_directory(security.backup_dir(), name, as_attachment=True)
+
+
+@app.route('/admin/securite/totp', methods=['POST'])
+@login_required
+def admin_totp_generate():
+    secret = security.new_totp_secret()
+    session['new_totp'] = {'secret': secret, 'uri': security.totp_uri(secret, Config.ADMIN_USERNAME or 'admin')}
+    return redirect(url_for('admin_security') + '#double-authentification')
+
+
+@app.route('/admin/securite/empreinte', methods=['POST'])
+@login_required
+def admin_password_hash():
+    password = request.form.get('new_password', '')
+    if len(password) < 12:
+        flash('Choisissez un mot de passe d\'au moins 12 caractères.', 'danger')
+        return redirect(url_for('admin_security') + '#mot-de-passe')
+    session['new_hash'] = generate_password_hash(password)
+    return redirect(url_for('admin_security') + '#mot-de-passe')
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

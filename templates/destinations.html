@@ -20,7 +20,7 @@
 
 <section class="section" style="padding-top:0">
     <div class="wrap">
-        <form class="toolbar trust-overlap" id="filters" role="search" onsubmit="return false">
+        <form class="toolbar trust-overlap" id="filters" role="search">
             <div class="field">
                 <label for="f-q">Rechercher</label>
                 <div class="input-icon"><i class="fas fa-magnifying-glass"></i>
@@ -106,6 +106,7 @@
             <div style="text-align:right"><small id="booking-country">Destination</small><span class="code" id="booking-code">---</span></div>
         </div>
         <form id="booking-form" data-ajax="/api/booking" novalidate>
+                    {{ m_honeypot() }}
             <input type="hidden" name="destination_id" id="booking-id">
             <input type="hidden" name="destination_name" id="booking-name">
             <div class="form-grid">
@@ -145,7 +146,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
     var grid = document.getElementById('pass-grid');
     if (!grid) return;
