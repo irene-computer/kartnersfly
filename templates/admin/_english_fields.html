@@ -1,0 +1,28 @@
+{# Champs de la version anglaise. Variables : table ('destinations' | 'services' | 'scholarship_opportunities'), obj (ligne ou None). #}
+{% set labels = {
+    'name_en': 'Nom (anglais)', 'country_en': 'Pays (anglais)', 'description_en': 'Description (anglais)',
+    'features_en': 'Points forts (anglais, séparés par |)', 'title_en': 'Titre (anglais)',
+    'benefits_en': 'Avantages (anglais)', 'requirements_en': 'Conditions (anglais)'
+} %}
+{% set fields = {
+    'destinations': ['name_en', 'country_en', 'description_en'],
+    'services': ['name_en', 'description_en', 'features_en'],
+    'scholarship_opportunities': ['title_en', 'country_en', 'description_en', 'benefits_en', 'requirements_en'],
+}[table] %}
+<details class="mt-3 mb-2 p-3 rounded" style="background:#F3EAF7" {% if obj and obj[fields[0]] %}open{% endif %}>
+    <summary class="fw-semibold" style="cursor:pointer;color:#662581">
+        <i class="fas fa-language"></i> Version anglaise <span class="text-muted fw-normal small">(facultatif : vide = texte français affiché aux visiteurs anglophones)</span>
+    </summary>
+    <div class="row g-3 mt-1">
+        {% for f in fields %}
+        <div class="{{ 'col-12' if f in ('description_en', 'benefits_en', 'requirements_en') else 'col-md-6' }}">
+            <label class="form-label small" for="{{ table }}-{{ f }}">{{ labels[f] }}</label>
+            {% if f in ('description_en', 'benefits_en', 'requirements_en') %}
+            <textarea class="form-control" rows="2" id="{{ table }}-{{ f }}" name="{{ f }}">{{ (obj[f] if obj else '') or '' }}</textarea>
+            {% else %}
+            <input class="form-control" id="{{ table }}-{{ f }}" name="{{ f }}" value="{{ (obj[f] if obj else '') or '' }}">
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</details>

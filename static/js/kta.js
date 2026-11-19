@@ -2,6 +2,13 @@
 (function () {
     'use strict';
     document.documentElement.classList.add('js');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Traductions (fournies par la page, voir i18n.py) ---------- */
+    var strings = {};
+    try { strings = JSON.parse(document.getElementById('kta-i18n').textContent); } catch (e) {}
+    function t(key) { return strings[key] || key; }
+    window.ktaT = t;
 
     /* ---------- Notifications ---------- */
     function toast(message, type) {
@@ -35,12 +42,12 @@
                 body: JSON.stringify(data)
             });
         } catch (e) {
-            return { success: false, message: 'Connexion impossible. Vérifiez votre réseau puis réessayez.' };
+            return { success: false, message: t('Connexion impossible. Vérifiez votre réseau puis réessayez.') };
         }
         try {
             return await res.json();
         } catch (e) {
-            return { success: false, message: 'Le serveur ne répond pas correctement (code ' + res.status + '). Réessayez dans un instant.' };
+            return { success: false, message: t('Le serveur ne répond pas correctement. Réessayez dans un instant.') + ' (' + res.status + ')' };
         }
     }
     window.ktaPostJSON = postJSON;
@@ -50,7 +57,7 @@
         if (busy) {
             button.dataset.label = button.innerHTML;
             button.disabled = true;
-            button.innerHTML = '<span class="spinner" aria-hidden="true"></span> ' + (label || 'Envoi…');
+            button.innerHTML = '<span class="spinner" aria-hidden="true"></span> ' + (label || t('Envoi…'));
         } else {
             button.disabled = false;
             if (button.dataset.label) button.innerHTML = button.dataset.label;
@@ -87,7 +94,7 @@
                     }
                 });
                 if (firstInvalid) {
-                    showFormMessage(form, 'Vérifiez les champs signalés en rouge.', false);
+                    showFormMessage(form, t('Vérifiez les champs signalés en rouge.'), false);
                     firstInvalid.focus();
                     return;
                 }
@@ -105,7 +112,7 @@
                     form.reset();
                     form.dispatchEvent(new CustomEvent('kta:success', { detail: result }));
                 } else {
-                    showFormMessage(form, result.message || 'Une erreur est survenue. Réessayez.', false);
+                    showFormMessage(form, result.message || t('Une erreur est survenue. Réessayez.'), false);
                 }
             });
         });
@@ -134,13 +141,73 @@
 
         /* Diaporama du héros */
         var slides = document.querySelectorAll('.hero-slides span');
-        if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (slides.length > 1 && !reduceMotion) {
             var i = 0;
             setInterval(function () {
                 slides[i].classList.remove('is-active');
                 i = (i + 1) % slides.length;
                 slides[i].classList.add('is-active');
             }, 6000);
+        }
+
+        /* Thème clair / sombre : choix mémorisé dans le navigateur */
+        var themeBtn = document.querySelector('[data-theme-toggle]');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', function () {
+                var root = document.documentElement;
+                var current = root.getAttribute('data-theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                var next = current === 'dark' ? 'light' : 'dark';
+                var apply = function () { root.setAttribute('data-theme', next); };
+                if (document.startViewTransition && !reduceMotion) document.startViewTransition(apply); else apply();
+                try { localStorage.setItem('kta-theme', next); } catch (e) {}
+                themeBtn.setAttribute('aria-pressed', String(next === 'dark'));
+                toast(t(next === 'dark' ? 'Thème sombre activé' : 'Thème clair activé'), 'ok');
+            });
+        }
+
+        /* Cascade : chaque élément d'une grille apparaît un peu après le précédent */
+        document.querySelectorAll('.stagger').forEach(function (group) {
+            Array.prototype.forEach.call(group.children, function (child, index) {
+                child.style.setProperty('--i', String(index % 6));
+            });
+        });
+
+        /* Chiffres qui défilent jusqu'à leur valeur */
+        var counters = document.querySelectorAll('[data-count]');
+        var runCounter = function (el) {
+            var end = parseInt(el.getAttribute('data-count'), 10);
+            if (!end || reduceMotion) return;
+            var start = performance.now(), duration = 1200;
+            var step = function (now) {
+                var p = Math.min(1, (now - start) / duration);
+                el.textContent = String(Math.round(end * (1 - Math.pow(1 - p, 3))));
+                if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        };
+        if ('IntersectionObserver' in window && counters.length) {
+            var co = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) { runCounter(entry.target); co.unobserve(entry.target); }
+                });
+            }, { threshold: .6 });
+            counters.forEach(function (el) { co.observe(el); });
+        }
+
+        /* Inclinaison 3D légère des cartes sous la souris (ordinateur uniquement) */
+        if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+            document.querySelectorAll('.pass, .lift').forEach(function (card) {
+                card.addEventListener('pointermove', function (e) {
+                    var r = card.getBoundingClientRect();
+                    var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+                    card.style.setProperty('--ry', (x * 6).toFixed(2) + 'deg');
+                    card.style.setProperty('--rx', (-y * 6).toFixed(2) + 'deg');
+                });
+                card.addEventListener('pointerleave', function () {
+                    card.style.removeProperty('--rx'); card.style.removeProperty('--ry');
+                });
+            });
         }
 
         /* Apparition au défilement */
@@ -166,7 +233,7 @@
         document.querySelectorAll('[data-copy]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 var value = btn.getAttribute('data-copy');
-                var done = function () { toast('Copié : ' + value, 'ok'); };
+                var done = function () { toast(t('Copié :') + ' ' + value, 'ok'); };
                 if (navigator.clipboard) navigator.clipboard.writeText(value).then(done, function () { toast(value, 'ok'); });
                 else toast(value, 'ok');
             });

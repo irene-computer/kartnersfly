@@ -159,6 +159,8 @@ cd kartnersfly
 | `ADMIN_PASSWORD_HASH` | Recommandé | Empreinte du mot de passe, à la place de `ADMIN_PASSWORD` (`python manage_security.py hash` ou page Admin › Sécurité). |
 | `ADMIN_TOTP_SECRET` | Recommandé | Active la double authentification (`python manage_security.py totp` ou page Admin › Sécurité). |
 | `AUTO_BACKUP` / `BACKUP_DIR` | Non | Sauvegarde quotidienne de la base (activée par défaut, 14 copies dans `backups/` à côté de la base). |
+| `NOTIFY_EMAIL` | Non | Adresse qui reçoit une alerte à chaque réservation, message ou candidature (par défaut : l'email de contact). |
+| `CALLMEBOT_PHONE` / `CALLMEBOT_APIKEY` | Non | Alerte WhatsApp gratuite via CallMeBot (voir `notify.py` pour l'activation). |
 | `SECRET_KEY` | Recommandé | Clé de session. Si absente, une clé est générée une fois et conservée dans `.secret_key` à côté de la base. |
 | `DATABASE` | Non | Chemin de la base SQLite (`/data/database.db` sur Fly.io). |
 | `UPLOAD_ROOT` | Non | Dossier persistant des images envoyées depuis l'admin (`/data/uploads` sur Fly.io), pour qu'elles survivent aux déploiements. |
@@ -182,3 +184,10 @@ ADMIN_USERNAME=admin ADMIN_PASSWORD=motdepasse DEBUG=True python app.py
 - Connexion admin : blocage après 5 échecs en 15 min par adresse IP (et 30 par heure au total), conservé en base ; double authentification TOTP en option ; sessions révoquées quand le mot de passe change.
 - Formulaires publics : champ piège anti-robots, jeton signé, délai minimum de saisie, 10 envois par heure et par adresse IP.
 - Page **Admin › Sécurité & sauvegardes** : journal des connexions, recherche de contenus suspects en base, sauvegardes téléchargeables.
+
+## 🌍 Langues, thème, prix
+
+- **Bilingue français / anglais** : bouton FR / EN dans l'en-tête (`?lang=en`, mémorisé). Textes de l'interface dans `i18n.py` ; contenus (destinations, services, bourses) traduits depuis l'admin, champs « Version anglaise ».
+- **Thème clair / sombre** : suit le réglage de l'appareil, bouton lune / soleil pour forcer un thème.
+- **Prix en FCFA** : saisis en euros dans l'admin, affichés en francs CFA (parité fixe 1 € = 655,957 FCFA) avec l'équivalent en euros.
+- **Photos des destinations** : Unsplash, licence libre (voir `static/images/destinations/CREDITS.md`).

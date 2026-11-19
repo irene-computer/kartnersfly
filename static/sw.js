@@ -3,8 +3,8 @@
  * - Fichiers /static : cache d'abord.
  * - Jamais de cache pour l'administration ni pour l'API.
  */
-const CACHE = 'kta-v4';
-const PRECACHE = ['/', '/static/css/kta.css?v=4', '/static/js/kta.js?v=4', '/static/images/kta-logo.png', '/static/images/icon-192.png'];
+const CACHE = 'kta-v5';
+const PRECACHE = ['/', '/static/css/kta.css?v=5', '/static/js/kta.js?v=5', '/static/images/kta-logo.png', '/static/images/icon-192.png'];
 
 self.addEventListener('install', event => {
     event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)).catch(() => {}));

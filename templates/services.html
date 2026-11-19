@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 
-{% block title %}Services · Kartners Travel Agency{% endblock %}
+{% block title %}{{ _('Services') }} · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Billetterie aérienne, assistance visa, réservation d'hôtels, pré-enrôlement passeport et CNI, planification de voyage et assurance : les services de Kartners Travel Agency à Douala.">
+<meta name="description" content="{{ _("Billetterie aérienne, assistance visa, réservation d'hôtels, pré-enrôlement passeport et CNI, planification de voyage et assurance : les services de Kartners Travel Agency à Douala.") }}">
 {% endblock %}
 
 {% set regions = [
-    ('Europe', 'fas fa-landmark', [('fr','France'),('de','Allemagne'),('be','Belgique'),('it','Italie'),('es','Espagne'),('nl','Pays-Bas'),('ch','Suisse'),('gb','Royaume-Uni')]),
-    ('Amériques & Asie', 'fas fa-earth-americas', [('us','États-Unis'),('ca','Canada'),('cn','Chine'),('ae','Émirats arabes unis'),('tr','Turquie')]),
-    ('Afrique', 'fas fa-earth-africa', [('ma','Maroc'),('za','Afrique du Sud'),('sn','Sénégal'),('ci',"Côte d'Ivoire"),('ga','Gabon')]),
+    (_('Europe'), 'fas fa-landmark', [('fr', _('France')), ('de', _('Allemagne')), ('be', _('Belgique')), ('it', _('Italie')), ('es', _('Espagne')), ('nl', _('Pays-Bas')), ('ch', _('Suisse')), ('gb', _('Royaume-Uni'))]),
+    (_('Amériques & Asie'), 'fas fa-earth-americas', [('us', _('États-Unis')), ('ca', _('Canada')), ('cn', _('Chine')), ('ae', _('Émirats arabes unis')), ('tr', _('Turquie'))]),
+    (_('Afrique'), 'fas fa-earth-africa', [('ma', _('Maroc')), ('za', _('Afrique du Sud')), ('sn', _('Sénégal')), ('ci', _("Côte d'Ivoire")), ('ga', _('Gabon'))]),
 ] %}
 
 {% block content %}
@@ -17,18 +17,19 @@
     <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/voyage-plus.webp') }}')"></span></div>
     <div class="wrap hero-grid">
         <div>
-            <p class="hero-kicker"><b>{{ services|length }}</b> services sous un même toit</p>
-            <h1>Nos services</h1>
-            <p class="hero-lead">Des démarches administratives jusqu'à l'embarquement : nous prenons en charge chaque étape de votre projet de voyage, d'études ou d'affaires.</p>
+            <p class="hero-kicker rise" style="--d:0"><b>{{ services|length }}</b> {{ _('services sous un même toit') }}</p>
+            <h1 class="rise" style="--d:1">{{ _('Nos services') }}</h1>
+            <p class="hero-lead rise" style="--d:2">{{ _("Des démarches administratives jusqu'à l'embarquement : nous prenons en charge chaque étape de votre projet de voyage, d'études ou d'affaires.") }}</p>
         </div>
     </div>
 </section>
 
 <section class="section">
     <div class="wrap">
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for service in services %}
             {% set photo = service.image|img %}
+            {% set features = tr(service, 'features') %}
             <article class="service-card reveal" id="service-{{ service.id }}">
                 <div class="service-media">
                     {% if photo %}
@@ -38,18 +39,18 @@
                     {% endif %}
                 </div>
                 <div class="service-body">
-                    <h3><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i> {{ service.name }}</h3>
-                    <p>{{ service.description }}</p>
-                    {% if service.features %}
+                    <h3><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i> {{ tr(service, 'name') }}</h3>
+                    <p>{{ tr(service, 'description') }}</p>
+                    {% if features %}
                     <ul class="checks">
-                        {% for feature in service.features.split('|') if feature.strip() %}<li>{{ feature.strip() }}</li>{% endfor %}
+                        {% for feature in features.split('|') if feature.strip() %}<li>{{ feature.strip() }}</li>{% endfor %}
                     </ul>
                     {% endif %}
-                    <a class="link-arrow" href="/contact?service={{ service.name|urlencode }}">Demander un devis <i class="fas fa-arrow-right"></i></a>
+                    <a class="link-arrow" href="/contact?service={{ service.name|urlencode }}">{{ _('Demander un devis') }} <i class="fas fa-arrow-right"></i></a>
                 </div>
             </article>
             {% else %}
-            <div class="empty"><i class="fas fa-concierge-bell"></i><h3>Services en cours de mise à jour</h3><p>Contactez-nous pour toute demande.</p></div>
+            <div class="empty"><i class="fas fa-concierge-bell"></i><h3>{{ _('Services en cours de mise à jour') }}</h3><p>{{ _('Contactez-nous pour toute demande.') }}</p></div>
             {% endfor %}
         </div>
     </div>
@@ -57,12 +58,12 @@
 
 <section class="section section-ink">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Assistance visa</span>
-            <h2>Pays pour lesquels nous montons des dossiers</h2>
-            <p>Visas d'études, de tourisme et d'affaires. Votre pays n'apparaît pas ? Demandez-nous, la liste n'est pas limitative.</p>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Assistance visa') }}</span>
+            <h2>{{ _('Pays pour lesquels nous montons des dossiers') }}</h2>
+            <p>{{ _("Visas d'études, de tourisme et d'affaires. Votre pays n'apparaît pas ? Demandez-nous, la liste n'est pas limitative.") }}</p>
         </div>
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for title, icon, countries in regions %}
             <div class="region reveal">
                 <h3><i class="{{ icon }}" style="color:var(--cyan)"></i> {{ title }}</h3>
@@ -79,22 +80,22 @@
 
 <section class="section section-white">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Notre méthode</span>
-            <h2>Pourquoi passer par Kartners</h2>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Notre méthode') }}</span>
+            <h2>{{ _('Pourquoi passer par Kartners') }}</h2>
         </div>
-        <div class="grid-2">
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-bolt"></i></span><div><h3>Rapidité et rigueur</h3><p>Des conseillers qui connaissent les exigences des consulats et vérifient chaque pièce avant le dépôt.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile sky"><i class="fas fa-user-check"></i></span><div><h3>Un conseiller dédié</h3><p>Une seule personne suit votre dossier, joignable par téléphone et WhatsApp.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile sun"><i class="fas fa-receipt"></i></span><div><h3>Tarifs annoncés à l'avance</h3><p>Le prix de notre accompagnement est fixé avant le début des démarches, sans frais cachés.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-handshake"></i></span><div><h3>Un réseau de partenaires</h3><p>Compagnies aériennes, hôtels, assureurs et établissements d'enseignement à l'étranger.</p></div></div>
+        <div class="grid-2 stagger">
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-bolt"></i></span><div><h3>{{ _('Rapidité et rigueur') }}</h3><p>{{ _('Des conseillers qui connaissent les exigences des consulats et vérifient chaque pièce avant le dépôt.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile sky"><i class="fas fa-user-check"></i></span><div><h3>{{ _('Un conseiller dédié') }}</h3><p>{{ _('Une seule personne suit votre dossier, joignable par téléphone et WhatsApp.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile sun"><i class="fas fa-receipt"></i></span><div><h3>{{ _("Tarifs annoncés à l'avance") }}</h3><p>{{ _('Le prix de notre accompagnement est fixé avant le début des démarches, sans frais cachés.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-handshake"></i></span><div><h3>{{ _('Un réseau de partenaires') }}</h3><p>{{ _("Compagnies aériennes, hôtels, assureurs et établissements d'enseignement à l'étranger.") }}</p></div></div>
         </div>
     </div>
 </section>
 
 <section class="section-tight">
     <div class="wrap">
-        {{ m.cta_band("Prêt à lancer votre projet ?", "Une première étude de votre dossier est gratuite. Dites-nous ce dont vous avez besoin.", "Demander un devis gratuit") }}
+        {{ m.cta_band(_('Prêt à lancer votre projet ?'), _("Une première étude de votre dossier est gratuite. Dites-nous ce dont vous avez besoin."), _('Demander un devis gratuit')) }}
     </div>
 </section>
 {% endblock %}

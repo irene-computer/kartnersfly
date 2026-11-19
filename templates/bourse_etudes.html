@@ -1,73 +1,76 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 
-{% block title %}Bourses d'études & visa étudiant · Kartners Travel Agency{% endblock %}
+{% block title %}{{ _("Bourses d'études & visa étudiant") }} · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Bourses d'études à l'étranger : recherche de bourse, dossier académique et visa étudiant avec Kartners Travel Agency, Douala. France, Canada, Belgique, Allemagne, Maroc, Turquie.">
+<meta name="description" content="{{ _("Bourses d'études à l'étranger : recherche de bourse, dossier académique et visa étudiant avec Kartners Travel Agency, Douala. France, Canada, Belgique, Allemagne, Maroc, Turquie.") }}">
 {% endblock %}
+
+{% set study_countries = [('France', _('France')), ('Canada', _('Canada')), ('Belgique', _('Belgique')), ('Allemagne', _('Allemagne')), ('Maroc', _('Maroc')), ('Turquie', _('Turquie')), ('Suisse', _('Suisse')), ('Royaume-Uni', _('Royaume-Uni')), ('États-Unis', _('États-Unis'))] %}
 
 {% block content %}
 <section class="hero page-hero">
     <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/voyageimagar.webp') }}')"></span></div>
     <div class="wrap hero-grid split">
         <div>
-            <p class="hero-kicker"><b>ÉTUDES</b> Bourses & visa étudiant</p>
-            <h1>Du dossier de bourse à l'embarquement, <em>un seul interlocuteur.</em></h1>
-            <p class="hero-lead">Nous cherchons les bourses adaptées à votre profil, montons votre dossier académique et préparons votre visa étudiant.</p>
-            <div class="hero-actions">
-                <a class="btn btn-sun" href="#candidature"><i class="fas fa-file-signature"></i> Déposer ma candidature</a>
-                <a class="btn btn-glass" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Poser une question</a>
+            <p class="hero-kicker rise" style="--d:0"><b>{{ _('ÉTUDES') }}</b> {{ _('Bourses & visa étudiant') }}</p>
+            <h1 class="rise" style="--d:1">{{ _("Du dossier de bourse à l'embarquement,") }} <em>{{ _('un seul interlocuteur.') }}</em></h1>
+            <p class="hero-lead rise" style="--d:2">{{ _('Nous cherchons les bourses adaptées à votre profil, montons votre dossier académique et préparons votre visa étudiant.') }}</p>
+            <div class="hero-actions rise" style="--d:3">
+                <a class="btn btn-sun" href="#candidature"><i class="fas fa-file-signature"></i> {{ _('Déposer ma candidature') }}</a>
+                <a class="btn btn-glass" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> {{ _('Poser une question') }}</a>
             </div>
         </div>
-        <div class="search-card" aria-label="Exemple de suivi de dossier">
-            <h2>Dossier étudiant</h2>
-            <p>Ce que nous suivons pour vous</p>
-            <ul class="checks" style="gap:12px">
-                <li>Bilan d'éligibilité gratuit</li>
-                <li>Recherche et candidature aux bourses</li>
-                <li>Relevés, traductions, lettre de motivation</li>
-                <li>Préparation à l'entretien consulaire</li>
-                <li>Billet d'avion tarif étudiant</li>
+        <div class="search-card rise" style="--d:2" aria-label="{{ _('Ce que nous suivons pour vous') }}">
+            <h2>{{ _('Dossier étudiant') }}</h2>
+            <p>{{ _('Ce que nous suivons pour vous') }}</p>
+            <ul class="checks checks-animated" style="gap:12px">
+                <li>{{ _("Bilan d'éligibilité gratuit") }}</li>
+                <li>{{ _('Recherche et candidature aux bourses') }}</li>
+                <li>{{ _('Relevés, traductions, lettre de motivation') }}</li>
+                <li>{{ _("Préparation à l'entretien consulaire") }}</li>
+                <li>{{ _("Billet d'avion tarif étudiant") }}</li>
             </ul>
         </div>
     </div>
 </section>
 
 <div class="wrap">
-    <div class="trust trust-overlap">
-        <div><strong>200+</strong><span>dossiers accompagnés</span></div>
-        <div><strong>12</strong><span>pays de destination</span></div>
-        <div><strong>87 %</strong><span>de visas obtenus</span></div>
-        <div><strong>24 h</strong><span>pour un premier retour</span></div>
+    <div class="trust trust-overlap reveal">
+        <div><strong><span data-count="200">200</span>+</strong><span>{{ _('dossiers accompagnés') }}</span></div>
+        <div><strong data-count="12">12</strong><span>{{ _('pays de destination') }}</span></div>
+        <div><strong><span data-count="87">87</span> %</strong><span>{{ _('de visas obtenus') }}</span></div>
+        <div><strong><span data-count="24">24</span> h</strong><span>{{ _('pour un premier retour') }}</span></div>
     </div>
 </div>
 
 <section class="section">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Opportunités</span>
-            <h2>Bourses ouvertes en ce moment</h2>
-            <p>Mises à jour par notre équipe. Les bourses dont la date limite est passée sont retirées automatiquement.</p>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Opportunités') }}</span>
+            <h2>{{ _('Bourses ouvertes en ce moment') }}</h2>
+            <p>{{ _('Mises à jour par notre équipe. Les bourses dont la date limite est passée sont retirées automatiquement.') }}</p>
         </div>
 
         {% if scholarship_opportunities %}
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for opp in scholarship_opportunities %}
             {% set photo = opp.image_url|img %}
             {% set flag = opp.flag_url|flag(opp.country) %}
-            <article class="scholar-card reveal" id="bourse-{{ opp.id }}">
+            <article class="scholar-card reveal lift" id="bourse-{{ opp.id }}">
                 <div class="scholar-media">
                     {% if photo %}
                     <img src="{{ photo }}" alt="" loading="lazy" data-fallback>
-                    <div class="placeholder" hidden>{{ opp.country }}</div>
+                    <div class="placeholder" hidden>{{ tr(opp, 'country') }}</div>
                     {% else %}
-                    <div class="placeholder">{{ opp.country }}</div>
+                    <div class="placeholder">{{ tr(opp, 'country') }}</div>
                     {% endif %}
                 </div>
                 <div class="scholar-body">
-                    <span class="scholar-country">{% if flag %}<img src="{{ flag }}" alt="" loading="lazy">{% endif %}{{ opp.country }}</span>
-                    <h3>{{ opp.title }}</h3>
-                    {% if opp.description %}<p>{{ opp.description|truncate(130, True, '…') }}</p>{% endif %}
+                    <span class="scholar-country">{% if flag %}<img src="{{ flag }}" alt="" loading="lazy">{% endif %}{{ tr(opp, 'country') }}</span>
+                    <h3>{{ tr(opp, 'title') }}</h3>
+                    {% set desc = tr(opp, 'description') %}
+                    {% if desc %}<p>{{ desc|truncate(130, True, '…') }}</p>{% endif %}
                     <div class="meta">
                         <span class="badge badge-violet"><i class="fas fa-graduation-cap"></i> {{ opp.study_level }}</span>
                         <span class="badge badge-violet"><i class="fas fa-book-open"></i> {{ opp.field_of_study }}</span>
@@ -76,19 +79,19 @@
                 <div class="scholar-foot">
                     <span class="deadline">
                         <i class="far fa-calendar"></i>
-                        {% if opp.end_date %}Jusqu'au {{ opp.end_date|date_fr }}{% elif opp.start_date %}Dès le {{ opp.start_date|date_fr }}{% else %}Candidatures ouvertes{% endif %}
+                        {% if opp.end_date %}{{ _("Jusqu'au") }} {{ opp.end_date|date_fr }}{% elif opp.start_date %}{{ _('Dès le') }} {{ opp.start_date|date_fr }}{% else %}{{ _('Candidatures ouvertes') }}{% endif %}
                     </span>
-                    <button class="btn btn-dark btn-sm" type="button" data-opp="{{ loop.index0 }}">Détails</button>
+                    <button class="btn btn-dark btn-sm" type="button" data-opp="{{ loop.index0 }}">{{ _('Détails') }}</button>
                 </div>
             </article>
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty">
+        <div class="empty reveal">
             <i class="fas fa-graduation-cap"></i>
-            <h3>Aucune bourse publiée pour le moment</h3>
-            <p>Déposez votre profil ci-dessous : nous vous prévenons dès qu'une bourse vous correspond.</p>
-            <a class="btn btn-primary" href="#candidature">Déposer mon profil</a>
+            <h3>{{ _('Aucune bourse publiée pour le moment') }}</h3>
+            <p>{{ _("Déposez votre profil ci-dessous : nous vous prévenons dès qu'une bourse vous correspond.") }}</p>
+            <a class="btn btn-primary" href="#candidature">{{ _('Déposer mon profil') }}</a>
         </div>
         {% endif %}
     </div>
@@ -96,30 +99,30 @@
 
 <section class="section section-white">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Le parcours</span>
-            <h2>Quatre étapes, un accompagnement continu</h2>
-            <p>Chaque dossier suit le même fil, du bilan initial jusqu'à l'arrivée sur le campus.</p>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Le parcours') }}</span>
+            <h2>{{ _('Quatre étapes, un accompagnement continu') }}</h2>
+            <p>{{ _("Chaque dossier suit le même fil, du bilan initial jusqu'à l'arrivée sur le campus.") }}</p>
         </div>
-        <ol class="steps">
-            <li class="step reveal"><h3>Bilan et orientation</h3><p>Profil académique, budget, pays et filières compatibles avec vos objectifs.</p></li>
-            <li class="step reveal"><h3>Recherche de bourse</h3><p>Programmes gouvernementaux, universitaires, Campus France, DAAD… et dépôt des candidatures.</p></li>
-            <li class="step reveal"><h3>Constitution du dossier</h3><p>Relevés de notes, traductions, légalisations, lettre de motivation et CV académique.</p></li>
-            <li class="step reveal"><h3>Visa et départ</h3><p>Entretien consulaire, dépôt du visa, billet d'avion et briefing avant le départ.</p></li>
+        <ol class="steps stagger">
+            <li class="step reveal"><h3>{{ _('Bilan et orientation') }}</h3><p>{{ _('Profil académique, budget, pays et filières compatibles avec vos objectifs.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('Recherche de bourse') }}</h3><p>{{ _('Programmes gouvernementaux, universitaires, Campus France, DAAD… et dépôt des candidatures.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('Constitution du dossier') }}</h3><p>{{ _('Relevés de notes, traductions, légalisations, lettre de motivation et CV académique.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('Visa et départ') }}</h3><p>{{ _("Entretien consulaire, dépôt du visa, billet d'avion et briefing avant le départ.") }}</p></li>
         </ol>
     </div>
 </section>
 
 <section class="section">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Destinations</span>
-            <h2>Où partent nos étudiants</h2>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Destinations') }}</span>
+            <h2>{{ _('Où partent nos étudiants') }}</h2>
         </div>
-        <div class="grid-3">
-            {% for code, pays, prog in [('fr','France',"Campus France, bourses d'excellence"),('ca','Canada','Bourses provinciales et universitaires'),('be','Belgique','Bourses ARES, universités francophones'),('ma','Maroc','Bourses AMCI, filières techniques'),('tr','Turquie','Türkiye Bursları (bourses d\'État)'),('de','Allemagne','DAAD, frais universitaires réduits')] %}
-            <div class="card feature reveal">
-                <img src="https://flagcdn.com/w80/{{ code }}.png" alt="Drapeau : {{ pays }}" width="48" height="34" loading="lazy" style="border-radius:6px;box-shadow:0 0 0 1px var(--line);flex-shrink:0">
+        <div class="grid-3 stagger">
+            {% for code, pays, prog in [('fr', _('France'), _("Campus France, bourses d'excellence")), ('ca', _('Canada'), _('Bourses provinciales et universitaires')), ('be', _('Belgique'), _('Bourses ARES, universités francophones')), ('ma', _('Maroc'), _('Bourses AMCI, filières techniques')), ('tr', _('Turquie'), _("Türkiye Bursları (bourses d'État)")), ('de', _('Allemagne'), _('DAAD, frais universitaires réduits'))] %}
+            <div class="card feature reveal lift">
+                <img src="https://flagcdn.com/w80/{{ code }}.png" alt="{{ _('Drapeau') }} : {{ pays }}" width="48" height="34" loading="lazy" style="border-radius:6px;box-shadow:0 0 0 1px var(--line);flex-shrink:0">
                 <div><h3>{{ pays }}</h3><p>{{ prog }}</p></div>
             </div>
             {% endfor %}
@@ -129,32 +132,32 @@
 
 <section class="section section-white">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Formules</span>
-            <h2>Un accompagnement adapté à votre avancement</h2>
-            <p>Tarif communiqué après le bilan gratuit, selon le pays visé et l'état de votre dossier.</p>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Formules') }}</span>
+            <h2>{{ _('Un accompagnement adapté à votre avancement') }}</h2>
+            <p>{{ _("Tarif communiqué après le bilan gratuit, selon le pays visé et l'état de votre dossier.") }}</p>
         </div>
-        <div class="plans">
-            <div class="plan reveal">
-                <span class="badge badge-violet" style="justify-self:start">Orientation</span>
-                <h3>Bilan et orientation</h3>
-                <p>Pour cadrer votre projet d'études.</p>
-                <ul class="checks"><li>Évaluation du profil académique</li><li>Pays et filières éligibles</li><li>Liste des bourses accessibles</li><li>Feuille de route personnalisée</li></ul>
-                <a class="btn btn-ghost" href="#candidature">Démarrer le bilan</a>
+        <div class="plans stagger">
+            <div class="plan reveal lift">
+                <span class="badge badge-violet" style="justify-self:start">{{ _('Orientation') }}</span>
+                <h3>{{ _('Bilan et orientation') }}</h3>
+                <p>{{ _("Pour cadrer votre projet d'études.") }}</p>
+                <ul class="checks"><li>{{ _('Évaluation du profil académique') }}</li><li>{{ _('Pays et filières éligibles') }}</li><li>{{ _('Liste des bourses accessibles') }}</li><li>{{ _('Feuille de route personnalisée') }}</li></ul>
+                <a class="btn btn-ghost" href="#candidature">{{ _('Démarrer le bilan') }}</a>
             </div>
-            <div class="plan featured reveal">
-                <span class="badge badge-sun" style="justify-self:start">Formule complète</span>
-                <h3>Bourse, dossier et visa</h3>
-                <p>Un accompagnement de bout en bout.</p>
-                <ul class="checks"><li>Recherche et candidature à la bourse</li><li>Dossier académique complet</li><li>Préparation à l'entretien de visa</li><li>Dépôt et suivi consulaire</li><li>Réservation du billet d'avion</li></ul>
-                <a class="btn btn-sun" href="#candidature">Demander un devis</a>
+            <div class="plan featured reveal lift">
+                <span class="badge badge-sun" style="justify-self:start">{{ _('Formule complète') }}</span>
+                <h3>{{ _('Bourse, dossier et visa') }}</h3>
+                <p>{{ _('Un accompagnement de bout en bout.') }}</p>
+                <ul class="checks"><li>{{ _('Recherche et candidature à la bourse') }}</li><li>{{ _('Dossier académique complet') }}</li><li>{{ _("Préparation à l'entretien de visa") }}</li><li>{{ _('Dépôt et suivi consulaire') }}</li><li>{{ _("Réservation du billet d'avion") }}</li></ul>
+                <a class="btn btn-sun" href="#candidature">{{ _('Demander un devis') }}</a>
             </div>
-            <div class="plan reveal">
-                <span class="badge badge-violet" style="justify-self:start">Après le visa</span>
-                <h3>Accompagnement au départ</h3>
-                <p>Pour arriver sans imprévu.</p>
-                <ul class="checks"><li>Logement étudiant</li><li>Assurance voyage et santé</li><li>Billet d'avion tarif étudiant</li><li>Aide à l'arrivée et à l'installation</li></ul>
-                <a class="btn btn-ghost" href="#candidature">En savoir plus</a>
+            <div class="plan reveal lift">
+                <span class="badge badge-violet" style="justify-self:start">{{ _('Après le visa') }}</span>
+                <h3>{{ _('Accompagnement au départ') }}</h3>
+                <p>{{ _('Pour arriver sans imprévu.') }}</p>
+                <ul class="checks"><li>{{ _('Logement étudiant') }}</li><li>{{ _('Assurance voyage et santé') }}</li><li>{{ _("Billet d'avion tarif étudiant") }}</li><li>{{ _("Aide à l'arrivée et à l'installation") }}</li></ul>
+                <a class="btn btn-ghost" href="#candidature">{{ _('En savoir plus') }}</a>
             </div>
         </div>
     </div>
@@ -162,67 +165,62 @@
 
 <section class="section" id="candidature">
     <div class="wrap" style="max-width:880px">
-        <div class="section-head center">
-            <span class="eyebrow">Candidature</span>
-            <h2>Déposez votre dossier d'études</h2>
-            <p>Notre équipe étudie votre éligibilité et vous recontacte sous 24 h.</p>
+        <div class="section-head center reveal">
+            <span class="eyebrow">{{ _('Candidature') }}</span>
+            <h2>{{ _("Déposez votre dossier d'études") }}</h2>
+            <p>{{ _('Notre équipe étudie votre éligibilité et vous recontacte sous 24 h.') }}</p>
         </div>
-        <form class="card card-shadow" id="scholarship-form" data-ajax="/api/scholarship" novalidate>
-                    {{ m_honeypot() }}
+        <form class="card card-shadow reveal" id="scholarship-form" data-ajax="/api/scholarship" novalidate>
+            {{ m_honeypot() }}
             <div class="form-grid">
                 <div class="field">
-                    <label for="s-name">Nom complet <span class="req">*</span></label>
+                    <label for="s-name">{{ _('Nom complet') }} <span class="req">*</span></label>
                     <input class="input" id="s-name" name="full_name" required autocomplete="name" placeholder="Jean Dupont">
                 </div>
                 <div class="field">
-                    <label for="s-email">Email <span class="req">*</span></label>
+                    <label for="s-email">{{ _('Email') }} <span class="req">*</span></label>
                     <input class="input" id="s-email" name="email" type="email" required autocomplete="email" placeholder="jean.dupont@gmail.com">
                 </div>
                 <div class="field">
-                    <label for="s-phone">Téléphone / WhatsApp <span class="req">*</span></label>
+                    <label for="s-phone">{{ _('Téléphone / WhatsApp') }} <span class="req">*</span></label>
                     <input class="input" id="s-phone" name="phone" type="tel" required autocomplete="tel" placeholder="+237 6XX XXX XXX" pattern="[+0-9 ().-]{8,20}">
                 </div>
                 <div class="field">
-                    <label for="s-level">Niveau d'études actuel <span class="req">*</span></label>
+                    <label for="s-level">{{ _("Niveau d'études actuel") }} <span class="req">*</span></label>
                     <select class="select" id="s-level" name="study_level" required>
-                        <option value="">Choisir</option>
-                        <option>Baccalauréat</option>
-                        <option value="Licence">Licence (Bac + 3)</option>
-                        <option value="Master">Master (Bac + 5)</option>
-                        <option>Doctorat</option>
-                        <option>Autre</option>
+                        <option value="">{{ _('Choisir') }}</option>
+                        <option value="Baccalauréat">{{ _('Baccalauréat') }}</option>
+                        <option value="Licence">{{ _('Licence (Bac + 3)') }}</option>
+                        <option value="Master">{{ _('Master (Bac + 5)') }}</option>
+                        <option value="Doctorat">{{ _('Doctorat') }}</option>
+                        <option value="Autre">{{ _('Autre') }}</option>
                     </select>
                 </div>
                 <div class="field">
-                    <label for="s-country">Pays souhaité <span class="req">*</span></label>
+                    <label for="s-country">{{ _('Pays souhaité') }} <span class="req">*</span></label>
                     <select class="select" id="s-country" name="country" required>
-                        <option value="">Choisir</option>
-                        {% for c in ['France','Canada','Belgique','Allemagne','Maroc','Turquie','Suisse','Royaume-Uni','États-Unis'] %}<option>{{ c }}</option>{% endfor %}
-                        <option value="Autre">Autre destination</option>
+                        <option value="">{{ _('Choisir') }}</option>
+                        {% for value, label in study_countries %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                        <option value="Autre">{{ _('Autre destination') }}</option>
                     </select>
                 </div>
                 <div class="field">
-                    <label for="s-field">Domaine d'études visé <span class="req">*</span></label>
+                    <label for="s-field">{{ _("Domaine d'études visé") }} <span class="req">*</span></label>
                     <select class="select" id="s-field" name="field_of_study" required>
-                        <option value="">Choisir</option>
-                        <option value="Médecine / Santé">Médecine / Santé</option>
-                        <option value="Ingénierie / Technologie">Ingénierie / Technologie</option>
-                        <option value="Commerce / Gestion">Commerce / Gestion</option>
-                        <option>Droit</option>
-                        <option value="Lettres / Arts">Lettres / Arts</option>
-                        <option value="Sciences fondamentales">Sciences fondamentales</option>
-                        <option value="Informatique / Data">Informatique / Data</option>
-                        <option>Autre</option>
+                        <option value="">{{ _('Choisir') }}</option>
+                        {% for value in ['Médecine / Santé', 'Ingénierie / Technologie', 'Commerce / Gestion', 'Droit', 'Lettres / Arts', 'Sciences fondamentales', 'Informatique / Data', 'Autre'] %}
+                        <option value="{{ value }}">{{ _(value) }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="field full">
-                    <label for="s-message">Votre projet</label>
-                    <textarea class="textarea" id="s-message" name="message" maxlength="2000" placeholder="Bourse visée, moyenne, niveau de langue, date de rentrée souhaitée…"></textarea>
+                    <label for="s-message">{{ _('Votre projet') }}</label>
+                    <textarea class="textarea" id="s-message" name="message" maxlength="2000" placeholder="{{ _('Bourse visée, moyenne, niveau de langue, date de rentrée souhaitée…') }}"></textarea>
                 </div>
                 <div class="full" data-form-message hidden></div>
                 <div class="full" style="display:grid;gap:10px">
-                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> Envoyer ma candidature</button>
-                    <p class="form-note"><i class="fas fa-lock"></i> Vos informations restent confidentielles et ne sont utilisées que pour votre dossier.</p>
+                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> {{ _('Envoyer ma candidature') }}</button>
+                    <p class="form-note"><i class="fas fa-lock"></i> {{ _('Vos informations restent confidentielles et ne sont utilisées que pour votre dossier.') }}</p>
                 </div>
             </div>
         </form>
@@ -231,22 +229,22 @@
 
 <section class="section section-white">
     <div class="wrap">
-        <div class="section-head center">
-            <span class="eyebrow">Questions fréquentes</span>
-            <h2>Avant de vous lancer</h2>
+        <div class="section-head center reveal">
+            <span class="eyebrow">{{ _('Questions fréquentes') }}</span>
+            <h2>{{ _('Avant de vous lancer') }}</h2>
         </div>
-        <div class="faq">
-            <details><summary>Comment savoir si je suis éligible à une bourse ?</summary><div>Nous étudions gratuitement votre dossier (relevés de notes, diplômes, niveau de langue) pour identifier les bourses et destinations où vos chances sont les meilleures.</div></details>
-            <details><summary>Quand faut-il candidater ?</summary><div>Les campagnes ouvrent en général 6 à 10 mois avant la rentrée. Pour une rentrée en septembre, commencez à préparer votre dossier dès octobre de l'année précédente.</div></details>
-            <details><summary>Garantissez-vous l'obtention du visa ?</summary><div>Non : la décision appartient uniquement aux ambassades et consulats. Notre taux de réussite de 87 % repose sur un contrôle rigoureux de chaque pièce du dossier.</div></details>
-            <details><summary>Puis-je partir sans bourse, avec un financement personnel ?</summary><div>Oui. L'accompagnement pour l'admission et le visa est disponible quel que soit votre mode de financement.</div></details>
+        <div class="faq stagger">
+            <details class="reveal"><summary>{{ _('Comment savoir si je suis éligible à une bourse ?') }}</summary><div>{{ _('Nous étudions gratuitement votre dossier (relevés de notes, diplômes, niveau de langue) pour identifier les bourses et destinations où vos chances sont les meilleures.') }}</div></details>
+            <details class="reveal"><summary>{{ _('Quand faut-il candidater ?') }}</summary><div>{{ _("Les campagnes ouvrent en général 6 à 10 mois avant la rentrée. Pour une rentrée en septembre, commencez à préparer votre dossier dès octobre de l'année précédente.") }}</div></details>
+            <details class="reveal"><summary>{{ _("Garantissez-vous l'obtention du visa ?") }}</summary><div>{{ _('Non : la décision appartient uniquement aux ambassades et consulats. Notre taux de réussite de 87 % repose sur un contrôle rigoureux de chaque pièce du dossier.') }}</div></details>
+            <details class="reveal"><summary>{{ _('Puis-je partir sans bourse, avec un financement personnel ?') }}</summary><div>{{ _("Oui. L'accompagnement pour l'admission et le visa est disponible quel que soit votre mode de financement.") }}</div></details>
         </div>
     </div>
 </section>
 
 <section class="section-tight">
     <div class="wrap">
-        {{ m.cta_band("Prêt à étudier à l'étranger ?", "Rejoignez les étudiants que nous avons accompagnés jusqu'à leur campus.", "Déposer mon dossier", "#candidature") }}
+        {{ m.cta_band(_("Prêt à étudier à l'étranger ?"), _("Rejoignez les étudiants que nous avons accompagnés jusqu'à leur campus."), _('Déposer mon dossier'), '#candidature') }}
     </div>
 </section>
 
@@ -257,7 +255,7 @@
             <span class="scholar-country" id="opp-country"></span>
             <h2 id="opp-title"></h2>
         </div>
-        <button class="modal-close" type="button" data-close aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+        <button class="modal-close" type="button" data-close aria-label="{{ _('Fermer') }}"><i class="fas fa-xmark"></i></button>
     </div>
     <div class="modal-body">
         <div class="detail-grid">
@@ -267,15 +265,15 @@
                 <p class="deadline" id="opp-dates"></p>
             </div>
             <div style="display:grid;gap:18px">
-                <div class="detail-block" id="opp-description-block"><h3>Description</h3><p id="opp-description"></p></div>
-                <div class="detail-block" id="opp-benefits-block"><h3>Avantages</h3><p id="opp-benefits"></p></div>
-                <div class="detail-block" id="opp-requirements-block"><h3>Conditions</h3><p id="opp-requirements"></p></div>
-                <a class="btn btn-primary" href="#candidature" data-close-to-form>Je suis intéressé·e</a>
+                <div class="detail-block" id="opp-description-block"><h3>{{ _('Description') }}</h3><p id="opp-description"></p></div>
+                <div class="detail-block" id="opp-benefits-block"><h3>{{ _('Avantages') }}</h3><p id="opp-benefits"></p></div>
+                <div class="detail-block" id="opp-requirements-block"><h3>{{ _('Conditions') }}</h3><p id="opp-requirements"></p></div>
+                <a class="btn btn-primary" href="#candidature" data-close-to-form>{{ _('Je suis intéressé·e') }}</a>
             </div>
         </div>
     </div>
 </dialog>
-<script type="application/json" id="opp-data" nonce="{{ csp_nonce }}">{{ scholarship_opportunities|tojson }}</script>
+<script type="application/json" id="opp-data" nonce="{{ csp_nonce }}">{{ opp_details|tojson }}</script>
 {% endif %}
 {% endblock %}
 
@@ -284,11 +282,12 @@
 (function () {
     var dataEl = document.getElementById('opp-data');
     if (!dataEl) return;
+    var t = window.ktaT;
     var items = JSON.parse(dataEl.textContent);
     var dlg = document.getElementById('opp-dialog');
     var $ = function (id) { return document.getElementById(id); };
-    var mois = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
-    function fr(d) { if (!d) return ''; var p = d.slice(0, 10).split('-'); return p.length === 3 ? (+p[2]) + ' ' + mois[+p[1] - 1] + ' ' + p[0] : d; }
+    var fmt = new Intl.DateTimeFormat(document.documentElement.lang, { day: 'numeric', month: 'short', year: 'numeric' });
+    function d(s) { if (!s) return ''; var p = s.slice(0, 10).split('-'); return p.length === 3 ? fmt.format(new Date(+p[0], +p[1] - 1, +p[2])) : s; }
     function block(id, text) { $(id).textContent = text || ''; $(id + '-block').hidden = !text; }
 
     document.addEventListener('click', function (e) {
@@ -302,21 +301,22 @@
         $('opp-image').hidden = !(img && !img.hidden);
         if (img) $('opp-image').src = img.src;
         $('opp-meta').innerHTML = card.querySelector('.meta').innerHTML;
-        $('opp-dates').textContent = o.start_date && o.end_date ? 'Du ' + fr(o.start_date) + ' au ' + fr(o.end_date)
-            : o.end_date ? "Jusqu'au " + fr(o.end_date) : o.start_date ? 'À partir du ' + fr(o.start_date) : 'Candidatures ouvertes';
+        $('opp-dates').textContent = o.start_date && o.end_date ? t('Du') + ' ' + d(o.start_date) + ' ' + t('au') + ' ' + d(o.end_date)
+            : o.end_date ? t("Jusqu'au") + ' ' + d(o.end_date) : o.start_date ? t('À partir du') + ' ' + d(o.start_date) : t('Candidatures ouvertes');
         block('opp-description', o.description);
         block('opp-benefits', o.benefits);
         block('opp-requirements', o.requirements);
+        dlg.dataset.country = o.country_fr;
         dlg.showModal();
     });
     dlg.querySelector('[data-close-to-form]').addEventListener('click', function () {
         dlg.close();
         var sel = document.getElementById('s-country');
-        var country = $('opp-country').textContent.trim();
+        var country = dlg.dataset.country;
         var match = Array.prototype.find.call(sel.options, function (op) { return op.value === country; });
         sel.value = match ? country : 'Autre';
         var msg = document.getElementById('s-message');
-        if (!msg.value) msg.value = 'Intéressé·e par : ' + $('opp-title').textContent;
+        if (!msg.value) msg.value = t('Intéressé·e par :') + ' ' + $('opp-title').textContent;
     });
 })();
 </script>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 
-{% block title %}Kartners Travel Agency · Voyagez, comme vous l'imaginez{% endblock %}
+{% block title %}Kartners Travel Agency · {{ _("Voyagez, comme vous l'imaginez") }}{% endblock %}
 
 {% block content %}
 <section class="hero">
@@ -12,39 +12,39 @@
     </div>
     <div class="wrap hero-grid">
         <div>
-            <p class="hero-kicker"><b>DLA</b> Agence de voyages à Douala</p>
-            <h1>Voyagez, <em>comme vous l'imaginez.</em></h1>
-            <p class="hero-lead">Billets d'avion, visa, hôtel, passeport ou bourse d'études : un conseiller Kartners prépare tout votre départ, de la première question jusqu'à l'embarquement.</p>
-            <div class="hero-actions">
-                <a class="btn btn-sun" href="/destinations"><i class="fas fa-plane-departure"></i> Voir les destinations</a>
-                <a class="btn btn-glass" href="/bourse-etudes"><i class="fas fa-graduation-cap"></i> Étudier à l'étranger</a>
+            <p class="hero-kicker rise" style="--d:0"><b>DLA</b> {{ _('Agence de voyages à Douala') }}</p>
+            <h1 class="rise" style="--d:1">{{ _('Voyagez,') }} <em>{{ _("comme vous l'imaginez.") }}</em></h1>
+            <p class="hero-lead rise" style="--d:2">{{ _("Billets d'avion, visa, hôtel, passeport ou bourse d'études : un conseiller Kartners prépare tout votre départ, de la première question jusqu'à l'embarquement.") }}</p>
+            <div class="hero-actions rise" style="--d:3">
+                <a class="btn btn-sun" href="/destinations"><i class="fas fa-plane-departure"></i> {{ _('Voir les destinations') }}</a>
+                <a class="btn btn-glass" href="/bourse-etudes"><i class="fas fa-graduation-cap"></i> {{ _("Étudier à l'étranger") }}</a>
             </div>
         </div>
 
-        <form class="search-card" action="/destinations" method="get" role="search">
-            <h2>Où voulez-vous aller ?</h2>
-            <p>Départ de Douala. Un conseiller confirme le prix sous 24 h.</p>
+        <form class="search-card rise" style="--d:2" action="/destinations" method="get" role="search">
+            <h2>{{ _('Où voulez-vous aller ?') }}</h2>
+            <p>{{ _('Départ de Douala. Un conseiller confirme le prix sous 24 h.') }}</p>
             <div class="route" aria-hidden="true">
-                <div><small>Départ</small><span class="code">DLA</span></div>
-                <i class="fas fa-plane plane"></i>
-                <div style="text-align:right"><small>Arrivée</small><span class="code" id="route-to">???</span></div>
+                <div><small>{{ _('Départ') }}</small><span class="code">DLA</span></div>
+                <span class="route-line"><i class="fas fa-plane plane"></i></span>
+                <div style="text-align:right"><small>{{ _('Arrivée') }}</small><span class="code" id="route-to">???</span></div>
             </div>
             <div class="search-row">
                 <div class="field">
-                    <label class="sr-only" for="hero-q">Ville ou pays</label>
+                    <label class="sr-only" for="hero-q">{{ _('Ville ou pays') }}</label>
                     <div class="input-icon">
                         <i class="fas fa-location-dot"></i>
-                        <input class="input" id="hero-q" name="q" type="search" list="dest-list" placeholder="Paris, Canada, Dubaï…" autocomplete="off">
+                        <input class="input" id="hero-q" name="q" type="search" list="dest-list" placeholder="{{ _('Paris, Canada, Dubaï…') }}" autocomplete="off">
                     </div>
                     <datalist id="dest-list">
-                        {% for d in destinations %}<option value="{{ d.name }}" data-code="{{ d.name|airport }}">{% endfor %}
+                        {% for d in destinations %}<option value="{{ tr(d, 'name') }}" data-code="{{ d.name|airport }}">{% endfor %}
                     </datalist>
                 </div>
-                <button class="btn btn-primary" type="submit"><i class="fas fa-magnifying-glass"></i> Rechercher</button>
+                <button class="btn btn-primary" type="submit"><i class="fas fa-magnifying-glass"></i> {{ _('Rechercher') }}</button>
             </div>
             <div class="chips">
                 {% for d in destinations[:4] %}
-                <a class="chip" href="/destinations?reserver={{ d.id }}">{{ d.name }} · {{ d.price|money }} €</a>
+                <a class="chip" href="/destinations?reserver={{ d.id }}">{{ tr(d, 'name') }} · {{ d.price|fcfa }} FCFA</a>
                 {% endfor %}
             </div>
         </form>
@@ -52,29 +52,29 @@
 </section>
 
 <div class="wrap">
-    <div class="trust trust-overlap">
-        <div><strong>{{ destinations_total }}</strong><span>destinations au départ de Douala</span></div>
-        <div><strong>24 h</strong><span>pour une réponse à votre demande</span></div>
-        <div><strong>6</strong><span>services sous un même toit</span></div>
-        <div><strong>Lun – sam</strong><span>agence ouverte de 8 h à 18 h</span></div>
+    <div class="trust trust-overlap reveal">
+        <div><strong data-count="{{ destinations_total }}">{{ destinations_total }}</strong><span>{{ _('destinations au départ de Douala') }}</span></div>
+        <div><strong><span data-count="24">24</span> h</strong><span>{{ _('pour une réponse à votre demande') }}</span></div>
+        <div><strong data-count="6">6</strong><span>{{ _('services sous un même toit') }}</span></div>
+        <div><strong>{{ _('Lun – sam') }}</strong><span>{{ _('agence ouverte de 8 h à 18 h') }}</span></div>
     </div>
 </div>
 
 <section class="section">
     <div class="wrap">
         <div class="section-head-row">
-            <div class="section-head">
-                <span class="eyebrow">Destinations</span>
-                <h2>Les meilleurs tarifs du moment</h2>
-                <p>Prix indicatifs par personne, au départ de Douala. Choisissez une destination, un conseiller vous rappelle avec l'offre exacte.</p>
+            <div class="section-head reveal">
+                <span class="eyebrow">{{ _('Destinations') }}</span>
+                <h2>{{ _('Les meilleurs tarifs du moment') }}</h2>
+                <p>{{ _("Prix indicatifs par personne, au départ de Douala. Choisissez une destination, un conseiller vous rappelle avec l'offre exacte.") }}</p>
             </div>
-            <a class="link-arrow" href="/destinations">Toutes les destinations <i class="fas fa-arrow-right"></i></a>
+            <a class="link-arrow" href="/destinations">{{ _('Toutes les destinations') }} <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div class="pass-grid">
+        <div class="pass-grid stagger">
             {% for dest in destinations %}
                 {{ m.boarding_pass(dest) }}
             {% else %}
-                <div class="empty"><i class="fas fa-plane"></i><h3>Destinations bientôt en ligne</h3><p>Appelez-nous pour un devis personnalisé.</p></div>
+                <div class="empty"><i class="fas fa-plane"></i><h3>{{ _('Destinations bientôt en ligne') }}</h3><p>{{ _('Appelez-nous pour un devis personnalisé.') }}</p></div>
             {% endfor %}
         </div>
     </div>
@@ -83,20 +83,20 @@
 <section class="section section-white">
     <div class="wrap">
         <div class="section-head-row">
-            <div class="section-head">
-                <span class="eyebrow">Services</span>
-                <h2>Tout votre départ, au même endroit</h2>
-                <p>Inutile de courir entre plusieurs bureaux : nous gérons les démarches administratives et la logistique du voyage.</p>
+            <div class="section-head reveal">
+                <span class="eyebrow">{{ _('Services') }}</span>
+                <h2>{{ _('Tout votre départ, au même endroit') }}</h2>
+                <p>{{ _('Inutile de courir entre plusieurs bureaux : nous gérons les démarches administratives et la logistique du voyage.') }}</p>
             </div>
-            <a class="link-arrow" href="/services">Détail des services <i class="fas fa-arrow-right"></i></a>
+            <a class="link-arrow" href="/services">{{ _('Détail des services') }} <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for service in services %}
-            <a class="card feature reveal" href="/contact?service={{ service.name|urlencode }}" style="text-decoration:none;color:inherit">
+            <a class="card feature reveal lift" href="/contact?service={{ service.name|urlencode }}" style="text-decoration:none;color:inherit">
                 <span class="icon-tile {{ loop.cycle('', 'sky', 'sun') }}"><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i></span>
                 <div>
-                    <h3>{{ service.name }}</h3>
-                    <p>{{ service.description }}</p>
+                    <h3>{{ tr(service, 'name') }}</h3>
+                    <p>{{ tr(service, 'description') }}</p>
                 </div>
             </a>
             {% endfor %}
@@ -106,15 +106,15 @@
 
 <section class="section">
     <div class="wrap">
-        <div class="section-head center">
-            <span class="eyebrow">Comment ça marche</span>
-            <h2>Quatre étapes jusqu'à l'embarquement</h2>
+        <div class="section-head center reveal">
+            <span class="eyebrow">{{ _('Comment ça marche') }}</span>
+            <h2>{{ _("Quatre étapes jusqu'à l'embarquement") }}</h2>
         </div>
-        <ol class="steps">
-            <li class="step reveal"><h3>Vous choisissez</h3><p>Une destination sur le site, ou un projet à nous expliquer par WhatsApp.</p></li>
-            <li class="step reveal"><h3>On vous rappelle</h3><p>Sous 24 h, avec le meilleur tarif disponible et la liste des documents.</p></li>
-            <li class="step reveal"><h3>On prépare le dossier</h3><p>Billet, visa, hôtel, assurance : nous suivons chaque démarche.</p></li>
-            <li class="step reveal"><h3>Vous partez</h3><p>Billet en main, avec un conseiller joignable pendant le voyage.</p></li>
+        <ol class="steps stagger">
+            <li class="step reveal"><h3>{{ _('Vous choisissez') }}</h3><p>{{ _('Une destination sur le site, ou un projet à nous expliquer par WhatsApp.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('On vous rappelle') }}</h3><p>{{ _('Sous 24 h, avec le meilleur tarif disponible et la liste des documents.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('On prépare le dossier') }}</h3><p>{{ _('Billet, visa, hôtel, assurance : nous suivons chaque démarche.') }}</p></li>
+            <li class="step reveal"><h3>{{ _('Vous partez') }}</h3><p>{{ _('Billet en main, avec un conseiller joignable pendant le voyage.') }}</p></li>
         </ol>
     </div>
 </section>
@@ -122,29 +122,29 @@
 <section class="section section-ink">
     <div class="wrap">
         <div class="section-head-row">
-            <div class="section-head">
-                <span class="eyebrow">Bourses d'études</span>
-                <h2>Étudier à l'étranger, dossier et visa compris</h2>
-                <p>Recherche de bourse, constitution du dossier académique et visa étudiant, avec un seul interlocuteur.</p>
+            <div class="section-head reveal">
+                <span class="eyebrow">{{ _("Bourses d'études") }}</span>
+                <h2>{{ _("Étudier à l'étranger, dossier et visa compris") }}</h2>
+                <p>{{ _('Recherche de bourse, constitution du dossier académique et visa étudiant, avec un seul interlocuteur.') }}</p>
             </div>
-            <a class="btn btn-sun" href="/bourse-etudes">Voir les bourses</a>
+            <a class="btn btn-sun" href="/bourse-etudes">{{ _('Voir les bourses') }}</a>
         </div>
         {% if opportunities %}
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for opp in opportunities %}
-            <a class="region reveal" href="/bourse-etudes#bourse-{{ opp.id }}" style="text-decoration:none;color:inherit;display:grid;gap:10px">
+            <a class="region reveal lift" href="/bourse-etudes#bourse-{{ opp.id }}" style="text-decoration:none;color:inherit;display:grid;gap:10px">
                 <span class="scholar-country" style="color:var(--on-ink)">
                     {% set f = opp.flag_url|flag(opp.country) %}{% if f %}<img src="{{ f }}" alt="" loading="lazy">{% endif %}
-                    {{ opp.country }}
+                    {{ tr(opp, 'country') }}
                 </span>
-                <h3 style="margin:0">{{ opp.title }}</h3>
-                <span class="meta"><span class="badge badge-sun">{{ opp.study_level }}</span>{% if opp.end_date %}<span class="badge">Jusqu'au {{ opp.end_date|date_fr }}</span>{% endif %}</span>
+                <h3 style="margin:0">{{ tr(opp, 'title') }}</h3>
+                <span class="meta"><span class="badge badge-sun">{{ opp.study_level }}</span>{% if opp.end_date %}<span class="badge">{{ _("Jusqu'au") }} {{ opp.end_date|date_fr }}</span>{% endif %}</span>
             </a>
             {% endfor %}
         </div>
         {% else %}
-        <div class="grid-4">
-            {% for code, pays, prog in [('fr','France','Campus France'),('ca','Canada','Bourses provinciales'),('be','Belgique','Bourses ARES'),('de','Allemagne','DAAD')] %}
+        <div class="grid-4 stagger">
+            {% for code, pays, prog in [('fr', _('France'), 'Campus France'), ('ca', _('Canada'), _('Bourses provinciales')), ('be', _('Belgique'), _('Bourses ARES')), ('de', _('Allemagne'), 'DAAD')] %}
             <div class="region reveal"><h3><img src="https://flagcdn.com/w40/{{ code }}.png" alt="" width="24" height="17" style="border-radius:3px"> {{ pays }}</h3><p style="color:var(--on-ink)">{{ prog }}</p></div>
             {% endfor %}
         </div>
@@ -154,7 +154,7 @@
 
 <section class="section-tight">
     <div class="wrap">
-        {{ m.cta_band("Un projet de voyage ? Parlons-en.", "Dites-nous où et quand vous voulez partir : nous revenons vers vous avec une proposition claire, sans engagement.", "Demander un devis") }}
+        {{ m.cta_band(_('Un projet de voyage ? Parlons-en.'), _('Dites-nous où et quand vous voulez partir : nous revenons vers vous avec une proposition claire, sans engagement.'), _('Demander un devis')) }}
     </div>
 </section>
 {% endblock %}
@@ -168,7 +168,8 @@
         document.querySelectorAll('#dest-list option').forEach(function (o) { codes[o.value.toLowerCase()] = o.dataset.code; });
         input && input.addEventListener('input', function () {
             var v = input.value.trim().toLowerCase();
-            out.textContent = codes[v] || (v ? v.replace(/[^a-z]/g, '').slice(0, 3).toUpperCase() || '???' : '???');
+            var code = codes[v] || (v ? v.normalize('NFD').replace(/[^a-z]/g, '').slice(0, 3).toUpperCase() || '???' : '???');
+            if (out.textContent !== code) { out.textContent = code; out.classList.remove('flip'); void out.offsetWidth; out.classList.add('flip'); }
         });
     })();
 </script>

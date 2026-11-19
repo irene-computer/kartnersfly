@@ -29,6 +29,7 @@
                         <label class="form-label">Image</label>
                         <input type="file" name="image" class="form-control" accept="image/*">
                     </div>
+                    <div class="col-12">{% with table='services', obj=None %}{% include 'admin/_english_fields.html' %}{% endwith %}</div>
                     <div class="col-md-1">
                         <label class="form-label">&nbsp;</label>
                         <button type="submit" class="btn btn-primary w-100">

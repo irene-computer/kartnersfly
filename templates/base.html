@@ -1,33 +1,46 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{% block title %}Kartners Travel Agency{% endblock %}</title>
     {% block meta %}
-    <meta name="description" content="Kartners Travel Agency, agence de voyages à Douala : billetterie aérienne, assistance visa, réservation d'hôtels, pré-enrôlement et bourses d'études à l'étranger.">
+    <meta name="description" content="{{ _("Kartners Travel Agency, agence de voyages à Douala : billetterie aérienne, assistance visa, réservation d'hôtels, pré-enrôlement et bourses d'études à l'étranger.") }}">
     {% endblock %}
     <meta name="theme-color" content="#662581">
+    <meta name="color-scheme" content="light dark">
     <meta name="kta-form-token" content="{{ form_token() }}">
-    <link rel="canonical" href="https://www.kartnersagency.com{{ request.path }}">
+    <link rel="canonical" href="https://www.kartnersagency.com{{ request.path }}{{ '?lang=en' if lang == 'en' }}">
+    <link rel="alternate" hreflang="fr" href="https://www.kartnersagency.com{{ request.path }}?lang=fr">
+    <link rel="alternate" hreflang="en" href="https://www.kartnersagency.com{{ request.path }}?lang=en">
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Kartners Travel Agency">
     <meta property="og:title" content="{{ self.title() }}">
-    <meta property="og:description" content="Voyagez, comme vous l'imaginez. Billets d'avion, visas, hôtels et bourses d'études depuis Douala.">
+    <meta property="og:description" content="{{ _("Voyagez, comme vous l'imaginez. Billets d'avion, visas, hôtels et bourses d'études depuis Douala.") }}">
     <meta property="og:image" content="{{ url_for('static', filename='images/icon-512.png', _external=True) }}">
-    <meta property="og:locale" content="fr_FR">
+    <meta property="og:locale" content="{{ 'en_GB' if lang == 'en' else 'fr_FR' }}">
     <meta name="twitter:card" content="summary">
 
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
 
+    <script nonce="{{ csp_nonce }}">
+        /* Thème appliqué avant l'affichage pour éviter un flash blanc */
+        (function () {
+            try {
+                var t = localStorage.getItem('kta-theme');
+                if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/kta.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kta.css') }}?v=5">
     {% block head %}{% endblock %}
 
     <script type="application/ld+json" nonce="{{ csp_nonce }}">
@@ -39,24 +52,26 @@
         "telephone": "{{ contact_phone }}",
         "email": "{{ contact_email }}",
         "address": { "@type": "PostalAddress", "streetAddress": "Logpom", "addressLocality": "Douala", "addressCountry": "CM" },
-        "openingHours": "Mo-Sa 08:00-18:00"
+        "openingHours": "Mo-Sa 08:00-18:00",
+        "availableLanguage": ["French", "English"]
     }
     </script>
 </head>
 <body>
 {% set nav = [
-    ('home', '/', 'Accueil'),
-    ('destinations', '/destinations', 'Destinations'),
-    ('services_page', '/services', 'Services'),
-    ('bourse_etudes', '/bourse-etudes', "Bourses d'études"),
-    ('about', '/about', 'À propos'),
-    ('contact', '/contact', 'Contact'),
+    ('home', '/', _('Accueil')),
+    ('destinations', '/destinations', _('Destinations')),
+    ('services_page', '/services', _('Services')),
+    ('bourse_etudes', '/bourse-etudes', _("Bourses d'études")),
+    ('about', '/about', _('À propos')),
+    ('contact', '/contact', _('Contact')),
 ] %}
-<a class="skip-link" href="#contenu">Aller au contenu</a>
+<a class="skip-link" href="#contenu">{{ _('Aller au contenu') }}</a>
+<div class="scroll-progress" aria-hidden="true"></div>
 
 <header class="site-header">
     <div class="wrap header-inner">
-        <a class="brand" href="/" aria-label="Kartners Travel Agency, accueil">
+        <a class="brand" href="/" aria-label="{{ _('Kartners Travel Agency, accueil') }}">
             <picture>
                 <source srcset="{{ url_for('static', filename='images/kta-mark.webp') }}" type="image/webp">
                 <img src="{{ url_for('static', filename='images/kta-mark.png') }}" alt="" width="88" height="44">
@@ -64,20 +79,26 @@
             <span class="brand-text"><strong>Kartners</strong><span>Travel Agency</span></span>
         </a>
 
-        <nav class="main-nav" id="main-nav" aria-label="Navigation principale">
+        <nav class="main-nav" id="main-nav" aria-label="{{ _('Navigation principale') }}">
             {% for endpoint, href, label in nav %}
             <a href="{{ href }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ label }}</a>
             {% endfor %}
             <div class="nav-mobile-cta">
                 <a class="btn btn-whatsapp" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <a class="btn btn-primary" href="/destinations">Réserver</a>
+                <a class="btn btn-primary" href="/destinations">{{ _('Réserver') }}</a>
             </div>
         </nav>
 
         <div class="header-cta">
-            <a class="btn btn-ghost btn-sm" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp"><i class="fab fa-whatsapp"></i><span class="btn-label">{{ contact_phone }}</span></a>
-            <a class="btn btn-primary btn-sm" href="/destinations"><i class="fas fa-plane-departure"></i><span class="btn-label">Réserver</span></a>
-            <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Ouvrir le menu"><i class="fas fa-bars"></i></button>
+            <a class="lang-switch" href="{{ request.path }}?lang={{ 'fr' if lang == 'en' else 'en' }}" hreflang="{{ 'fr' if lang == 'en' else 'en' }}" lang="{{ 'fr' if lang == 'en' else 'en' }}" title="{{ 'Version française' if lang == 'en' else 'English version' }}">
+                <span class="{{ 'is-on' if lang == 'fr' }}">FR</span><span class="{{ 'is-on' if lang == 'en' }}">EN</span>
+            </a>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="{{ _('Changer de thème (clair / sombre)') }}" title="{{ _('Thème clair / sombre') }}">
+                <i class="fas fa-moon icon-dark" aria-hidden="true"></i><i class="fas fa-sun icon-light" aria-hidden="true"></i>
+            </button>
+            <a class="btn btn-ghost btn-sm" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="{{ _('Écrire sur WhatsApp') }}"><i class="fab fa-whatsapp"></i><span class="btn-label">{{ contact_phone }}</span></a>
+            <a class="btn btn-primary btn-sm" href="/destinations"><i class="fas fa-plane-departure"></i><span class="btn-label">{{ _('Réserver') }}</span></a>
+            <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="{{ _('Ouvrir le menu') }}"><i class="fas fa-bars"></i></button>
         </div>
     </div>
 </header>
@@ -94,7 +115,7 @@
                     <img src="{{ url_for('static', filename='images/kta-mark.png') }}" alt="" width="76" height="38">
                     <span class="brand-text"><strong>Kartners</strong><span>Travel Agency</span></span>
                 </a>
-                <p>Votre agence à Douala pour les billets d'avion, les visas, les hôtels et les études à l'étranger. « Voyagez, comme vous l'imaginez. »</p>
+                <p>{{ _("Votre agence à Douala pour les billets d'avion, les visas, les hôtels et les études à l'étranger. « Voyagez, comme vous l'imaginez. »") }}</p>
                 <div class="socials">
                     <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     <a href="https://www.facebook.com/profile.php?id=61555991666119" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -105,49 +126,50 @@
                 </div>
             </div>
             <div>
-                <h3>Services</h3>
+                <h3>{{ _('Services') }}</h3>
                 <ul class="footer-links">
-                    <li><a href="/services">Billetterie aérienne</a></li>
-                    <li><a href="/services">Assistance visa</a></li>
-                    <li><a href="/services">Réservation hôtelière</a></li>
-                    <li><a href="/services">Pré-enrôlement passeport / CNI</a></li>
-                    <li><a href="/bourse-etudes">Bourses d'études</a></li>
+                    <li><a href="/services">{{ _('Billetterie aérienne') }}</a></li>
+                    <li><a href="/services">{{ _('Assistance visa') }}</a></li>
+                    <li><a href="/services">{{ _('Réservation hôtelière') }}</a></li>
+                    <li><a href="/services">{{ _('Pré-enrôlement passeport / CNI') }}</a></li>
+                    <li><a href="/bourse-etudes">{{ _("Bourses d'études") }}</a></li>
                 </ul>
             </div>
             <div>
-                <h3>Agence</h3>
+                <h3>{{ _('Agence') }}</h3>
                 <ul class="footer-links">
                     <li><a href="tel:{{ contact_phone|replace(' ', '') }}">{{ contact_phone }}</a></li>
                     <li><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></li>
-                    <li>Logpom, Douala, Cameroun</li>
-                    <li>Lun – sam : 08:00 – 18:00</li>
+                    <li>{{ _('Logpom, Douala, Cameroun') }}</li>
+                    <li>{{ _('Lun – sam : 08:00 – 18:00') }}</li>
                 </ul>
             </div>
             <div class="newsletter">
-                <h3>Bons plans</h3>
-                <p>Promotions sur les billets et nouvelles bourses, une à deux fois par mois.</p>
+                <h3>{{ _('Bons plans') }}</h3>
+                <p>{{ _('Promotions sur les billets et nouvelles bourses, une à deux fois par mois.') }}</p>
                 <form data-ajax="/api/newsletter" novalidate>
                     {{ m_honeypot() }}
-                    <label class="sr-only" for="nl-email">Adresse email</label>
-                    <input class="input" id="nl-email" type="email" name="email" placeholder="vous@exemple.com" required autocomplete="email">
-                    <button class="btn btn-sun" type="submit">S'inscrire</button>
+                    <label class="sr-only" for="nl-email">{{ _('Adresse email') }}</label>
+                    <input class="input" id="nl-email" type="email" name="email" placeholder="{{ _('vous@exemple.com') }}" required autocomplete="email">
+                    <button class="btn btn-sun" type="submit">{{ _("S'inscrire") }}</button>
                 </form>
             </div>
         </div>
         <div class="footer-bottom">
             <span>© {{ now().year }} Kartners Travel Agency</span>
-            <nav aria-label="Informations légales">
-                <a href="/mentions-legales">Mentions légales</a>
-                <a href="/cgv">CGV</a>
-                <a href="/politique-confidentialite">Confidentialité</a>
+            <nav aria-label="{{ _('Informations légales') }}">
+                <a href="/mentions-legales">{{ _('Mentions légales') }}</a>
+                <a href="/cgv">{{ _('CGV') }}</a>
+                <a href="/politique-confidentialite">{{ _('Confidentialité') }}</a>
             </nav>
         </div>
     </div>
 </footer>
 
-<a class="fab-whatsapp" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="Discuter avec un conseiller sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+<a class="fab-whatsapp" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="{{ _('Discuter avec un conseiller sur WhatsApp') }}"><i class="fab fa-whatsapp"></i></a>
 
-<script src="{{ url_for('static', filename='js/kta.js') }}?v=4"></script>
+<script type="application/json" id="kta-i18n" nonce="{{ csp_nonce }}">{{ js_strings|tojson }}</script>
+<script src="{{ url_for('static', filename='js/kta.js') }}?v=5"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

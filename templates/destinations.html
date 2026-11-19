@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 
-{% block title %}Destinations · Kartners Travel Agency{% endblock %}
+{% block title %}{{ _('Destinations') }} · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Toutes nos destinations au départ de Douala : Europe, Afrique, Amériques, Asie. Prix indicatifs et réservation en ligne, confirmée par un conseiller sous 24 h.">
+<meta name="description" content="{{ _('Toutes nos destinations au départ de Douala : Europe, Afrique, Amériques, Asie. Prix indicatifs et réservation en ligne, confirmée par un conseiller sous 24 h.') }}">
 {% endblock %}
 
 {% block content %}
@@ -11,9 +11,9 @@
     <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/voyages2.webp') }}')"></span></div>
     <div class="wrap hero-grid">
         <div>
-            <p class="hero-kicker"><b>DLA</b> Départs depuis Douala</p>
-            <h1>Nos destinations</h1>
-            <p class="hero-lead">Filtrez par continent ou par budget, puis envoyez votre demande. Un conseiller vous confirme le tarif exact et les disponibilités sous 24 h.</p>
+            <p class="hero-kicker rise" style="--d:0"><b>DLA</b> {{ _('Départs depuis Douala') }}</p>
+            <h1 class="rise" style="--d:1">{{ _('Nos destinations') }}</h1>
+            <p class="hero-lead rise" style="--d:2">{{ _("Filtrez par continent ou par budget, puis envoyez votre demande. Un conseiller vous confirme le tarif exact et les disponibilités sous 24 h.") }}</p>
         </div>
     </div>
 </section>
@@ -22,122 +22,124 @@
     <div class="wrap">
         <form class="toolbar trust-overlap" id="filters" role="search">
             <div class="field">
-                <label for="f-q">Rechercher</label>
+                <label for="f-q">{{ _('Rechercher') }}</label>
                 <div class="input-icon"><i class="fas fa-magnifying-glass"></i>
-                    <input class="input" id="f-q" type="search" placeholder="Ville ou pays" value="{{ query }}" autocomplete="off">
+                    <input class="input" id="f-q" type="search" placeholder="{{ _('Ville ou pays') }}" value="{{ query }}" autocomplete="off">
                 </div>
             </div>
             <div class="field">
-                <label for="f-continent">Continent</label>
+                <label for="f-continent">{{ _('Continent') }}</label>
                 <select class="select" id="f-continent">
-                    <option value="">Tous</option>
-                    <option value="afrique">Afrique</option>
-                    <option value="europe">Europe</option>
-                    <option value="amerique">Amériques</option>
-                    <option value="asie">Asie & Moyen-Orient</option>
-                    <option value="oceanie">Océanie</option>
+                    <option value="">{{ _('Tous') }}</option>
+                    <option value="afrique">{{ _('Afrique') }}</option>
+                    <option value="europe">{{ _('Europe') }}</option>
+                    <option value="amerique">{{ _('Amériques') }}</option>
+                    <option value="asie">{{ _('Asie & Moyen-Orient') }}</option>
+                    <option value="oceanie">{{ _('Océanie') }}</option>
                 </select>
             </div>
             <div class="field">
-                <label for="f-price">Budget par personne</label>
+                <label for="f-price">{{ _('Budget par personne') }}</label>
+                {# Les prix sont enregistrés en euros ; les seuils correspondent à 650 000 et 1 300 000 FCFA. #}
                 <select class="select" id="f-price">
-                    <option value="">Tous les prix</option>
-                    <option value="0-1000">Moins de 1 000 €</option>
-                    <option value="1000-2000">1 000 € à 2 000 €</option>
-                    <option value="2000-999999">Plus de 2 000 €</option>
+                    <option value="">{{ _('Tous les prix') }}</option>
+                    <option value="0-1000">{{ _('Moins de 650 000 FCFA') }}</option>
+                    <option value="1000-2000">{{ _('650 000 à 1 300 000 FCFA') }}</option>
+                    <option value="2000-999999">{{ _('Plus de 1 300 000 FCFA') }}</option>
                 </select>
             </div>
             <div class="field">
-                <label for="f-sort">Trier</label>
+                <label for="f-sort">{{ _('Trier') }}</label>
                 <select class="select" id="f-sort">
-                    <option value="name">Nom (A → Z)</option>
-                    <option value="price-asc">Prix croissant</option>
-                    <option value="price-desc">Prix décroissant</option>
+                    <option value="name">{{ _('Nom (A → Z)') }}</option>
+                    <option value="price-asc">{{ _('Prix croissant') }}</option>
+                    <option value="price-desc">{{ _('Prix décroissant') }}</option>
                 </select>
             </div>
         </form>
 
         <div class="result-line">
-            <span id="result-count" aria-live="polite">{{ destinations|length }} destination{{ 's' if destinations|length > 1 }}</span>
-            <button class="btn btn-ghost btn-sm" type="button" id="f-reset" hidden><i class="fas fa-rotate-left"></i> Réinitialiser les filtres</button>
+            <span id="result-count" aria-live="polite">{{ destinations|length }} {{ _('destinations') if destinations|length > 1 else _('destination') }}</span>
+            <button class="btn btn-ghost btn-sm" type="button" id="f-reset" hidden><i class="fas fa-rotate-left"></i> {{ _('Réinitialiser les filtres') }}</button>
         </div>
 
         {% if destinations %}
-        <div class="pass-grid" id="pass-grid">
+        <div class="pass-grid stagger" id="pass-grid">
             {% for dest in destinations %}
                 {{ m.boarding_pass(dest, action='modal') }}
             {% endfor %}
         </div>
         <div class="empty" id="no-results" hidden>
             <i class="fas fa-map-location-dot"></i>
-            <h3>Aucune destination ne correspond</h3>
-            <p>Nous organisons aussi des voyages vers des villes absentes de cette liste.</p>
-            <a class="btn btn-primary" href="/contact">Demander une autre destination</a>
+            <h3>{{ _('Aucune destination ne correspond') }}</h3>
+            <p>{{ _('Nous organisons aussi des voyages vers des villes absentes de cette liste.') }}</p>
+            <a class="btn btn-primary" href="/contact">{{ _('Demander une autre destination') }}</a>
         </div>
         {% else %}
         <div class="empty">
             <i class="fas fa-plane"></i>
-            <h3>Destinations en cours de mise à jour</h3>
-            <p>Contactez-nous directement pour un devis.</p>
-            <a class="btn btn-primary" href="/contact">Nous contacter</a>
+            <h3>{{ _('Destinations en cours de mise à jour') }}</h3>
+            <p>{{ _('Contactez-nous directement pour un devis.') }}</p>
+            <a class="btn btn-primary" href="/contact">{{ _('Nous contacter') }}</a>
         </div>
         {% endif %}
+        <p class="field-hint" style="margin-top:20px">{{ _('Prix indicatifs en francs CFA (1 € = 655,957 FCFA), à confirmer par un conseiller selon les dates et la disponibilité.') }}</p>
     </div>
 </section>
 
 <section class="section-tight">
     <div class="wrap">
-        {{ m.cta_band("Votre ville n'est pas dans la liste ?", "Nous réservons des vols vers toutes les destinations desservies depuis Douala et Yaoundé, et nous montons des circuits sur mesure.", "Demander un devis") }}
+        {{ m.cta_band(_("Votre ville n'est pas dans la liste ?"), _('Nous réservons des vols vers toutes les destinations desservies depuis Douala et Yaoundé, et nous montons des circuits sur mesure.'), _('Demander un devis')) }}
     </div>
 </section>
 
 <dialog class="modal" id="booking-dialog" aria-labelledby="booking-title">
     <div class="modal-head">
         <div>
-            <h2 id="booking-title">Demande de réservation</h2>
-            <p>Sans paiement en ligne : un conseiller vous rappelle pour confirmer.</p>
+            <h2 id="booking-title">{{ _('Demande de réservation') }}</h2>
+            <p>{{ _('Sans paiement en ligne : un conseiller vous rappelle pour confirmer.') }}</p>
         </div>
-        <button class="modal-close" type="button" data-close aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+        <button class="modal-close" type="button" data-close aria-label="{{ _('Fermer') }}"><i class="fas fa-xmark"></i></button>
     </div>
     <div class="modal-body">
         <div class="ticket-head">
-            <div><small>Départ</small><span class="code">DLA</span></div>
-            <i class="fas fa-plane plane"></i>
-            <div style="text-align:right"><small id="booking-country">Destination</small><span class="code" id="booking-code">---</span></div>
+            <div><small>{{ _('Départ') }}</small><span class="code">DLA</span></div>
+            <span class="route-line"><i class="fas fa-plane plane"></i></span>
+            <div style="text-align:right"><small id="booking-country">{{ _('Destination') }}</small><span class="code" id="booking-code">---</span></div>
         </div>
         <form id="booking-form" data-ajax="/api/booking" novalidate>
-                    {{ m_honeypot() }}
+            {{ m_honeypot() }}
             <input type="hidden" name="destination_id" id="booking-id">
             <input type="hidden" name="destination_name" id="booking-name">
             <div class="form-grid">
                 <div class="field full">
-                    <label for="b-fullname">Nom complet <span class="req">*</span></label>
-                    <input class="input" id="b-fullname" name="fullname" required autocomplete="name" placeholder="Comme sur le passeport">
+                    <label for="b-fullname">{{ _('Nom complet') }} <span class="req">*</span></label>
+                    <input class="input" id="b-fullname" name="fullname" required autocomplete="name" placeholder="{{ _('Comme sur le passeport') }}">
                 </div>
                 <div class="field">
-                    <label for="b-email">Email <span class="req">*</span></label>
-                    <input class="input" id="b-email" name="email" type="email" required autocomplete="email" placeholder="vous@exemple.com">
+                    <label for="b-email">{{ _('Email') }} <span class="req">*</span></label>
+                    <input class="input" id="b-email" name="email" type="email" required autocomplete="email" placeholder="{{ _('vous@exemple.com') }}">
                 </div>
                 <div class="field">
-                    <label for="b-phone">Téléphone / WhatsApp <span class="req">*</span></label>
+                    <label for="b-phone">{{ _('Téléphone / WhatsApp') }} <span class="req">*</span></label>
                     <input class="input" id="b-phone" name="phone" type="tel" required autocomplete="tel" placeholder="+237 6XX XXX XXX" pattern="[+0-9 ().-]{8,20}">
                 </div>
                 <div class="field">
-                    <label for="b-date">Date de départ <span class="req">*</span></label>
+                    <label for="b-date">{{ _('Date de départ') }} <span class="req">*</span></label>
                     <input class="input" id="b-date" name="departure_date" type="date" required min="{{ now().date().isoformat() }}">
                 </div>
                 <div class="field">
-                    <label for="b-travelers">Voyageurs <span class="req">*</span></label>
+                    <label for="b-travelers">{{ _('Voyageurs') }} <span class="req">*</span></label>
                     <input class="input" id="b-travelers" name="travelers" type="number" min="1" max="50" value="1" required inputmode="numeric">
                 </div>
                 <div class="field full">
-                    <label for="b-message">Précisions</label>
-                    <textarea class="textarea" id="b-message" name="message" maxlength="2000" placeholder="Aller simple ou aller-retour, date de retour, hôtel souhaité, besoin de visa…"></textarea>
+                    <label for="b-message">{{ _('Précisions') }}</label>
+                    <textarea class="textarea" id="b-message" name="message" maxlength="2000" placeholder="{{ _('Aller simple ou aller-retour, date de retour, hôtel souhaité, besoin de visa…') }}"></textarea>
                 </div>
                 <div class="full" data-form-message hidden></div>
                 <div class="full" style="display:grid;gap:10px">
-                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> Envoyer ma demande</button>
-                    <p class="form-note"><i class="fas fa-lock"></i> Vos coordonnées servent uniquement à traiter cette demande.</p>
+                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> {{ _('Envoyer ma demande') }}</button>
+                    <p class="form-note"><i class="fas fa-lock"></i> {{ _('Vos coordonnées servent uniquement à traiter cette demande.') }}</p>
                 </div>
             </div>
         </form>
@@ -150,6 +152,7 @@
 (function () {
     var grid = document.getElementById('pass-grid');
     if (!grid) return;
+    var t = window.ktaT;
     var cards = Array.prototype.slice.call(grid.querySelectorAll('.pass'));
     var q = document.getElementById('f-q');
     var continent = document.getElementById('f-continent');
@@ -173,15 +176,22 @@
             if (ok) { visible++; c.classList.add('is-visible'); }
         });
         var by = sort.value;
-        cards.slice().sort(function (a, b) {
+        var order = cards.slice().sort(function (a, b) {
             if (by === 'price-asc') return a.dataset.price - b.dataset.price;
             if (by === 'price-desc') return b.dataset.price - a.dataset.price;
-            return a.dataset.name.localeCompare(b.dataset.name, 'fr');
-        }).forEach(function (c) { grid.appendChild(c); });
-        count.textContent = visible + ' destination' + (visible > 1 ? 's' : '');
+            return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent, document.documentElement.lang);
+        });
+        var move = function () { order.forEach(function (c) { grid.appendChild(c); }); };
+        // Réorganisation animée quand le navigateur sait le faire (View Transitions)
+        if (document.startViewTransition && grid.dataset.ready && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.startViewTransition(move);
+        } else { move(); }
+        grid.dataset.ready = '1';
+        count.textContent = visible + ' ' + (visible > 1 ? t('destinations') : t('destination'));
         empty.hidden = visible > 0;
         reset.hidden = !(q.value || cont || price.value);
     }
+    cards.forEach(function (c, i) { c.style.viewTransitionName = 'pass-' + i; });
     [q, continent, price, sort].forEach(function (el) { el.addEventListener('input', apply); });
     reset.addEventListener('click', function () { q.value = ''; continent.value = ''; price.value = ''; apply(); q.focus(); });
     apply();
@@ -194,7 +204,7 @@
         document.getElementById('booking-name').value = btn.dataset.bookName;
         document.getElementById('booking-code').textContent = btn.dataset.bookCode;
         document.getElementById('booking-country').textContent = btn.dataset.bookName + ', ' + btn.dataset.bookCountry;
-        document.getElementById('booking-title').textContent = 'Réserver : ' + btn.dataset.bookName;
+        document.getElementById('booking-title').textContent = t('Réserver :') + ' ' + btn.dataset.bookName;
         var msg = form.querySelector('[data-form-message]'); if (msg) msg.hidden = true;
         dlg.showModal();
         setTimeout(function () { document.getElementById('b-fullname').focus(); }, 50);

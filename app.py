@@ -4,6 +4,9 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import Config
 import security
+import i18n
+import notify
+from i18n import gettext as _
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import g
 from markupsafe import Markup
@@ -71,10 +74,13 @@ from models import (
     get_destinations_count,
     get_scholarships_ending_soon,
     migrate_image_paths,
+    save_translations,
+    EN_COLUMNS,
 )
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.jinja_env.globals.update(_=i18n.gettext, tr=i18n.translate_field)
 
 if not Config.ADMIN_USERNAME or not Config.ADMIN_PASSWORD:
     print("[ATTENTION] ADMIN_USERNAME / ADMIN_PASSWORD non définis : la connexion admin est désactivée.")
@@ -128,8 +134,13 @@ def get_json_payload():
     return sanitize_input(data)
 
 
-def api_error(message, status=400):
-    return jsonify({'success': False, 'message': message}), status
+def api_error(message, status=400, **kwargs):
+    return jsonify({'success': False, 'message': _(message, **kwargs)}), status
+
+def form_translations(table):
+    """Champs anglais envoyés par un formulaire d'administration."""
+    return {col: sanitize_input(request.form.get(col, '')) for col in EN_COLUMNS[table]}
+
 
 def guard_public_form(kind, data, per_hour, success_message):
     """
@@ -141,7 +152,7 @@ def guard_public_form(kind, data, per_hour, success_message):
     if not ok and reason == 'bot':
         security.log_security_event('robot bloqué', ip, kind)
         # On répond "succès" pour ne pas aider le robot à s'adapter.
-        return jsonify({'success': True, 'message': success_message})
+        return jsonify({'success': True, 'message': _(success_message)})
     if not ok:
         return api_error("La page a expiré. Rechargez-la puis renvoyez le formulaire.", 400)
     if security.over_limit(f'form-{kind}', ip, per_hour, 3600):
@@ -200,6 +211,14 @@ def security_headers(response):
         response.headers['Content-Security-Policy'] = _content_security_policy()
     if request.path.startswith('/admin'):
         response.headers['Cache-Control'] = 'no-store'
+    # Mémorise la langue choisie avec ?lang=fr|en
+    asked = (request.args.get('lang') or '').lower()
+    if asked in i18n.LANGUAGES and request.cookies.get(i18n.COOKIE_NAME) != asked:
+        response.set_cookie(i18n.COOKIE_NAME, asked, max_age=365 * 86400, samesite='Lax',
+                            secure=request.is_secure, httponly=True)
+    if not request.path.startswith(('/static/', '/admin', '/api/')):
+        response.headers.add('Vary', 'Cookie')
+        response.headers.add('Vary', 'Accept-Language')
     return response
 
 
@@ -396,19 +415,38 @@ def airport_filter(name):
 @app.template_filter('money')
 def money_filter(value):
     try:
-        return f"{float(value):,.0f}".replace(',', '\u202f')
+        sep = ',' if i18n.get_lang() == 'en' else '\u202f'
+        return f"{float(value):,.0f}".replace(',', sep)
     except (TypeError, ValueError):
         return '—'
 
 
+EUR_TO_XAF = 655.957  # parité fixe euro / franc CFA
+
+
+@app.template_filter('fcfa')
+def fcfa_filter(value):
+    """Prix enregistré en euros → francs CFA, arrondi au millier."""
+    try:
+        amount = round(float(value) * EUR_TO_XAF / 1000) * 1000
+    except (TypeError, ValueError):
+        return '—'
+    sep = ',' if i18n.get_lang() == 'en' else '\u202f'
+    return f"{amount:,.0f}".replace(',', sep)
+
+
 @app.template_filter('date_fr')
 def date_fr_filter(value):
-    mois = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+    """Date courte dans la langue de la page (nom conservé pour compatibilité)."""
+    mois_fr = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+    months_en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     try:
         d = datetime.date.fromisoformat(str(value)[:10])
-        return f"{d.day} {mois[d.month - 1]} {d.year}"
     except (TypeError, ValueError):
         return value or ''
+    if i18n.get_lang() == 'en':
+        return f"{d.day} {months_en[d.month - 1]} {d.year}"
+    return f"{d.day} {mois_fr[d.month - 1]} {d.year}"
 
 
 def _honeypot():
@@ -429,7 +467,7 @@ def utility_processor():
             scholarships_pending = 0
     return dict(now=now, scholarships_pending=scholarships_pending,
                 csp_nonce=getattr(g, 'csp_nonce', ''), form_token=security.issue_form_token,
-                m_honeypot=_honeypot,
+                m_honeypot=_honeypot, lang=i18n.get_lang(), js_strings=i18n.js_strings(),
                 contact_phone=Config.PHONE, contact_email=Config.EMAIL,
                 whatsapp_number=re.sub(r'\D', '', Config.PHONE))
 
@@ -668,15 +706,15 @@ def contact():
 
 @app.route('/mentions-legales')
 def mentions_legales():
-    return render_template('legal/mentions.html')
+    return render_template('legal/mentions_en.html' if i18n.get_lang() == 'en' else 'legal/mentions.html')
 
 @app.route('/cgv')
 def cgv():
-    return render_template('legal/cgv.html')
+    return render_template('legal/cgv_en.html' if i18n.get_lang() == 'en' else 'legal/cgv.html')
 
 @app.route('/politique-confidentialite')
 def confidentialite():
-    return render_template('legal/confidentialite.html')
+    return render_template('legal/confidentialite_en.html' if i18n.get_lang() == 'en' else 'legal/confidentialite.html')
 
 # ----- PWA : le manifeste et le service worker doivent être servis à la racine -----
 @app.route('/manifest.json')
@@ -730,10 +768,13 @@ def api_contact():
         return api_error('Message trop long (2000 caractères maximum).')
     try:
         add_message(name, email, data.get('phone', '')[:40], data.get('service', '')[:60], message)
+        notify.notify_agency('contact', {'name': name, 'email': email, 'phone': data.get('phone', ''),
+                                         'service': data.get('service', ''), 'message': message,
+                                         'lang': i18n.get_lang()}, request.host_url)
     except Exception:
         traceback.print_exc()
         return api_error("Votre message n'a pas pu être enregistré. Réessayez ou appelez-nous.", 500)
-    return jsonify({'success': True, 'message': 'Merci ! Notre équipe vous répond sous 24 h.'})
+    return jsonify({'success': True, 'message': _('Merci ! Notre équipe vous répond sous 24 h.')})
 
 @app.route('/api/scholarship', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -746,7 +787,7 @@ def api_scholarship():
               'study_level': "niveau d'études", 'field_of_study': "domaine d'études"}
     for field, label in labels.items():
         if not data.get(field):
-            return api_error(f'Le champ « {label} » est obligatoire.')
+            return api_error('Le champ « {label} » est obligatoire.', label=_(label))
     if not is_valid_email(data['email']):
         return api_error('Adresse email invalide.')
     try:
@@ -764,7 +805,10 @@ def api_scholarship():
         scholarship_id = None
     if not scholarship_id:
         return api_error("Votre candidature n'a pas pu être enregistrée. Réessayez.", 500)
-    return jsonify({'success': True, 'message': 'Candidature reçue ! Un conseiller vous recontacte sous 24 h.'})
+    notify.notify_agency('scholarship', {k: data.get(k, '') for k in
+                         ('full_name', 'email', 'phone', 'country', 'study_level', 'field_of_study', 'message')}
+                         | {'lang': i18n.get_lang()}, request.host_url)
+    return jsonify({'success': True, 'message': _('Candidature reçue ! Un conseiller vous recontacte sous 24 h.')})
 
 @app.route('/api/booking', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -776,7 +820,7 @@ def api_booking():
     labels = {'fullname': 'nom complet', 'email': 'email', 'phone': 'téléphone', 'departure_date': 'date de départ'}
     for field, label in labels.items():
         if not data.get(field):
-            return api_error(f'Le champ « {label} » est obligatoire.')
+            return api_error('Le champ « {label} » est obligatoire.', label=_(label))
     if not is_valid_email(data['email']):
         return api_error('Adresse email invalide.')
 
@@ -826,8 +870,12 @@ def api_booking():
     finally:
         conn.close()
 
+    notify.notify_agency('booking', {
+        'ref': f'KTA-{last_id}', 'fullname': data['fullname'], 'email': data['email'], 'phone': data['phone'],
+        'destination_name': destination_name, 'departure_date': departure.isoformat(), 'travelers': travelers,
+        'message': data.get('message', ''), 'lang': i18n.get_lang()}, request.host_url)
     return jsonify({'success': True, 'id': last_id,
-                    'message': f'Demande KTA-{last_id} envoyée. Un conseiller vous contacte sous 24 h pour confirmer.'})
+                    'message': _('Demande {ref} envoyée. Un conseiller vous contacte sous 24 h pour confirmer.', ref=f'KTA-{last_id}')})
 
 @app.route('/api/newsletter', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -848,7 +896,7 @@ def api_newsletter():
     except Exception:
         traceback.print_exc()
         return api_error("Inscription impossible pour le moment. Réessayez plus tard.", 500)
-    return jsonify({'success': True, 'message': 'Inscription confirmée. À bientôt dans votre boîte mail !'})
+    return jsonify({'success': True, 'message': _('Inscription confirmée. À bientôt dans votre boîte mail !')})
 
 # ============================================================
 # ADMIN
@@ -1017,7 +1065,8 @@ def admin_destination_add():
         if not dest_path:
             dest_path = 'images/destinations/default.jpg'
 
-        add_destination(name, country, flag_path, description, price, dest_path, continent)
+        new_id = add_destination(name, country, flag_path, description, price, dest_path, continent)
+        save_translations('destinations', new_id, form_translations('destinations'))
         flash('Destination ajoutée avec succès', 'success')
         return redirect(url_for('admin_destinations'))
     except Exception as e:
@@ -1080,6 +1129,7 @@ def admin_destination_edit(id):
                 dest_path = save_uploaded_image(dest_file, 'destinations')
 
             update_destination(id, name, country, flag_path, description, price, dest_path, continent)
+            save_translations('destinations', id, form_translations('destinations'))
             flash('Destination mise à jour avec succès', 'success')
             return redirect(url_for('admin_destinations'))
         except Exception as e:
@@ -1121,7 +1171,8 @@ def admin_service_add():
             features = sanitize_input(request.form.get('features', ''))
             image_file = request.files.get('image')
             image_path = save_uploaded_image(image_file, 'services') if image_file else 'images/services/default.jpg'
-            add_service(name, description, icon, image_path, features)
+            new_id = add_service(name, description, icon, image_path, features)
+            save_translations('services', new_id, form_translations('services'))
             flash('Service ajouté avec succès', 'success')
             return redirect(url_for('admin_services'))
         except Exception as e:
@@ -1164,6 +1215,7 @@ def admin_service_edit(id):
                 image_path = save_uploaded_image(image_file, 'services')
 
             update_service(id, name, description, icon, image_path, features)
+            save_translations('services', id, form_translations('services'))
             flash('Service mis à jour avec succès', 'success')
             return redirect(url_for('admin_services'))
         except Exception as e:
@@ -1462,11 +1514,12 @@ def admin_scholarship_add():
             if not image_url:
                 image_url = sanitize_input(request.form.get('image_url', ''))
 
-            add_scholarship_opportunity(
+            new_id = add_scholarship_opportunity(
                 title, country, study_level, field_of_study,
                 start_date, end_date, flag_url, image_url,
                 description, benefits, requirements
             )
+            save_translations('scholarship_opportunities', new_id, form_translations('scholarship_opportunities'))
 
             scholarship_data = {
                 'country': country,
@@ -1543,6 +1596,7 @@ def admin_scholarship_edit(id):
                 start_date, end_date, flag_url, image_url,
                 description, benefits, requirements
             )
+            save_translations('scholarship_opportunities', id, form_translations('scholarship_opportunities'))
             flash('Bourse modifiée avec succès !', 'success')
             return redirect(url_for('admin_scholarship_opportunities'))
         except Exception as e:
@@ -1578,7 +1632,14 @@ def bourse_etudes():
     opportunities = get_all_scholarship_opportunities()
     today = datetime.datetime.now().date().isoformat()
     active_opportunities = [dict(opp) for opp in opportunities if not opp['end_date'] or opp['end_date'] >= today]
-    return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities, today=today)
+    tr = i18n.translate_field
+    opp_details = [{
+        'title': tr(o, 'title'), 'description': tr(o, 'description'), 'benefits': tr(o, 'benefits'),
+        'requirements': tr(o, 'requirements'), 'start_date': o['start_date'], 'end_date': o['end_date'],
+        'country_fr': o['country'],
+    } for o in active_opportunities]
+    return render_template('bourse_etudes.html', scholarship_opportunities=active_opportunities,
+                           opp_details=opp_details, today=today)
 
 # ==================== ROUTE DE TEST POUR LES EMAILS ====================
 @app.route('/admin/test-email')

@@ -198,8 +198,10 @@
                     <hr class="my-4">
                     <div class="alert alert-info">
                         <h6><i class="fas fa-bell"></i> Notification automatique</h6>
-                        <p class="mb-0">Lors de l'ajout de cette bourse, une notification par email sera envoyée à <strong>tous les utilisateurs</strong> présents dans la base de données.</p>
+                        <p class="mb-0">Lors de l'ajout de cette bourse, une notification par email est envoyée aux <strong>abonnés à la newsletter</strong>.</p>
                     </div>
+
+                    {% with table='scholarship_opportunities', obj=None %}{% include 'admin/_english_fields.html' %}{% endwith %}
 
                     <!-- ===== Boutons d'action ===== -->
                     <div class="d-flex gap-2 mt-4">

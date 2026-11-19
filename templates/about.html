@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 
-{% block title %}À propos · Kartners Travel Agency{% endblock %}
+{% block title %}{{ _('À propos') }} · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Kartners Travel Agency, agence de voyages à Logpom, Douala : notre histoire, nos services et notre façon de travailler.">
+<meta name="description" content="{{ _('Kartners Travel Agency, agence de voyages à Logpom, Douala : notre histoire, nos services et notre façon de travailler.') }}">
 {% endblock %}
 
 {% block content %}
 <section class="section">
     <div class="wrap about-grid">
         <div style="display:grid;gap:22px">
-            <span class="eyebrow">À propos</span>
-            <h1 style="font-size:var(--step-5)">Les architectes de vos voyages, depuis Douala.</h1>
-            <div class="prose">
-                <p><strong>Kartners Travel Agency</strong> accompagne particuliers, étudiants et professionnels dans tous leurs projets de voyage. Nous réunissons l'expertise locale et un réseau international pour proposer un service sur mesure, de la préparation administrative jusqu'à l'embarquement.</p>
-                <p>Billet d'avion, visa, hôtel, passeport, bourse d'études : vous gardez un seul interlocuteur, qui connaît votre dossier et reste joignable pendant tout le voyage.</p>
+            <span class="eyebrow rise" style="--d:0">{{ _('À propos') }}</span>
+            <h1 class="rise" style="--d:1;font-size:var(--step-5)">{{ _('Les architectes de vos voyages, depuis Douala.') }}</h1>
+            <div class="prose rise" style="--d:2">
+                <p>{{ _("Kartners Travel Agency accompagne particuliers, étudiants et professionnels dans tous leurs projets de voyage. Nous réunissons l'expertise locale et un réseau international pour proposer un service sur mesure, de la préparation administrative jusqu'à l'embarquement.") }}</p>
+                <p>{{ _("Billet d'avion, visa, hôtel, passeport, bourse d'études : vous gardez un seul interlocuteur, qui connaît votre dossier et reste joignable pendant tout le voyage.") }}</p>
             </div>
-            <blockquote class="motto">« Voyagez, comme vous l'imaginez. » Ce n'est pas un slogan, c'est notre promesse.</blockquote>
+            <blockquote class="motto rise" style="--d:3">{{ _("« Voyagez, comme vous l'imaginez. » Ce n'est pas un slogan, c'est notre promesse.") }}</blockquote>
         </div>
         <div class="about-photo reveal">
-            <img src="{{ url_for('static', filename='images/backgrounds/voyage.webp') }}" alt="Monuments du monde entier réunis autour d'un globe" loading="lazy">
+            <img src="{{ url_for('static', filename='images/backgrounds/voyage.webp') }}" alt="{{ _("Monuments du monde entier réunis autour d'un globe") }}" loading="lazy">
             <div class="stamp">
                 <span class="icon-tile"><i class="fas fa-location-dot"></i></span>
-                <div><strong>Logpom, Douala</strong><br><span style="color:var(--muted);font-size:.9rem">Lundi – samedi, 08:00 – 18:00</span></div>
+                <div><strong>Logpom, Douala</strong><br><span style="color:var(--muted);font-size:.9rem">{{ _('Lundi – samedi') }}, 08:00 – 18:00</span></div>
             </div>
         </div>
     </div>
@@ -30,20 +30,20 @@
 
 <section class="section section-white">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Ce que nous faisons</span>
-            <h2>Six métiers, un même suivi</h2>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Ce que nous faisons') }}</span>
+            <h2>{{ _('Plusieurs métiers, un même suivi') }}</h2>
         </div>
-        <div class="grid-3">
+        <div class="grid-3 stagger">
             {% for service in services %}
             <div class="feature reveal">
                 <span class="icon-tile {{ loop.cycle('', 'sky', 'sun') }}"><i class="{{ service.icon or 'fas fa-concierge-bell' }}"></i></span>
-                <div><h3>{{ service.name }}</h3><p>{{ service.description }}</p></div>
+                <div><h3>{{ tr(service, 'name') }}</h3><p>{{ tr(service, 'description') }}</p></div>
             </div>
             {% endfor %}
             <div class="feature reveal">
                 <span class="icon-tile sun"><i class="fas fa-graduation-cap"></i></span>
-                <div><h3>Bourses d'études</h3><p>Recherche de bourse, dossier académique et visa étudiant.</p></div>
+                <div><h3>{{ _("Bourses d'études") }}</h3><p>{{ _('Recherche de bourse, dossier académique et visa étudiant.') }}</p></div>
             </div>
         </div>
     </div>
@@ -51,22 +51,22 @@
 
 <section class="section section-ink">
     <div class="wrap">
-        <div class="section-head">
-            <span class="eyebrow">Nos engagements</span>
-            <h2>Ce que vous pouvez attendre de nous</h2>
+        <div class="section-head reveal">
+            <span class="eyebrow">{{ _('Nos engagements') }}</span>
+            <h2>{{ _('Ce que vous pouvez attendre de nous') }}</h2>
         </div>
-        <div class="grid-4">
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-bolt"></i></span><div><h3>Rapidité</h3><p>Une réponse à chaque demande sous 24 h.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-handshake"></i></span><div><h3>Fiabilité</h3><p>Des dossiers vérifiés pièce par pièce.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-receipt"></i></span><div><h3>Transparence</h3><p>Le prix est annoncé avant de commencer.</p></div></div>
-            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-headset"></i></span><div><h3>Disponibilité</h3><p>Un conseiller joignable par téléphone et WhatsApp.</p></div></div>
+        <div class="grid-4 stagger">
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-bolt"></i></span><div><h3>{{ _('Rapidité') }}</h3><p>{{ _('Une réponse à chaque demande sous 24 h.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-handshake"></i></span><div><h3>{{ _('Fiabilité') }}</h3><p>{{ _('Des dossiers vérifiés pièce par pièce.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-receipt"></i></span><div><h3>{{ _('Transparence') }}</h3><p>{{ _('Le prix est annoncé avant de commencer.') }}</p></div></div>
+            <div class="feature reveal"><span class="icon-tile"><i class="fas fa-headset"></i></span><div><h3>{{ _('Disponibilité') }}</h3><p>{{ _('Un conseiller joignable par téléphone et WhatsApp.') }}</p></div></div>
         </div>
     </div>
 </section>
 
 <section class="section-tight">
     <div class="wrap">
-        {{ m.cta_band("Passez nous voir à Logpom", "Ou écrivez-nous : votre voyage commence par une conversation.", "Nous contacter") }}
+        {{ m.cta_band(_('Passez nous voir à Logpom'), _('Ou écrivez-nous : votre voyage commence par une conversation.'), _('Nous contacter')) }}
     </div>
 </section>
 {% endblock %}

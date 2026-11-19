@@ -216,6 +216,8 @@
                         </div>
                     </div>
 
+                    {% with table='scholarship_opportunities', obj=opportunity %}{% include 'admin/_english_fields.html' %}{% endwith %}
+
                     <!-- ===== Boutons d'action ===== -->
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-warning">

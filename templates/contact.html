@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Contact · Kartners Travel Agency{% endblock %}
+{% block title %}{{ _('Contact') }} · Kartners Travel Agency{% endblock %}
 {% block meta %}
-<meta name="description" content="Contactez Kartners Travel Agency à Logpom, Douala : téléphone, WhatsApp, email et formulaire. Réponse sous 24 h, du lundi au samedi.">
+<meta name="description" content="{{ _('Contactez Kartners Travel Agency à Logpom, Douala : téléphone, WhatsApp, email et formulaire. Réponse sous 24 h, du lundi au samedi.') }}">
 {% endblock %}
 
+{# La valeur enregistrée reste en français (lue par l'équipe), le libellé suit la langue. #}
 {% set service_options = ['Billetterie aérienne', 'Réservation hôtelière', 'Assistance visa', 'Pré-enrôlement', 'Planification de voyage', 'Assurance voyage', "Bourse d'études", 'Autre demande'] %}
 
 {% block content %}
@@ -12,9 +13,9 @@
     <div class="hero-slides" aria-hidden="true"><span class="is-active" style="background-image:url('{{ url_for('static', filename='images/backgrounds/vv.webp') }}')"></span></div>
     <div class="wrap hero-grid">
         <div>
-            <p class="hero-kicker"><b>24 H</b> Délai de réponse</p>
-            <h1>Parlons de votre projet</h1>
-            <p class="hero-lead">Par téléphone, WhatsApp, email ou à l'agence de Logpom. Nous répondons du lundi au samedi.</p>
+            <p class="hero-kicker rise" style="--d:0"><b>24 H</b> {{ _('Délai de réponse') }}</p>
+            <h1 class="rise" style="--d:1">{{ _('Parlons de votre projet') }}</h1>
+            <p class="hero-lead rise" style="--d:2">{{ _("Par téléphone, WhatsApp, email ou à l'agence de Logpom. Nous répondons du lundi au samedi.") }}</p>
         </div>
     </div>
 </section>
@@ -22,93 +23,93 @@
 <section class="section">
     <div class="wrap">
         <div class="contact-layout">
-            <aside class="card card-shadow" style="display:grid;gap:22px">
+            <aside class="card card-shadow reveal" style="display:grid;gap:22px">
                 <div class="contact-list">
                     <div class="contact-item">
                         <span class="icon-tile"><i class="fas fa-phone"></i></span>
                         <div>
-                            <strong>Téléphone</strong>
+                            <strong>{{ _('Téléphone') }}</strong>
                             <a href="tel:{{ contact_phone|replace(' ', '') }}">{{ contact_phone }}</a>
-                            <button class="copy-btn" type="button" data-copy="{{ contact_phone }}" aria-label="Copier le numéro"><i class="far fa-copy"></i></button>
+                            <button class="copy-btn" type="button" data-copy="{{ contact_phone }}" aria-label="{{ _('Copier le numéro') }}"><i class="far fa-copy"></i></button>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="icon-tile" style="background:#e3f6ea;color:var(--whatsapp)"><i class="fab fa-whatsapp"></i></span>
                         <div>
                             <strong>WhatsApp</strong>
-                            <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener">Écrire à un conseiller</a>
+                            <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener">{{ _('Écrire à un conseiller') }}</a>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="icon-tile sky"><i class="fas fa-envelope"></i></span>
                         <div>
-                            <strong>Email</strong>
+                            <strong>{{ _('Email') }}</strong>
                             <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
-                            <button class="copy-btn" type="button" data-copy="{{ contact_email }}" aria-label="Copier l'adresse email"><i class="far fa-copy"></i></button>
+                            <button class="copy-btn" type="button" data-copy="{{ contact_email }}" aria-label="{{ _("Copier l'adresse email") }}"><i class="far fa-copy"></i></button>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="icon-tile sun"><i class="fas fa-location-dot"></i></span>
                         <div>
-                            <strong>Agence</strong>
-                            <span>Logpom, Douala, Cameroun</span>
+                            <strong>{{ _('Agence') }}</strong>
+                            <span>{{ _('Logpom, Douala, Cameroun') }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="hours">
-                    <div><span>Lundi – samedi</span><strong>08:00 – 18:00</strong></div>
-                    <div><span>Dimanche et jours fériés</span><span class="closed">Fermé</span></div>
+                    <div><span>{{ _('Lundi – samedi') }}</span><strong>08:00 – 18:00</strong></div>
+                    <div><span>{{ _('Dimanche et jours fériés') }}</span><span class="closed">{{ _('Fermé') }}</span></div>
                 </div>
-                <a class="btn btn-whatsapp btn-block" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Discuter sur WhatsApp</a>
+                <a class="btn btn-whatsapp btn-block" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> {{ _('Discuter sur WhatsApp') }}</a>
             </aside>
 
-            <div class="card card-shadow">
-                <h2 style="font-size:var(--step-3);margin-bottom:6px">Envoyez-nous un message</h2>
-                <p style="color:var(--muted);margin-bottom:22px">Décrivez votre besoin, nous revenons vers vous sous 24 h.</p>
+            <div class="card card-shadow reveal" style="--d:1">
+                <h2 style="font-size:var(--step-3);margin-bottom:6px">{{ _('Envoyez-nous un message') }}</h2>
+                <p style="color:var(--muted);margin-bottom:22px">{{ _('Décrivez votre besoin, nous revenons vers vous sous 24 h.') }}</p>
                 <form id="contact-form" data-ajax="/api/contact" novalidate>
                     {{ m_honeypot() }}
                     <div class="form-grid">
                         <div class="field full">
-                            <label for="c-name">Nom complet <span class="req">*</span></label>
+                            <label for="c-name">{{ _('Nom complet') }} <span class="req">*</span></label>
                             <input class="input" id="c-name" name="name" required minlength="2" maxlength="120" autocomplete="name" placeholder="Jean Dupont">
                         </div>
                         <div class="field">
-                            <label for="c-email">Email <span class="req">*</span></label>
-                            <input class="input" id="c-email" name="email" type="email" required autocomplete="email" placeholder="vous@exemple.com">
+                            <label for="c-email">{{ _('Email') }} <span class="req">*</span></label>
+                            <input class="input" id="c-email" name="email" type="email" required autocomplete="email" placeholder="{{ _('vous@exemple.com') }}">
                         </div>
                         <div class="field">
-                            <label for="c-phone">Téléphone</label>
+                            <label for="c-phone">{{ _('Téléphone') }}</label>
                             <input class="input" id="c-phone" name="phone" type="tel" autocomplete="tel" placeholder="+237 6XX XXX XXX" pattern="[+0-9 ().-]{8,20}">
                         </div>
                         <div class="field full">
-                            <label for="c-service">Service concerné</label>
+                            <label for="c-service">{{ _('Service concerné') }}</label>
                             <select class="select" id="c-service" name="service">
-                                <option value="">Choisir un service</option>
+                                <option value="">{{ _('Choisir un service') }}</option>
                                 {% for s in service_options %}
-                                <option{% if selected_service and selected_service.lower()[:6] == s.lower()[:6] %} selected{% endif %}>{{ s }}</option>
+                                <option value="{{ s }}"{% if selected_service and selected_service.lower()[:6] == s.lower()[:6] %} selected{% endif %}>{{ _(s) }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="field full">
-                            <label for="c-message">Message <span class="req">*</span></label>
-                            <textarea class="textarea" id="c-message" name="message" required minlength="10" maxlength="2000" placeholder="Destination, dates, nombre de voyageurs, type de visa…"></textarea>
-                            <span class="field-hint" id="c-count">0 / 2000 caractères</span>
+                            <label for="c-message">{{ _('Message') }} <span class="req">*</span></label>
+                            <textarea class="textarea" id="c-message" name="message" required minlength="10" maxlength="2000" placeholder="{{ _('Destination, dates, nombre de voyageurs, type de visa…') }}"></textarea>
+                            <span class="field-hint" id="c-count">0 / 2000</span>
                         </div>
                         <div class="full" data-form-message hidden></div>
                         <div class="full" style="display:grid;gap:10px">
-                            <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> Envoyer le message</button>
-                            <p class="form-note"><i class="fas fa-lock"></i> Vos informations restent confidentielles.</p>
+                            <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-paper-plane"></i> {{ _('Envoyer le message') }}</button>
+                            <p class="form-note"><i class="fas fa-lock"></i> {{ _('Vos informations restent confidentielles.') }}</p>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="map-card">
-            <iframe src="https://maps.google.com/maps?q=Logpom%2C%20Douala%2C%20Cameroun&z=14&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Carte : Logpom, Douala"></iframe>
+        <div class="map-card reveal">
+            <iframe src="https://maps.google.com/maps?q=Logpom%2C%20Douala%2C%20Cameroun&z=14&output=embed&hl={{ lang }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="{{ _('Carte : Logpom, Douala') }}"></iframe>
             <div class="map-foot">
-                <span><i class="fas fa-location-dot" style="color:var(--violet)"></i> Logpom, Douala, Cameroun</span>
-                <a class="link-arrow" href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener">Itinéraire dans Google Maps <i class="fas fa-arrow-right"></i></a>
+                <span><i class="fas fa-location-dot" style="color:var(--violet)"></i> {{ _('Logpom, Douala, Cameroun') }}</span>
+                <a class="link-arrow" href="https://maps.app.goo.gl/krCoz7KoEHUJqRJfA" target="_blank" rel="noopener">{{ _('Itinéraire dans Google Maps') }} <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
     </div>
@@ -119,7 +120,7 @@
 <script nonce="{{ csp_nonce }}">
 (function () {
     var msg = document.getElementById('c-message'), out = document.getElementById('c-count');
-    var update = function () { out.textContent = msg.value.length + ' / 2000 caractères'; };
+    var update = function () { out.textContent = msg.value.length + ' / 2000'; };
     msg.addEventListener('input', update);
     document.getElementById('contact-form').addEventListener('kta:success', update);
 })();

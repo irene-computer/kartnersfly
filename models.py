@@ -150,26 +150,26 @@ def init_db():
 
     cursor.execute("SELECT COUNT(*) FROM destinations")
     if cursor.fetchone()[0] == 0:
-        # Images : seules Paris, Dubai et Marrakech ont une photo livrée avec le
-        # site. Les autres s'affichent avec un visuel généré (ajoutez une photo
-        # depuis l'admin). Les drapeaux manquants sont chargés depuis flagcdn.
+        # Photos libres de droits (Unsplash, voir static/images/destinations/CREDITS.md).
+        # Dakar n'a pas encore de photo : un visuel généré s'affiche. Les
+        # drapeaux manquants sont chargés depuis flagcdn.
         default_destinations = [
-            ('Paris', 'France', 'images/flags/france.png', "La ville des lumières et de l'amour", 850, 'images/destinations/paris.jpg', 'europe'),
-            ('Dubai', 'Émirats Arabes Unis', '', 'Luxe moderne et désert', 1200, 'images/destinations/dubai.jpg', 'asie'),
-            ('Marrakech', 'Maroc', '', 'La perle du Sud', 650, 'images/destinations/marrakech.jpg', 'afrique'),
-            ('Maldives', 'Maldives', '', "Lagons turquoise et villas sur l'eau", 2890, '', 'asie'),
-            ('Rome', 'Italie', '', 'La ville éternelle', 1590, '', 'europe'),
-            ('Tokyo', 'Japon', '', 'Entre tradition et modernité', 3250, '', 'asie'),
-            ('New York', 'États-Unis', '', 'La ville qui ne dort jamais', 1990, '', 'amerique'),
-            ('Londres', 'Royaume-Uni', '', 'La capitale britannique', 1450, '', 'europe'),
-            ('Montréal', 'Canada', '', 'Grands espaces et nature sauvage', 2450, '', 'amerique'),
+            ('Paris', 'France', 'images/flags/france.png', "La ville des lumières et de l'amour", 850, 'images/destinations/kta-paris.jpg', 'europe'),
+            ('Dubai', 'Émirats Arabes Unis', '', 'Luxe moderne et désert', 1200, 'images/destinations/kta-dubai.jpg', 'asie'),
+            ('Marrakech', 'Maroc', '', 'La perle du Sud', 650, 'images/destinations/kta-marrakech.jpg', 'afrique'),
+            ('Maldives', 'Maldives', '', "Lagons turquoise et villas sur l'eau", 2890, 'images/destinations/kta-maldives.jpg', 'asie'),
+            ('Rome', 'Italie', '', 'La ville éternelle', 1590, 'images/destinations/kta-rome.jpg', 'europe'),
+            ('Tokyo', 'Japon', '', 'Entre tradition et modernité', 3250, 'images/destinations/kta-tokyo.jpg', 'asie'),
+            ('New York', 'États-Unis', '', 'La ville qui ne dort jamais', 1990, 'images/destinations/kta-new-york.jpg', 'amerique'),
+            ('Londres', 'Royaume-Uni', '', 'La capitale britannique', 1450, 'images/destinations/kta-londres.jpg', 'europe'),
+            ('Montréal', 'Canada', '', 'Grands espaces et nature sauvage', 2450, 'images/destinations/kta-montreal.jpg', 'amerique'),
             ('Zurich', 'Suisse', 'images/flags/flag_zurich_drapeausuisse.jpeg', 'Alpes, chocolat et précision', 2200, 'images/destinations/dest_zurich_suisse.jpg', 'europe'),
-            ('Istanbul', 'Turquie', '', "Où l'Orient rencontre l'Occident", 1490, '', 'asie'),
-            ('Athènes', 'Grèce', '', 'Îles paradisiaques et histoire', 1690, '', 'europe'),
+            ('Istanbul', 'Turquie', '', "Où l'Orient rencontre l'Occident", 1490, 'images/destinations/kta-istanbul.jpg', 'asie'),
+            ('Athènes', 'Grèce', '', 'Îles paradisiaques et histoire', 1690, 'images/destinations/kta-athenes.jpg', 'europe'),
             ('Dakar', 'Sénégal', '', "La perle de l'Afrique de l'Ouest", 890, '', 'afrique'),
-            ('Le Caire', 'Égypte', '', 'Les pyramides et la civilisation antique', 1350, '', 'afrique'),
-            ('Bali', 'Indonésie', '', 'Île des dieux et paradis tropical', 1850, '', 'asie'),
-            ('Sydney', 'Australie', '', 'Opéra, plages et kangourous', 3200, '', 'oceanie'),
+            ('Le Caire', 'Égypte', '', 'Les pyramides et la civilisation antique', 1350, 'images/destinations/kta-le-caire.jpg', 'afrique'),
+            ('Bali', 'Indonésie', '', 'Île des dieux et paradis tropical', 1850, 'images/destinations/kta-bali.jpg', 'asie'),
+            ('Sydney', 'Australie', '', 'Opéra, plages et kangourous', 3200, 'images/destinations/kta-sydney.jpg', 'oceanie'),
         ]
         cursor.executemany('''
             INSERT INTO destinations (name, country, flag_image, description, price, image, continent) 
@@ -191,10 +191,108 @@ def init_db():
             VALUES (?, ?, ?, ?, ?)
         ''', default_services)
 
+    migrate_stock_photos(conn)
+    migrate_english_columns(conn)
     conn.commit()
     conn.close()
     print("[SUCCES] Base de données initialisée avec succès")
     print(f"[SUCCES] Chemin utilisé : {DB_PATH}")
+
+
+# Anciennes images "par défaut" (dont la photo de Marrakech filigranée « alamy »)
+# remplacées par des photos libres de droits. Une image envoyée depuis l'admin
+# n'est jamais remplacée.
+OLD_DEFAULT_IMAGES = {
+    '', 'images/destinations/default.jpg', 'images/destinations/paris.jpg', 'images/destinations/dubai.jpg',
+    'images/destinations/marrakech.jpg', 'images/destinations/maldives.jpg', 'images/destinations/italy.jpg',
+    'images/destinations/japan.jpg', 'images/destinations/newyork.jpg', 'images/destinations/london.jpg',
+    'images/destinations/canada.jpg', 'images/destinations/switzerland.jpg', 'images/destinations/turkey.jpg',
+    'images/destinations/greece.jpg', 'images/destinations/dakar.jpg', 'images/destinations/egypt.jpg',
+    'images/destinations/bali.jpg', 'images/destinations/australia.jpg',
+}
+STOCK_PHOTOS = {
+    'paris': 'paris', 'dubai': 'dubai', 'dubaï': 'dubai', 'marrakech': 'marrakech', 'maldives': 'maldives',
+    'rome': 'rome', 'tokyo': 'tokyo', 'new york': 'new-york', 'londres': 'londres', 'london': 'londres',
+    'montreal': 'montreal', 'montréal': 'montreal', 'zurich': 'zurich', 'istanbul': 'istanbul',
+    'athenes': 'athenes', 'athènes': 'athenes', 'le caire': 'le-caire', 'bali': 'bali', 'sydney': 'sydney',
+}
+
+
+def migrate_stock_photos(conn):
+    rows = conn.execute('SELECT id, name, image FROM destinations').fetchall()
+    changed = 0
+    for row in rows:
+        photo = STOCK_PHOTOS.get((row['name'] or '').strip().lower())
+        if photo and (row['image'] or '') in OLD_DEFAULT_IMAGES:
+            conn.execute('UPDATE destinations SET image = ? WHERE id = ?',
+                         (f'images/destinations/kta-{photo}.jpg', row['id']))
+            changed += 1
+    if changed:
+        print(f"[MIGRATION] {changed} photo(s) de destination remplacée(s)")
+
+
+
+# ---------------------------------------------------------------------------
+# Version anglaise du contenu : colonnes *_en (vides = texte français affiché)
+# ---------------------------------------------------------------------------
+EN_COLUMNS = {
+    'destinations': ['name_en', 'country_en', 'description_en'],
+    'services': ['name_en', 'description_en', 'features_en'],
+    'scholarship_opportunities': ['title_en', 'country_en', 'description_en', 'benefits_en', 'requirements_en'],
+}
+
+DEFAULT_DESTINATIONS_EN = {
+    'paris': ('Paris', 'France', 'The city of light and love'),
+    'dubai': ('Dubai', 'United Arab Emirates', 'Modern luxury and desert'),
+    'marrakech': ('Marrakech', 'Morocco', 'The pearl of the South'),
+    'maldives': ('Maldives', 'Maldives', 'Turquoise lagoons and overwater villas'),
+    'rome': ('Rome', 'Italy', 'The Eternal City'),
+    'tokyo': ('Tokyo', 'Japan', 'Where tradition meets modernity'),
+    'new york': ('New York', 'United States', 'The city that never sleeps'),
+    'londres': ('London', 'United Kingdom', 'The British capital'),
+    'montreal': ('Montreal', 'Canada', 'Wide open spaces and wild nature'),
+    'montréal': ('Montreal', 'Canada', 'Wide open spaces and wild nature'),
+    'zurich': ('Zurich', 'Switzerland', 'Alps, chocolate and precision'),
+    'istanbul': ('Istanbul', 'Türkiye', 'Where East meets West'),
+    'athenes': ('Athens', 'Greece', 'Island paradise and ancient history'),
+    'athènes': ('Athens', 'Greece', 'Island paradise and ancient history'),
+    'dakar': ('Dakar', 'Senegal', 'The pearl of West Africa'),
+    'le caire': ('Cairo', 'Egypt', 'The pyramids and an ancient civilisation'),
+    'bali': ('Bali', 'Indonesia', 'Island of the gods, tropical paradise'),
+    'sydney': ('Sydney', 'Australia', 'Opera House, beaches and kangaroos'),
+}
+
+DEFAULT_SERVICES_EN = {
+    'billetterie aérienne': ('Flight tickets', 'Domestic and international flights at the best prices', 'Domestic and international flights|Competitive fares|Fast booking'),
+    'billeterie aerienne': ('Flight tickets', 'Domestic and international flights at the best prices', 'Domestic and international flights|Competitive fares|Fast booking'),
+    'réservation hôtelière': ('Hotel booking', 'Stays at home and abroad', 'Standard hotels|Superior comfort|Luxury and prestige'),
+    'reservation hotels': ('Hotel booking', 'Stays at home and abroad', 'Standard hotels|Superior comfort|Luxury and prestige'),
+    'assistance visa': ('Visa assistance', 'All types of visas, worldwide', 'Study|Tourism|Business|Full follow-up'),
+    'pré-enrôlement': ('Passport & ID pre-enrolment', 'Passport and national ID card (CNI)', 'Passport|National ID card|Simplified paperwork'),
+    'pre-enrolement': ('Passport & ID pre-enrolment', 'Passport and national ID card (CNI)', 'Passport|National ID card|Simplified paperwork'),
+    'planification de voyage': ('Trip planning', 'Organised trips and tailor-made tours', 'Organised trips|Tailor-made tours|Themed stays'),
+    'assurance voyage': ('Travel insurance', 'Complete, reliable cover', 'Cancellation|Repatriation|Healthcare abroad|Luggage'),
+}
+
+
+def migrate_english_columns(conn):
+    for table, columns in EN_COLUMNS.items():
+        existing = {row[1] for row in conn.execute(f'PRAGMA table_info({table})')}
+        for column in columns:
+            if column not in existing:
+                conn.execute(f'ALTER TABLE {table} ADD COLUMN {column} TEXT')
+    # Traductions des contenus livrés avec le site (jamais d'écrasement).
+    for row in conn.execute('SELECT id, name, name_en FROM destinations').fetchall():
+        en = DEFAULT_DESTINATIONS_EN.get((row['name'] or '').strip().lower())
+        if en and not row['name_en']:
+            conn.execute('UPDATE destinations SET name_en = ?, country_en = ?, description_en = ? WHERE id = ?',
+                         (*en, row['id']))
+    for row in conn.execute('SELECT id, name, name_en FROM services').fetchall():
+        en = DEFAULT_SERVICES_EN.get((row['name'] or '').strip().lower())
+        if en and not row['name_en']:
+            conn.execute('UPDATE services SET name_en = ?, description_en = ?, features_en = ? WHERE id = ?',
+                         (*en, row['id']))
+
 
 def add_message(name, email, phone, service, message):
     conn = get_db()
@@ -249,13 +347,14 @@ def add_destination(name, country, flag_image, description, price, image, contin
         flag_image = normalize_image_path(flag_image)
         image = normalize_image_path(image)
         conn = get_db()
-        conn.execute('''
+        cursor = conn.execute('''
             INSERT INTO destinations (name, country, flag_image, description, price, image, continent)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (name, country, flag_image, description, price, image, continent))
         conn.commit()
+        new_id = cursor.lastrowid
         conn.close()
-        return True
+        return new_id
     except Exception as e:
         print(f"[ERREUR] add_destination: {e}")
         raise
@@ -309,12 +408,14 @@ def get_service_by_id(service_id):
 def add_service(name, description, icon, image, features=''):
     image = normalize_image_path(image)
     conn = get_db()
-    conn.execute('''
+    cursor = conn.execute('''
         INSERT INTO services (name, description, icon, image, features)
         VALUES (?, ?, ?, ?, ?)
     ''', (name, description, icon, image, features))
     conn.commit()
+    new_id = cursor.lastrowid
     conn.close()
+    return new_id
 
 def update_service(service_id, name, description, icon, image, features):
     image = normalize_image_path(image)
@@ -608,3 +709,15 @@ def create_upload_folders():
             os.chmod(folder, 0o777)
         except:
             pass
+
+def save_translations(table, row_id, values):
+    """Enregistre les champs anglais (*_en) d'une ligne. Seules les colonnes connues sont acceptées."""
+    allowed = EN_COLUMNS.get(table, [])
+    pairs = [(k, (v or '').strip()) for k, v in values.items() if k in allowed]
+    if not row_id or not pairs:
+        return
+    conn = get_db()
+    conn.execute(f"UPDATE {table} SET {', '.join(f'{k} = ?' for k, _ in pairs)} WHERE id = ?",
+                 [v for _, v in pairs] + [row_id])
+    conn.commit()
+    conn.close()

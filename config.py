@@ -75,6 +75,11 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', '')
 
+    # ===== ALERTES À L'AGENCE (nouvelle réservation, message, candidature) =====
+    NOTIFY_EMAIL = os.getenv('NOTIFY_EMAIL', '').strip() or os.getenv('EMAIL', 'kta2k23@gmail.com')
+    CALLMEBOT_PHONE = os.getenv('CALLMEBOT_PHONE', '').strip()      # ex. 237676268350
+    CALLMEBOT_APIKEY = os.getenv('CALLMEBOT_APIKEY', '').strip()
+
     # ===== UPLOADS =====
     # Dossier persistant pour les images envoyées depuis l'admin (ex. /data/uploads
     # sur le volume Fly.io). Vide = images stockées dans static/images.
