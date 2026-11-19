@@ -65,7 +65,7 @@
         <div class="grid-3">
             {% for title, icon, countries in regions %}
             <div class="region reveal">
-                <h3><i class="{{ icon }}" style="color:var(--sun)"></i> {{ title }}</h3>
+                <h3><i class="{{ icon }}" style="color:var(--cyan)"></i> {{ title }}</h3>
                 <ul>
                     {% for code, name in countries %}
                     <li><img src="https://flagcdn.com/w40/{{ code }}.png" alt="" loading="lazy" width="22" height="16">{{ name }}</li>

@@ -133,7 +133,7 @@
         <div class="grid-3">
             {% for opp in opportunities %}
             <a class="region reveal" href="/bourse-etudes#bourse-{{ opp.id }}" style="text-decoration:none;color:inherit;display:grid;gap:10px">
-                <span class="scholar-country" style="color:#b9b3d6">
+                <span class="scholar-country" style="color:var(--on-ink)">
                     {% set f = opp.flag_url|flag(opp.country) %}{% if f %}<img src="{{ f }}" alt="" loading="lazy">{% endif %}
                     {{ opp.country }}
                 </span>
@@ -145,7 +145,7 @@
         {% else %}
         <div class="grid-4">
             {% for code, pays, prog in [('fr','France','Campus France'),('ca','Canada','Bourses provinciales'),('be','Belgique','Bourses ARES'),('de','Allemagne','DAAD')] %}
-            <div class="region reveal"><h3><img src="https://flagcdn.com/w40/{{ code }}.png" alt="" width="24" height="17" style="border-radius:3px"> {{ pays }}</h3><p style="color:#b9b3d6">{{ prog }}</p></div>
+            <div class="region reveal"><h3><img src="https://flagcdn.com/w40/{{ code }}.png" alt="" width="24" height="17" style="border-radius:3px"> {{ pays }}</h3><p style="color:var(--on-ink)">{{ prog }}</p></div>
             {% endfor %}
         </div>
         {% endif %}

@@ -4,8 +4,8 @@
   "description": "Voyagez comme vous l'imaginez - Agence de voyages sur mesure",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#17132e",
-  "background_color": "#f6f5fb",
+  "theme_color": "#662581",
+  "background_color": "#f7f7f7",
   "icons": [
     {
       "src": "/static/images/icon-192.png",

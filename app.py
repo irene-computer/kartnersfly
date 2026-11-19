@@ -558,13 +558,13 @@ def send_scholarship_notification(recipients, scholarship_data):
         <style>
             body {{ font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }}
             .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-            .header {{ background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; padding: 30px; text-align: center; }}
+            .header {{ background: #662581; border-bottom: 6px solid #01AEF0; color: white; padding: 30px; text-align: center; }}
             .header h1 {{ margin: 0; font-size: 24px; }}
             .header p {{ margin: 10px 0 0; opacity: 0.9; }}
             .content {{ padding: 30px; }}
             .info-block {{ background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; }}
-            .info-block h3 {{ margin: 0 0 15px; color: #6B3FA0; }}
-            .btn {{ display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; text-decoration: none; border-radius: 50px; font-weight: 600; }}
+            .info-block h3 {{ margin: 0 0 15px; color: #662581; }}
+            .btn {{ display: inline-block; padding: 12px 30px; background: #662581; border-bottom: 6px solid #01AEF0; color: white; text-decoration: none; border-radius: 50px; font-weight: 600; }}
             .footer {{ background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }}
         </style>
     </head>
@@ -1334,7 +1334,7 @@ def admin_newsletter_send():
             <style>
                 body {{ font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }}
                 .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                .header {{ background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; padding: 30px; text-align: center; }}
+                .header {{ background: #662581; border-bottom: 6px solid #01AEF0; color: white; padding: 30px; text-align: center; }}
                 .header h1 {{ margin: 0; font-size: 24px; }}
                 .header p {{ margin: 10px 0 0; opacity: 0.9; }}
                 .content {{ padding: 30px; }}
@@ -1348,7 +1348,7 @@ def admin_newsletter_send():
                     <p>Voyagez, comme vous l'imaginez</p>
                 </div>
                 <div class="content">
-                    <p><a href="https://www.kartnersagency.com" style="display:inline-block; padding:10px 20px; background:#8B5CF6; color:white; text-decoration:none; border-radius:50px;">Visitez notre site</a></p>
+                    <p><a href="https://www.kartnersagency.com" style="display:inline-block; padding:10px 20px; background:#662581; color:white; text-decoration:none; border-radius:50px;">Visitez notre site</a></p>
                     {content}
                 </div>
                 <div class="footer">

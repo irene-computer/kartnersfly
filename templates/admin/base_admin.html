@@ -16,10 +16,10 @@
     
     <style>
         :root {
-            --violet-primary: #8B5CF6;
-            --violet-dark: #6B3FA0;
-            --blue-primary: #3B82F6;
-            --blue-dark: #1E3A8A;
+            --violet-primary: #662581;
+            --violet-dark: #4E1C63;
+            --blue-primary: #0091C9;
+            --blue-dark: #00557A;
             --gray-50: #F8FAFC;
             --gray-100: #F1F5F9;
             --gray-200: #E2E8F0;
@@ -28,7 +28,7 @@
             --success: #10B981;
             --danger: #EF4444;
             --warning: #F59E0B;
-            --info: #3B82F6;
+            --info: #0091C9;
         }
         
         * {
@@ -180,7 +180,7 @@
         }
         
         .admin-nav li a:hover {
-            background: #F3E8FF;
+            background: #F3EAF7;
             color: var(--violet-primary);
             border-left-color: var(--violet-primary);
         }
@@ -190,7 +190,7 @@
         }
         
         .admin-nav li a.active {
-            background: #F3E8FF;
+            background: #F3EAF7;
             color: var(--violet-primary);
             border-left-color: var(--violet-primary);
             font-weight: 600;
@@ -330,11 +330,11 @@
         .badge-pending { background: #FEF3C7; color: #D97706; }
         .badge-confirmed { background: #D1FAE5; color: #059669; }
         .badge-cancelled { background: #FEE2E2; color: #DC2626; }
-        .badge-en-cours { background: #DBEAFE; color: #2563EB; }
+        .badge-en-cours { background: #E3F6FD; color: #00739F; }
         .badge-success { background: #D1FAE5; color: #059669; }
         .badge-warning { background: #FEF3C7; color: #D97706; }
         .badge-danger { background: #FEE2E2; color: #DC2626; }
-        .badge-info { background: #DBEAFE; color: #2563EB; }
+        .badge-info { background: #E3F6FD; color: #00739F; }
         
         /* ===== BUTTONS ===== */
         .btn-primary-custom {
@@ -349,7 +349,7 @@
         
         .btn-primary-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+            box-shadow: 0 5px 20px rgba(102,37,129,0.3);
             color: white;
         }
         
@@ -451,7 +451,7 @@
         
         .form-control:focus, .form-select:focus {
             border-color: var(--violet-primary);
-            box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+            box-shadow: 0 0 0 4px rgba(102,37,129,0.1);
         }
         
         .form-control.is-invalid {
@@ -466,6 +466,16 @@
         .gap-3 { gap: 1rem; }
         
         .flex-wrap { flex-wrap: wrap; }
+    </style>
+    <style>
+        /* Couleurs de la marque (logo) appliquées aux composants Bootstrap */
+        .btn-primary { --bs-btn-bg: #662581; --bs-btn-border-color: #662581; --bs-btn-hover-bg: #4E1C63; --bs-btn-hover-border-color: #4E1C63; --bs-btn-active-bg: #4E1C63; --bs-btn-active-border-color: #4E1C63; --bs-btn-disabled-bg: #662581; --bs-btn-disabled-border-color: #662581; }
+        .btn-outline-primary { --bs-btn-color: #662581; --bs-btn-border-color: #662581; --bs-btn-hover-bg: #662581; --bs-btn-hover-border-color: #662581; --bs-btn-active-bg: #662581; }
+        .bg-primary { background-color: #662581 !important; }
+        .text-primary { color: #662581 !important; }
+        .bg-info { background-color: #01AEF0 !important; }
+        a { color: #662581; }
+        .form-control:focus, .form-select:focus { border-color: #01AEF0; box-shadow: 0 0 0 .25rem rgba(1, 174, 240, .2); }
     </style>
     {% block extra_css %}{% endblock %}
 </head>

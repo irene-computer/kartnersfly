@@ -32,17 +32,17 @@ def send_booking_confirmation_email(booking_data):
             <style>
                 body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
                 .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                .header { background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; padding: 30px; text-align: center; }
+                .header { background: #662581; border-bottom: 6px solid #01AEF0; color: white; padding: 30px; text-align: center; }
                 .header h1 { margin: 0; font-size: 24px; }
                 .content { padding: 30px; }
                 .info-block { background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-                .info-block h3 { margin: 0 0 10px; color: #6B3FA0; }
+                .info-block h3 { margin: 0 0 10px; color: #662581; }
                 .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
                 .info-label { width: 120px; font-weight: bold; color: #495057; }
                 .info-value { flex: 1; color: #212529; }
                 .status { display: inline-block; background: #10B981; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; }
                 .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }
-                .btn { display: inline-block; background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; text-decoration: none; padding: 10px 25px; border-radius: 25px; margin-top: 15px; }
+                .btn { display: inline-block; background: #662581; border-bottom: 6px solid #01AEF0; color: white; text-decoration: none; padding: 10px 25px; border-radius: 25px; margin-top: 15px; }
             </style>
         </head>
         <body>
@@ -120,7 +120,7 @@ def send_admin_notification_email(booking_data):
             <style>
                 body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
                 .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                .header { background: linear-gradient(135deg, #8B5CF6, #3B82F6); color: white; padding: 20px; text-align: center; }
+                .header { background: #662581; border-bottom: 6px solid #01AEF0; color: white; padding: 20px; text-align: center; }
                 .content { padding: 25px; }
                 .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
                 .info-label { width: 130px; font-weight: bold; }
